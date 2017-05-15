@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">View author</div>
+{% endblock %}
+
+{% block content %}
+<h2 class="ui header">
+    <a href="{{ author.link }}">{{ author.name }}</a>
+    <a href="{% url 'admin:books_author_change' author.pk %}">
+        <i class="edit icon"></i>
+    </a>
+    <div class="sub header">
+        {{ author.goodreads_id }}
+    </div>
+</h2>
+<div class="ui five cards">
+    {% for book in author.books.all %}
+    <a class="ui card" href="{{ book.get_absolute_url }}">
+        <div class="image">
+            <img src="{{ book.image_url }}" class="ui fluid image" />
+        </div>
+        <div class="content">
+            <div class="header">
+                {{ book.title }}
+            </div>
+        </div>
+        <div class="extra content">
+            <span>
+                <i class="flag icon"></i> {{ book.terms.count }} terms
+            </span>
+            <span>
+                <i class="sticky note icon"></i> {{ book.notes.count }} notes
+            </span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">View all terms</div>
+{% endblock %}
+
+{% block content %}
+<h2>View all terms</h2>
+
+<div class="ui divider"></div>
+
+{% include "pagination.html" with items=terms only %}
+
+{% include 'term_list.html' with terms=terms show_book=True only %}
+
+{% include "pagination.html" with items=terms only %}
+
+{% endblock %}

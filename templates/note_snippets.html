@@ -1,0 +1,30 @@
+{% load humanize %}
+
+<div class="ui comments">
+    {% for note in notes %}
+    <div class="comment">
+        <div class="avatar">
+            p.{{ note.page }}
+        </div>
+        <div class="content">
+            <span class="author">
+                <a href="{{ note.get_absolute_url }}">
+                    {{ note.subject|truncatechars:50 }}
+                </a>
+                <a href="{% url 'admin:books_note_change' note.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </span>
+            <div class="metadata">
+                <div class="date" title="{{ note.added }}">
+                    {{ note.added|naturaltime }}
+                </div>
+            </div>
+            <div class="text">
+                <i class="left quote icon"></i>
+                {{ note.quote|truncatechars:50 }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

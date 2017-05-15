@@ -1,0 +1,37 @@
+#masthead {
+    text-align: center;
+    margin: 50px 0;
+}
+
+#masthead h1 {
+    font-size: 3.0em;
+}
+
+.ui.comments {
+    max-width: none;
+}
+
+.ui.comments .comment .avatar {
+    text-align: center;
+}
+
+.left-floated {
+    float: left;
+}
+
+blockquote footer {
+    text-align: right;
+    font-style: italic;
+}
+
+.ui.horizontal.segments .ui.segment {
+    min-width: 150px; /* otherwise words extend beyond the edge */
+}
+
+.hidden {
+    display: none;
+}
+
+.highlight {
+    background: #eab18a;
+}

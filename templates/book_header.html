@@ -1,0 +1,12 @@
+<h2 class="ui header">
+    <a href="{{ book.get_absolute_url }}" class="ui mini image">
+        <img src="{{ book.image_url }}"
+             title="{{ book.title }}" />
+    </a>
+    <div class="content">
+        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+        <div class="sub header">
+            {% include 'author_list.html' with authors=book.authors only %}
+        </div>
+    </div>
+</h2>

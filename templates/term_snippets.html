@@ -1,0 +1,45 @@
+{% load humanize %}
+
+<div class="ui comments">
+    {% for term in terms %}
+    <div class="comment">
+        {% if show_book %}
+        <h4 class="ui header">
+            <a href="{{ term.book.get_absolute_url }}">{{ term.book }}</a>
+            <div class="sub header">
+                by
+                {% include "author_list.html" with authors=term.book.authors %}
+            </div>
+        </h4>
+        {% endif %}
+        <div class="avatar">
+            p.{{ term.page }}
+        </div>
+        <div class="content">
+            <a class="author" href="{{ term.term.get_absolute_url }}">
+                {{ term.term }} &raquo;
+            </a>
+            <div class="metadata">
+                <div class="date" title="{{ term.added }}">
+                    {{ term.added|naturaltime }}
+                </div>
+                <div class="rating">
+                    {% if term.is_new %}
+                    <i class="certificate icon" title="New"></i>
+                    {% endif %}
+                    {% if term.is_defined %}
+                    <i class="quote left icon" title="Defined"></i>
+                    {% endif %}
+                    <strong>{{ term.category }}</strong>
+                    <a href="{% url 'admin:vocab_termoccurrence_change' term.pk %}">
+                        <i class="edit icon"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="text">
+                {{ term.term.definition|truncatechars:50 }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

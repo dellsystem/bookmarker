@@ -1,0 +1,85 @@
+{% load humanize %}
+{% load markdown_filter %}
+
+<div class="ui grid">
+    {% for term in terms %}
+    {% ifchanged term.term %}
+    <div class="row">
+        <div class="column">
+            <h2 class="ui header">
+                <a href="{{ term.term.get_absolute_url }}">
+                    {{ term.term.text }}
+                </a>
+                ({{ term.term.language }})
+                <a href="{% url 'admin:vocab_term_change' term.term.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </h2>
+            {{ term.term.definition|markdownify }}
+        </div>
+    </div>
+    {% endifchanged %}
+    <div class="row">
+        <div class="center aligned one wide column">
+            <div class="ui big circular label">
+                {{ term.page }}
+            </div>
+        </div>
+        <div class="fifteen wide column">
+            <h2 class="ui header">
+                <div class="sub header">
+                    {{ term.added|naturaltime }}
+                    {% if show_book %}
+                    <i class="ellipsis vertical icon"></i>
+                    <a href="{{ term.book.get_absolute_url }}"
+                       title="by {{ term.book.authors.all|join:", " }}">
+                        {{ term.book }}
+                    </a>
+                    {% endif %}
+                    {% if term.section_title %}
+                    <i class="ellipsis vertical icon"></i>
+                    <strong>{{ term.section_title }}</strong>
+                    {% endif %}
+                    {% if term.section %}
+                    <i class="ellipsis vertical icon"></i>
+                    <a href="{{ term.section.get_absolute_url }}">
+                        <strong>{{ term.section }}</strong>
+                    </a>
+                    {% endif %}
+                    {% if term.author %}
+                    <i class="ellipsis vertical icon"></i>
+                    <strong>{{ term.author }}</strong>
+                    {% endif %}
+                    <i class="ellipsis vertical icon"></i>
+                    {% if term.is_new %}
+                    <i class="certificate icon" title="New"></i>
+                    {% endif %}
+                    {% if term.is_defined %}
+                    <i class="quote left icon" title="Defined"></i>
+                    {% endif %}
+                    <strong>{{ term.category }}</strong>
+                    <i class="ellipsis vertical icon"></i>
+                    <a href="{% url 'admin:vocab_termoccurrence_change' term.pk %}">
+                        <i class="edit icon"></i>
+                    </a>
+                </div>
+            </h2>
+            {% if term.quote or term.comments %}
+            <div class="ui horizontal segments">
+                {% if term.quote %}
+                <div class="ui segment">
+                    <i class="left quote icon left-floated"></i>
+                    {{ term.get_highlighted_quote|safe }}
+                </div>
+                {% endif %}
+                {% if term.comments %}
+                <div class="ui secondary segment">
+                    {{ term.comments|markdownify }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

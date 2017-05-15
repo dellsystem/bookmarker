@@ -1,0 +1,48 @@
+{% load humanize %}
+{% load markdown_filter %}
+
+<div class="ui grid">
+{% for note in notes %}
+    <div class="row">
+        <div class="one center aligned wide column">
+            <div class="ui big circular label">
+                {{ note.page }}
+            </div>
+        </div>
+        <div class="fifteen wide column">
+            <h2 class="ui header">
+                <a href="{{ note.get_absolute_url }}">{{ note.subject }}</a>
+                <a href="{% url 'admin:books_note_change' note.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+                <div class="sub header">
+                    {{ note.added|naturaltime }}
+                    {% if note.section_title %}
+                    :: <strong>{{ note.section_title }}</strong>
+                    {% endif %}
+                    {% if note.section %}
+                    ::
+                    <a href="{{ note.section.get_absolute_url }}">
+                        <strong title="{{ note.section.subtitle }}">
+                            {{ note.section.title }}
+                        </strong>
+                    </a>
+                    {% endif %}
+                    {% if note.author %}
+                    :: <strong>{{ note.author }}</strong>
+                    {% endif %}
+                </div>
+            </h2>
+            <div class="ui horizontal segments">
+                <div class="ui segment">
+                    <i class="quote left icon left-floated"></i>
+                    {{ note.quote|markdownify|safe }}
+                </div>
+                <div class="ui secondary segment">
+                    {{ note.comment|markdownify|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>

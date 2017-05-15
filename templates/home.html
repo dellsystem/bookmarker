@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block nobreadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="nine wide column">
+        <div class="ui segment">
+            <div class="ui four mini statistics">
+                <div class="statistic">
+                    <div class="value">
+                        {{ num_books }} <i class="book icon"></i>
+                    </div>
+                    <div class="label">
+                        Books
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ num_needing_terms }} <i class="flag icon"></i>
+                    </div>
+                    <div class="label">
+                        need terms
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ num_needing_notes }} <i class="sticky note icon"></i>
+                    </div>
+                    <div class="label">
+                        need notes
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ num_needing_sections }} <i class="angle right icon"></i>
+                    </div>
+                    <div class="label">
+                        need sections
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="seven wide column">
+        <div class="ui segment">
+            <form method="post" action="{% url 'add_book' %}">
+                <div class="ui fluid labeled action input">
+                    <div class="ui label">GoodReads ID</div>
+                    <input type="text" name="goodreads_id" />
+                    <button type="submit" class="ui green button">Add book</button>
+                </div>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+<br />
+<div class="ui four cards">
+    {% for book in books %}
+    <a class="ui card" href="{{ book.get_absolute_url }}">
+        <div class="image">
+            <img src="{{ book.image_url }}" class="ui fluid image" />
+        </div>
+        <div class="content">
+            <div class="header">{{ book.title }}</div>
+            <div class="meta">{{ book.authors.all|join:", " }}</div>
+        </div>
+        <div class="extra content">
+            <span title="Terms"
+                  class="ui icon {% if not book.completed_terms %}red{% endif %} label">
+                 <i class="flag icon"></i> {{ book.terms.count }}
+            </span>
+            <span title="Notes"
+                  class="ui icon {% if not book.completed_notes %}red{% endif %} label">
+                 <i class="sticky note icon"></i> {{ book.notes.count }}
+            </span>
+            <span title="Sections"
+                  class="ui icon {% if not book.completed_sections %}red{% endif %} label">
+                 <i class="angle right icon"></i> {{ book.sections.count }}
+            </span>
+            <span title="Summaries"
+                  class="ui icon {% if not book.completed_summaries %}red{% endif %} label">
+                  <i class="write icon"></i>
+            </span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

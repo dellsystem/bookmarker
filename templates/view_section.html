@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% load markdown_filter %}
+
+{% block breadcrumbs %}
+<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<i class="right angle icon divider"></i>
+<div class="active section">View section</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="row">
+        <div class="eight wide column">
+            <h2 class="ui header">
+                <img src="{{ book.image_url }}"
+                     class="ui mini image"
+                     title="{{ book.title }}" />
+                <div class="content">
+                    {{ book.title }}
+                    <div class="sub header">
+                        {{ book.authors.all|join:", " }}
+                    </div>
+                </div>
+            </h2>
+        </div>
+        <div class="one wide column">
+            <i class="big right angle icon divider"></i>
+        </div>
+        <div class="six wide column">
+            <h2 class="ui header">
+                {{ section.title }}
+                {% if section.subtitle %}
+                <div class="sub header">
+                    {{ section.subtitle }}
+                </div>
+                {% endif %}
+            </h2>
+        </div>
+        <div class="one wide column">
+            <div class="big ui circular label">
+                {{ section.first_page }}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui divider"></div>
+
+<div class="ui grid">
+    <div class="ten wide column">
+        {% if section.summary %}
+            {{ section.summary|markdownify|safe }}
+        {% else %}
+        <div class="ui icon warning message">
+            <i class="warning icon"></i>
+            Needs summary
+        </div>
+        {% endif %}
+    </div>
+    <div class="six wide column">
+        <div class="ui two statistics">
+            <div class="statistic">
+                <div class="value">
+                    {{ section.terms.count }}
+                </div>
+                <div class="label">
+                    <a href="#terms">
+                        terms
+                    </a>
+                </div>
+            </div>
+            <div class="statistic">
+                <div class="value">
+                    {{ section.notes.count }}
+                </div>
+                <div class="label">
+                    <a href="#notes">
+                        notes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui divider"></div>
+
+<a name="terms"></a>
+{% include 'term_list.html' with terms=section.terms.all only %}
+
+<div class="ui divider"></div>
+<a name="notes"></a>
+{% include 'note_list.html' with notes=section.notes.all only %}
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load markdown_filter %}
+
+{% block breadcrumbs %}
+<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<i class="right angle icon divider"></i>
+<a class="section" href="{% url 'view_notes' book.pk %}">View notes</a>
+<i class="right angle icon divider"></i>
+<div class="active section">View note</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="row">
+        <div class="fourteen wide column">
+            {% include 'book_header.html' with book=book only %}
+        </div>
+        <div class="two wide column">
+            <a class="ui green icon button" href="{% url 'add_note' book.pk %}">
+                <i class="plus icon"></i>
+                Add note
+            </a>
+        </div>
+    </div>
+</div>
+<div class="ui divider"></div>
+<div class="ui grid">
+    <div class="row">
+        <div class="one center aligned wide column">
+            <div class="ui big circular label">
+                {{ note.page }}
+            </div>
+        </div>
+        <div class="fifteen wide column">
+            <h2 class="ui header">
+                {{ note.subject }}
+                <a href="{% url 'admin:books_note_change' note.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+                <div class="sub header">
+                    {{ note.added|naturaltime }}
+                    {% if note.section %}
+                    :: <strong>{{ note.section }}</strong>
+                    {% endif %}
+                    {% if note.author %}
+                    :: <strong>{{ note.author }}</strong>
+                    {% endif %}
+                </div>
+            </h2>
+            <div class="ui horizontal segments">
+                <div class="ui segment">
+                    <i class="quote left icon left-floated"></i>
+                    {{ note.quote|markdownify|safe }}
+                </div>
+                <div class="ui secondary segment">
+                    {{ note.comment|markdownify|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

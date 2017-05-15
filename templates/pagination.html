@@ -1,0 +1,35 @@
+<div class="ui center aligned basic segment">
+    <div class="ui right pagination menu">
+        {% if items.has_previous %}
+        <a class="item" href="?page=1">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+        <i class="double left angle icon"></i> first</a>
+
+        {% if items.has_previous %}
+        <a class="item" href="?page={{ items.previous_page_number }}">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+        <i class="left angle icon"></i> previous</a>
+
+        <a class="active item">
+            Page {{ items.number }} of {{ items.paginator.num_pages }}
+        </a>
+
+        {% if items.has_next %}
+        <a class="item" href="?page={{ items.next_page_number }}">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+        next <i class="angle right icon"></i></a>
+
+        {% if items.has_next %}
+        <a class="item" href="?page={{ items.paginator.num_pages }}">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+        last <i class="angle double right icon"></i></a>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+{% block breadcrumbs %}
+<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<i class="right angle icon divider"></i>
+<div class="active section">View notes</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="fourteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="two wide column">
+        <a class="ui green icon button" href="{% url 'add_note' book.pk %}">
+            <i class="plus icon"></i>
+            Add note
+        </a>
+    </div>
+</div>
+<div class="ui divider"></div>
+
+{% include "pagination.html" with items=notes only %}
+
+{% include "note_list.html" with notes=notes only %}
+
+{% include "pagination.html" with items=notes only %}
+
+{% endblock %}

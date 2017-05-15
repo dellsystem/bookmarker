@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VocabReader</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+    <div class="ui container">
+        <br />
+        <div class="ui massive menu">
+            <div class="header item">
+                <h1>
+                    <i class="book icon"></i>
+                    VocabReader
+                </h1>
+            </div>
+            <div class="item">
+                <a href="{% url 'home' %}">Home</a>
+            </div>
+            <div class="item">
+                <a href="{% url 'view_all_terms' %}">Terms</a>
+            </div>
+            <div class="item">
+                <a href="{% url 'admin:index' %}">Admin</a>
+            </div>
+            <div class="right menu">
+                <div class="item">
+                    <div class="ui icon input">
+                        <input type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for message in messages %}
+        <div class="ui {{ message.tags }} icon message">
+            {% if message.level > 25 %}
+            <i class="warning sign icon"></i>
+            {% else %}
+            <i class="checkmark icon"></i>
+            {% endif %}
+            <div class="header">{{ message }}</div>
+        </div>
+        {% endfor %}
+
+        <div class="ui basic segment">
+            {% block nobreadcrumbs %}
+            <div class="ui breadcrumb">
+                <a class="section" href="{% url 'home' %}">Home</a>
+                <i class="right angle icon divider"></i>
+                {% block breadcrumbs %}
+                {% endblock %}
+            </div>
+            {% endblock %}
+        </div>
+
+        {% block content %}
+        {% endblock %}
+        <br />
+    </div>
+    <script src="/static/scripts.js" type="text/javascript"></script>
+</body>
+</html>
