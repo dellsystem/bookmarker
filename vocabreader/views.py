@@ -40,12 +40,8 @@ def view_book(request, book_id):
     else:
         needs_sections = True
 
-    notes_without_section = book.notes.filter(
-        section=None
-    ).order_by('section_title')
-    terms_without_section = book.terms.filter(
-        section=None
-    ).order_by('section_title')
+    notes_without_section = book.notes.filter(section=None)
+    terms_without_section = book.terms.filter(section=None)
 
     context = {
         'book': book,

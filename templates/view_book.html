@@ -87,13 +87,6 @@
                     <i class="x icon"></i>
                     {{ terms_without_section.count }} sections not filled in
                 </div>
-                <div class="ui bulleted list">
-                    {% for term in terms_without_section %}
-                    {% ifchanged term.section_title %}
-                    <div class="item">{{ term.section_title }}</div>
-                    {% endifchanged %}
-                    {% endfor %}
-                </div>
                 {% else %}
                 <div class="ui success icon message">
                     <i class="checkmark icon"></i>
@@ -142,13 +135,6 @@
                 <div class="ui error icon message">
                     <i class="x icon"></i>
                     {{ notes_without_section.count }} sections not filled in
-                </div>
-                <div class="ui bulleted list">
-                    {% for note in notes_without_section %}
-                    {% ifchanged note.section_title %}
-                    <div class="item">{{ note.section_title }}</div>
-                    {% endifchanged %}
-                    {% endfor %}
                 </div>
                 {% else %}
                 <div class="ui success icon message">

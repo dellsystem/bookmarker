@@ -36,10 +36,6 @@
                         {{ term.book }}
                     </a>
                     {% endif %}
-                    {% if term.section_title %}
-                    <i class="ellipsis vertical icon"></i>
-                    <strong>{{ term.section_title }}</strong>
-                    {% endif %}
                     {% if term.section %}
                     <i class="ellipsis vertical icon"></i>
                     <a href="{{ term.section.get_absolute_url }}">

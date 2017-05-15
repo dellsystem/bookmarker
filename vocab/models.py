@@ -45,7 +45,6 @@ class TermOccurrence(models.Model):
     added = models.DateTimeField(auto_now_add=True)
     section = models.ForeignKey(Section, blank=True, null=True,
                                 related_name='terms')
-    section_title = models.CharField(max_length=255, blank=True)
     quote = models.TextField(blank=True)
     comments = models.TextField(blank=True)
     page = models.CharField(max_length=5)  # Can be in Preface (e.g., vi)

@@ -17,9 +17,6 @@
                 </a>
                 <div class="sub header">
                     {{ note.added|naturaltime }}
-                    {% if note.section_title %}
-                    :: <strong>{{ note.section_title }}</strong>
-                    {% endif %}
                     {% if note.section %}
                     ::
                     <a href="{{ note.section.get_absolute_url }}">

@@ -124,7 +124,6 @@ class Note(models.Model):
     comment = models.TextField(blank=True)
     section = models.ForeignKey(Section, blank=True, null=True,
                                 related_name='notes')
-    section_title = models.CharField(max_length=255, blank=True)
     author = models.ForeignKey(Author, blank=True, null=True)  # original author - might be a quote
 
     def get_absolute_url(self):
