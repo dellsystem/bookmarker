@@ -85,9 +85,9 @@
 <div class="ui divider"></div>
 
 <a name="terms"></a>
-{% include 'term_list.html' with terms=section.terms.all only %}
+{% include 'term_list.html' with terms=section.terms.all hide_section=True only %}
 
 <div class="ui divider"></div>
 <a name="notes"></a>
-{% include 'note_list.html' with notes=section.notes.all only %}
+{% include 'note_list.html' with notes=section.notes.all hide_section=True only %}
 {% endblock %}

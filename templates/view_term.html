@@ -43,9 +43,11 @@
                         <i class="comment icon left-floated"></i>
                         {{ occurrence.comments|markdownify|safe }}
                         {% endif %}
-                        <footer>
+                        <footer title="{{ occurrence.added|naturaltime }}">
                             &mdash;p.{{ occurrence.page }},
-                            {{ occurrence.added|naturaltime }}
+                            {% if occurrence.section %}
+                            {% include "section_link.html" with section=occurrence.section only %}
+                            {% endif %}
                             <a href="{% url 'admin:vocab_termoccurrence_change' occurrence.pk %}">
                                 <i class="edit icon"></i>
                             </a>

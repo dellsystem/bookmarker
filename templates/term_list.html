@@ -36,11 +36,9 @@
                         {{ term.book }}
                     </a>
                     {% endif %}
-                    {% if term.section %}
+                    {% if not hide_section and term.section %}
                     <i class="ellipsis vertical icon"></i>
-                    <a href="{{ term.section.get_absolute_url }}">
-                        <strong>{{ term.section }}</strong>
-                    </a>
+                    {% include "section_link.html" with section=term.section only %}
                     {% endif %}
                     {% if term.author %}
                     <i class="ellipsis vertical icon"></i>
