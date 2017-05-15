@@ -38,6 +38,9 @@ class Term(models.Model):
     def get_absolute_url(self):
         return reverse('view_term', args=[str(self.id)])
 
+    def get_highlights(self):
+        return self.highlights.split('/')
+
 
 class TermOccurrence(models.Model):
     term = models.ForeignKey(Term, related_name='occurrences')

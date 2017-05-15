@@ -8,13 +8,28 @@
 {% endblock %}
 
 {% block content %}
-<h2>
-    {{ term.text }}
-    <a href="{% url 'admin:vocab_term_change' term.pk %}">
-        <i class="edit icon"></i>
-    </a>
-</h2>
-<p>{{ term.definition }}</p>
+<div class="ui grid">
+    <div class="twelve wide column">
+        <h2>
+            {{ term.text }}
+            <a href="{% url 'admin:vocab_term_change' term.pk %}">
+                <i class="edit icon"></i>
+            </a>
+        </h2>
+        <p>{{ term.definition }}</p>
+    </div>
+    <div class="four wide column">
+        <h4>Highlighted phrases</h4>
+        <div class="ui bulleted list">
+            {% for phrase in term.get_highlights %}
+            <div class="item">
+                {{ phrase }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 <div class="ui two column grid">
     {% for occurrence in occurrences %}
     {% with book=occurrence.book %}
