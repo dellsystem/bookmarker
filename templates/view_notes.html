@@ -23,7 +23,11 @@
 
 {% include "pagination.html" with items=notes only %}
 
-{% include "note_list.html" with notes=notes only %}
+<div class="ui grid">
+    {% for note in notes %}
+    {% include 'note_display.html' with x=note only %}
+    {% endfor %}
+</div>
 
 {% include "pagination.html" with items=notes only %}
 

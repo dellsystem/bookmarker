@@ -1,0 +1,51 @@
+{% load humanize %}
+{% load markdown_filter %}
+
+<div class="row">
+    <div class="column">
+        <h2 class="ui header">
+            <i class="yellow sticky note icon"></i>
+            <div class="content">
+                <a href="{{ x.get_absolute_url }}">{{ x.subject }}</a>
+                <a href="{% url 'admin:books_note_change' x.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </div>
+        </h2>
+    </div>
+</div>
+<div class="row">
+    <div class="one center aligned wide column">
+        <div class="ui big circular label">
+            {{ x.get_page_display }}
+        </div>
+    </div>
+    <div class="fifteen wide column">
+        <h2 class="ui header">
+            <div class="sub header">
+                {{ x.added|naturaltime }}
+                {% if not hide_section and x.section %}
+                <i class="ellipsis vertical icon"></i>
+                {% include "section_link.html" with section=x.section only %}
+                {% endif %}
+                {% if x.author %}
+                <i class="ellipsis vertical icon"></i>
+                <strong>
+                    <a href="{{ x.author.get_absolute_url }}">
+                        {{ x.author }}
+                    </a>
+                </strong>
+                {% endif %}
+            </div>
+        </h2>
+        <div class="ui horizontal segments">
+            <div class="ui segment">
+                <i class="quote left icon left-floated"></i>
+                {{ x.quote|markdownify|safe }}
+            </div>
+            <div class="ui secondary segment">
+                {{ x.comment|markdownify|safe }}
+            </div>
+        </div>
+    </div>
+</div>

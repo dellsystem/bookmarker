@@ -50,7 +50,7 @@ class TermOccurrenceAdmin(admin.ModelAdmin):
     action_form = TermOccurrenceActionForm
     actions = [change_author]
     list_filter = ('book', 'author')
-    list_display = ('term', 'page', 'book', 'author', 'is_new',
+    list_display = ('term', 'get_page_display', 'book', 'author', 'is_new',
                     'is_defined', '_get_category')
 
     def _get_category(self, obj):

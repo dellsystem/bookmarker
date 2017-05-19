@@ -9,85 +9,78 @@
 {% endblock %}
 
 {% block content %}
+{% include 'book_header.html' with book=book only %}
+
+<div class="ui divider"></div>
+
 <div class="ui grid">
     <div class="row">
-        <div class="eight wide column">
-            <h2 class="ui header">
-                <img src="{{ book.image_url }}"
-                     class="ui mini image"
-                     title="{{ book.title }}" />
-                <div class="content">
-                    {{ book.title }}
-                    <div class="sub header">
-                        {{ book.authors.all|join:", " }}
-                    </div>
-                </div>
-            </h2>
-        </div>
-        <div class="one wide column">
-            <i class="big right angle icon divider"></i>
-        </div>
-        <div class="six wide column">
-            <h2 class="ui header">
-                {{ section.title }}
-                {% if section.subtitle %}
-                <div class="sub header">
-                    {{ section.subtitle }}
-                </div>
-                {% endif %}
-            </h2>
-        </div>
         <div class="one wide column">
             <div class="big ui circular label">
-                {{ section.first_page }}
+                {{ section.get_page_display }}
             </div>
         </div>
-    </div>
-</div>
-<div class="ui divider"></div>
-
-<div class="ui grid">
-    <div class="ten wide column">
-        {% if section.summary %}
-            {{ section.summary|markdownify|safe }}
-        {% else %}
-        <div class="ui icon warning message">
-            <i class="warning icon"></i>
-            Needs summary
-        </div>
-        {% endif %}
-    </div>
-    <div class="six wide column">
-        <div class="ui two statistics">
-            <div class="statistic">
-                <div class="value">
-                    {{ section.terms.count }}
+        <div class="twelve wide column">
+            <h3 class="ui header">
+                {{ section.title }}
+                <a href="{% url 'admin:books_section_change' section.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+                <div class="sub header">
+                    {{ section.subtitle }}
+                    {% if section.author %}
+                    by
+                    <a href="{{ section.author.get_absolute_url }}">
+                        {{ section.author }}
+                    </a>
+                    {% endif %}
                 </div>
-                <div class="label">
-                    <a href="#terms">
+            </h3>
+        </div>
+        <div class="three wide column">
+            <div class="ui two mini statistics">
+                <div class="statistic">
+                    <div class="value">
+                        {{ section.terms.count }}
+                    </div>
+                    <div class="label">
                         terms
-                    </a>
+                        <a href="{% url 'add_term' book.pk %}">
+                            <i class="plus icon"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
-            <div class="statistic">
-                <div class="value">
-                    {{ section.notes.count }}
-                </div>
-                <div class="label">
-                    <a href="#notes">
+                <div class="statistic">
+                    <div class="value">
+                        {{ section.notes.count }}
+                    </div>
+                    <div class="label">
                         notes
-                    </a>
+                        <a href="{% url 'add_note' book.pk %}">
+                            <i class="plus icon"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="ui divider"></div>
 
-<a name="terms"></a>
-{% include 'term_list.html' with terms=section.terms.all hide_section=True only %}
+{% if section.summary %}
+    <div class="ui message">
+        {{ section.summary|markdownify|safe }}
+    </div>
+{% else %}
+<div class="ui icon warning message">
+    <i class="warning icon"></i>
+    Needs summary
+</div>
+{% endif %}
 
 <div class="ui divider"></div>
-<a name="notes"></a>
-{% include 'note_list.html' with notes=section.notes.all hide_section=True only %}
+<div class="ui grid">
+    {% for artefact in section.get_artefacts %}
+    {% include artefact.display_template with x=artefact hide_section=True %}
+    {% endfor %}
+</div>
 {% endblock %}

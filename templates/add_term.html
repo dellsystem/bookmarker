@@ -35,20 +35,20 @@
 {% endif %}
 {% endwith %}
 
-<div class="ui segment">
-    <form class="ui form" method="post">
+<form class="ui form" method="post">
+    <div class="ui segment">
         {% csrf_token %}
         <div class="ui fields">
-            {% with error=form.term.errors %}
+            {% with error=term_form.text.errors %}
             <div class="eight wide {% if error %}error{% endif %} field">
                 <label>Term{% if error %} (REQUIRED){% endif %}</label>
-                {{ form.term }}
+                {{ term_form.text }}
             </div>
             {% endwith %}
-            {% with error=form.language.errors %}
+            {% with error=term_form.language.errors %}
             <div class="five wide {% if error %}error{% endif %} field">
                 <label>Language{% if error %} (REQUIRED){% endif %}</label>
-                {{ form.language }}
+                {{ term_form.language }}
             </div>
             {% endwith %}
             <div class="three wide field">
@@ -60,55 +60,75 @@
                 </button>
             </div>
         </div>
-        <div class="ui fields">
-            <div class="four wide field">
-                <label>Author</label>
-                {{ form.author }}
-            </div>
-            {% with error=form.page.errors %}
-            <div class="two wide {% if error %}error{% endif %} field">
-                <label>Page{% if error %} (REQUIRED){% endif %}</label>
-                {{ form.page }}
-            </div>
-            {% endwith %}
-            <div class="seven wide field">
-                <label>Section</label>
-                {{ form.section }}
-            </div>
-            {% with error=form.category.errors %}
-            <div class="two wide {% if error %}error{% endif %} field">
-                <label>Category{% if error %} (REQUIRED){% endif %}</label>
-                {{ form.category }}
-            </div>
-            {% endwith %}
-            <div class="one wide field">
-                <label>New?</label>
-                {{ form.is_new }}
-            </div>
-            <div class="one wide field">
-                <label>Defined?</label>
-                {{ form.is_defined }}
-            </div>
+        <div class="ui horizontal divider">
+            <a id="link_button" class="ui disabled button">
+                View term
+                <span id="occurrences_count"></span>
+            </a>
         </div>
-        <div class="three fields">
-            {% with error=form.definition.errors %}
-            <div class="{% if error %}error{% endif %} field">
+        <div class="ui fields">
+            {% with error=term_form.definition.errors %}
+            <div class="{% if error %}error{% endif %} twelve wide field">
                 <label>
                     Definition{% if error %} (REQUIRED){% endif %}
-                    <a id="definition_edit" class="hidden">
-                        <i class="edit icon"></i>
-                    </a>
                 </label>
-                {{ form.definition }}
+                {{ term_form.definition }}
             </div>
             {% endwith %}
-            <div class="field">
-                <label>Quote</label>
-                {{ form.quote }}
+            {% with error=term_form.highlights.errors %}
+            <div class="{% if error %}error{% endif %} four wide field">
+                <label>
+                    Highlights{% if error %} (REQUIRED){% endif %}
+                </label>
+                {{ term_form.highlights }}
             </div>
-            <div class="field">
-                <label>Comments</label>
-                {{ form.comments }}
+            {% endwith %}
+        </div>
+    </div>
+    <div class="ui segment">
+        <div class="ui three column grid">
+            <div class="column">
+                <div class="ui fields">
+                    <div class="twelve wide field">
+                        <label>Author</label>
+                        {{ occurrence_form.author }}
+                    </div>
+                    {% with error=occurrence_form.page_number.errors %}
+                    <div class="four wide {% if error %}error{% endif %} field"
+                         {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                        <label>Page</label>
+                        {{ occurrence_form.page_number }}
+                    </div>
+                    {% endwith %}
+                </div>
+                <div class="ui fields">
+                    {% with error=occurrence_form.category.errors %}
+                    <div class="eight wide {% if error %}error{% endif %} field">
+                        <label>Category{% if error %} (REQUIRED){% endif %}</label>
+                        {{ occurrence_form.category }}
+                    </div>
+                    {% endwith %}
+                    <div class="four wide field">
+                        <label>New?</label>
+                        {{ occurrence_form.is_new }}
+                    </div>
+                    <div class="four wide field">
+                        <label>Defined?</label>
+                        {{ occurrence_form.is_defined }}
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label>Quote</label>
+                    {{ occurrence_form.quote }}
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label>Comments</label>
+                    {{ occurrence_form.comments }}
+                </div>
             </div>
         </div>
         <div class="ui basic center aligned segment">
@@ -117,6 +137,6 @@
                 Submit
             </button>
         </div>
-    </form>
-</div>
+    </div>
+</form>
 {% endblock %}

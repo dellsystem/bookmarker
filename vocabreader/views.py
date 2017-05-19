@@ -9,7 +9,7 @@ from books.api import CLIENT
 from books.forms import NoteForm, SectionForm
 from books.models import Book, Author, Note, Section
 from vocab.api import lookup_term
-from vocab.forms import TermOccurrenceForm
+from vocab.forms import TermForm, TermOccurrenceForm
 from vocab.models import Term, TermOccurrence
 
 
@@ -45,8 +45,8 @@ def view_book(request, book_id):
 
     context = {
         'book': book,
-        'recent_terms': book.terms.all()[:5],
-        'recent_notes': book.notes.all()[:5],
+        'recent_terms': book.terms.order_by('-added')[:5],
+        'recent_notes': book.notes.order_by('-added')[:5],
         'sections_1': sections_1,
         'sections_2': sections_2,
         'notes_without_section': notes_without_section,
@@ -85,9 +85,7 @@ def add_section(request, book_id):
     if request.method == 'POST':
         form = SectionForm(request.POST)
         if form.is_valid():
-            section = form.save(commit=False)
-            section.book = book
-            section.save()
+            section = form.save(book=book)
             messages.success(request, u'Added section: {}'.format(section.title))
         else:
             new_form = False
@@ -115,89 +113,55 @@ def add_section(request, book_id):
 def add_term(request, book_id):
     book = Book.objects.get(pk=book_id)
 
-    new_form = True
+    new_forms = True
     if request.method == 'POST':
-        form = TermOccurrenceForm(request.POST)
-        if form.is_valid():
+        term_form = TermForm(request.POST, prefix='term')
+        occurrence_form = TermOccurrenceForm(request.POST, prefix='occurrence')
+        if term_form.is_valid() and occurrence_form.is_valid():
             term, created = Term.objects.get_or_create(
-                text=form.cleaned_data['term'],
-                language=form.cleaned_data['language'],
+                text=term_form.cleaned_data['text'],
+                language=term_form.cleaned_data['language'],
                 defaults={
-                    'definition': form.cleaned_data['definition'],
-                    'highlights': form.cleaned_data['term'].lower(),
+                    'definition': term_form.cleaned_data['definition'],
+                    'highlights': term_form.cleaned_data['highlights'],
                 },
             )
 
-            # Make sure the section corresponds to the page number, if the
-            # book's sections all have page numbers and this page number is
-            # numeric.
-            try:
-                page_number = int(form.cleaned_data['page'])
-            except ValueError:
-                page_number = None
-
-            # Consider making this a method on some superclass of both Note and
-            # TermOccurrence.
-            if page_number:
-                section_pages = book.get_section_pages()
-                for section, first_page in section_pages:
-                    if page_number >= first_page:
-                        if section == form.cleaned_data['section']:
-                            break
-                        else:
-                            messages.warning(
-                                request,
-                                'Fixed section (was {was}, now {now})'.format(
-                                    was=form.cleaned_data['section'],
-                                    now=section,
-                                )
-                            )
-                            form.cleaned_data['section'] = section
-                            break
-
-            occurrence = term.occurrences.create(
-                book=book,
-                section=form.cleaned_data['section'],
-                quote=form.cleaned_data['quote'],
-                comments=form.cleaned_data['comments'],
-                page=form.cleaned_data['page'],
-                category=form.cleaned_data['category'],
-                is_new=form.cleaned_data['is_new'],
-                author=form.cleaned_data['author'],
-                is_defined=form.cleaned_data['is_defined'],
-            )
+            occurrence_form.save(term=term, book=book)
             messages.success(request, u'Added term: {}'.format(term.text))
         else:
-            new_form = False
+            new_forms = False
             messages.error(request, 'Failed to add term')
 
-    if new_form:
-        initial = {
-            'language': book.language,
-        }
+    if new_forms:
+        term_form = TermForm(
+            initial={'language': book.language},
+            prefix='term',
+        )
 
         latest_addition = book.get_latest_addition()
-        if latest_addition is not None:
-            initial['section'] = latest_addition.section
 
         # If the book has only one author, set the author to the author of the book
         # by default.
+        initial_author = None
         if book.authors.count() == 1:
-            initial['author'] = book.authors.latest('pk')
+            initial_author = book.authors.latest('pk')
         elif latest_addition is not None:
             # Otherwise, if this book has multiple authors but we've created
             # a previous TermOccurrence or note, use the author from that.
-            initial['author'] = latest_addition.author
+            initial_author = latest_addition.author
 
-        form = TermOccurrenceForm(initial=initial)
-
-    form.fields['section'].queryset = book.sections.all()
+        occurrence_form = TermOccurrenceForm(
+            initial={'author': initial_author},
+            prefix='occurrence',
+        )
 
     context = {
         'book': book,
         'recent_terms_1': book.terms.all()[:3],
         'recent_terms_2': book.terms.all()[3:6],
-        'form': form,
+        'term_form': term_form,
+        'occurrence_form': occurrence_form,
     }
 
     return render(request, 'add_term.html', context)
@@ -243,7 +207,11 @@ def get_definition(request):
     term = request.GET.get('term', '')
     language = request.GET.get('language', 'en')
 
-    edit_link = None
+    view_link = None
+    definition = None
+    highlights = None
+    num_occurrences = 0
+
     if term and language:
         # Check if the term already exists.
         try:
@@ -253,17 +221,20 @@ def get_definition(request):
 
         if existing_term:
             definition = existing_term.definition
-            edit_link = reverse('view_term', args=[existing_term.pk])
+            view_link = reverse('view_term', args=[existing_term.pk])
+            highlights = existing_term.highlights
+            num_occurrences = existing_term.occurrences.count()
         else:
             definition = lookup_term(language, term)
-    else:
-        definition = None
+            highlights = term.lower()
 
     return JsonResponse({
         'term': term,
         'language': language,
         'definition': definition,
-        'edit_link': edit_link,
+        'highlights': highlights,
+        'view_link': view_link,
+        'num_occurrences': num_occurrences,
     })
 
 
@@ -274,37 +245,7 @@ def add_note(request, book_id):
     if request.method == 'POST':
         form = NoteForm(request.POST)
         if form.is_valid():
-            note = form.save(commit=False)
-
-            # Make sure the section corresponds to the page number, if the
-            # book's sections all have page numbers and this page number is
-            # numeric.
-            try:
-                page_number = int(note.page)
-            except ValueError:
-                page_number = None
-
-            # Consider making this a method on some superclass of both Note and
-            # TermOccurrence.
-            if page_number:
-                section_pages = book.get_section_pages()
-                for section, first_page in section_pages:
-                    if page_number >= first_page:
-                        if section == note.section:
-                            break
-                        else:
-                            messages.warning(
-                                request,
-                                'Fixed section (was {was}, now {now})'.format(
-                                    was=note.section,
-                                    now=section,
-                                )
-                            )
-                            note.section = section
-                            break
-
-            note.book = book
-            note.save()
+            note = form.save(book=book)
             messages.success(request, u'Added note: {}'.format(note.subject))
         else:
             new_form = False
@@ -314,9 +255,6 @@ def add_note(request, book_id):
         initial = {}
 
         latest_addition = book.get_latest_addition()
-        if latest_addition is not None:
-            initial['section'] = latest_addition.section
-
         # If the book has only one author, set the author to the author of the book
         # by default.
         if book.authors.count() == 1:
@@ -326,10 +264,7 @@ def add_note(request, book_id):
             # a previous note or term, use the author from that.
             initial['author'] = latest_addition.author
 
-
         form = NoteForm(initial=initial)
-
-    form.fields['section'].queryset = book.sections.all()
 
     context = {
         'book': book,

@@ -4,7 +4,7 @@
     {% for note in notes %}
     <div class="comment">
         <div class="avatar">
-            p.{{ note.page }}
+            p.{{ note.get_page_display }}
         </div>
         <div class="content">
             <span class="author">

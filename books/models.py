@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
+from heapq import merge
 import operator
 
-from django.db import models
+from django import forms
 from django.core.urlresolvers import reverse
+from django.db import models
 from languages.fields import LanguageField
 
 from .api import CLIENT
+from .utils import int_to_roman, roman_to_int
 
 
 class Author(models.Model):
@@ -84,47 +87,112 @@ class Book(models.Model):
                 else:
                     return latest_note
 
-    def get_section_pages(self):
-        section_pages = []
-        for section in self.sections.all():
-            try:
-                page_number = int(section.first_page)
-            except ValueError:
-                continue
 
-            section_pages.append((section, page_number))
+class PageNumberField(models.PositiveSmallIntegerField):
+    def validate(self, value, model_instance):
+        if not value.isdigit() and not roman_to_int(value):
+            raise forms.ValidationError("Invalid page")
 
-        return sorted(section_pages, key=operator.itemgetter(1), reverse=True)
+    def to_python(self, value):
+        return value
+
+    def formfield(self, **kwargs):
+        return forms.CharField(**kwargs)
 
 
-class Section(models.Model):
+class PageArtefact(models.Model):
+    """Inherited by Note, TermOccurrence, and Section."""
+    in_preface = models.BooleanField()
+    page_number = PageNumberField()
+
+    class Meta:
+        abstract = True
+
+    def __cmp__(self, other):
+        """So we can compare notes with terms."""
+        if self.in_preface:
+            if other.in_preface:
+                return cmp(self.page_number, other.page_number)
+            else:
+                return -1
+        else:
+            if other.in_preface:
+                return 1
+            else:
+                return cmp(self.page_number, other.page_number)
+
+    def get_page_display(self):
+        if self.in_preface:
+            return int_to_roman(self.page_number)
+        else:
+            return self.page_number
+
+
+class Section(PageArtefact):
     book = models.ForeignKey(Book, related_name='sections')
+    author = models.ForeignKey(Author, related_name='sections', blank=True,
+                               null=True)
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)
     summary = models.TextField(blank=True)
-    first_page = models.CharField(max_length=5, blank=True)  # can be empty
+
+    class Meta:
+        ordering = ['-in_preface', 'page_number']
 
     def __unicode__(self):
         s = self.title
-        if self.first_page:
-            s += ' - ' + self.first_page
+        if self.page_number:
+            s += ' - %s' % self.get_page_display()
 
         return s
 
     def get_absolute_url(self):
         return reverse('view_section', args=[str(self.id)])
 
+    def get_artefacts(self):
+        """Returns a generator mixing notes and termoccurrences, ordered by
+        page (only because PageArtefact defines a custom __cmp__ method)."""
+        return merge(self.notes.all(), self.terms.all())
 
-class Note(models.Model):
+
+class SectionArtefact(PageArtefact):
+    """TermOccurrence and Note inherit from this. Section inherits from
+    PageArtefact. Defines a determine_section() method that determines the
+    correct section (if any) from the page number. Assumes that book is a
+    defined field."""
+
+    class Meta:
+        abstract = True
+
+    def determine_section(self):
+        in_preface = self.in_preface
+        sections = self.book.sections.filter(
+            in_preface=in_preface,
+            page_number__lte=self.page_number,
+        )
+        return sections.last()
+
+
+class Note(SectionArtefact):
     book = models.ForeignKey(Book, related_name='notes')
     added = models.DateTimeField(auto_now_add=True)
-    page = models.CharField(max_length=5)  # Can be in Preface (e.g., vi)
     subject = models.CharField(max_length=100)
     quote = models.TextField(blank=True)
     comment = models.TextField(blank=True)
     section = models.ForeignKey(Section, blank=True, null=True,
                                 related_name='notes')
     author = models.ForeignKey(Author, blank=True, null=True)  # original author - might be a quote
+
+    class Meta:
+        ordering = ['-in_preface', 'page_number']
+
+    @property
+    def display_template(self):
+        return 'note_display.html'
+
+    def save(self, *args, **kwargs):
+        self.section = self.determine_section()
+        super(Note, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('view_note', args=[str(self.id)])
@@ -134,6 +202,3 @@ class Note(models.Model):
             subject=self.subject,
             book=self.book.title
         )
-
-    class Meta:
-        ordering = ['-added']

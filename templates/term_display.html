@@ -1,0 +1,80 @@
+{% load humanize %}
+{% load markdown_filter %}
+
+<div class="row">
+    <div class="column">
+        <h2 class="ui header">
+            <i class="blue flag icon"></i>
+            <div class="content">
+                <a href="{{ x.term.get_absolute_url }}">
+                    {{ x.term.text }}
+                </a>
+                ({{ x.term.language }})
+                <a href="{% url 'admin:vocab_term_change' x.term.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </div>
+        </h2>
+        {{ x.term.definition|markdownify }}
+    </div>
+</div>
+<div class="row">
+    <div class="center aligned one wide column">
+        <div class="ui big circular label">
+            {{ x.get_page_display }}
+        </div>
+    </div>
+    <div class="fifteen wide column">
+        <h2 class="ui header">
+            <div class="sub header">
+                {{ x.added|naturaltime }}
+                {% if show_book %}
+                <i class="ellipsis vertical icon"></i>
+                <a href="{{ x.book.get_absolute_url }}"
+                   title="by {{ x.book.authors.all|join:", " }}">
+                    <strong>{{ x.book }}</strong>
+                </a>
+                {% endif %}
+                {% if not hide_section and x.section %}
+                <i class="ellipsis vertical icon"></i>
+                {% include "section_link.html" with section=x.section only %}
+                {% endif %}
+                {% if x.author %}
+                <i class="ellipsis vertical icon"></i>
+                <strong>
+                    <a href="{{ x.author.get_absolute_url }}">
+                        {{ x.author }}
+                    </a>
+                </strong>
+                {% endif %}
+                <i class="ellipsis vertical icon"></i>
+                {% if x.is_new %}
+                <i class="certificate icon" title="New"></i>
+                {% endif %}
+                {% if x.is_defined %}
+                <i class="quote left icon" title="Defined"></i>
+                {% endif %}
+                <strong>{{ x.category }}</strong>
+                <i class="ellipsis vertical icon"></i>
+                <a href="{% url 'admin:vocab_termoccurrence_change' x.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </div>
+        </h2>
+        {% if x.quote or x.comments %}
+        <div class="ui horizontal segments">
+            {% if x.quote %}
+            <div class="ui segment">
+                <i class="left quote icon left-floated"></i>
+                {{ x.get_highlighted_quote|safe }}
+            </div>
+            {% endif %}
+            {% if x.comments %}
+            <div class="ui secondary segment">
+                {{ x.comments|markdownify }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>

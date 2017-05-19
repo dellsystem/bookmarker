@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 from languages.fields import LanguageField
 import markdown
 
-from books.models import Book, Author, Section
+from books.models import Book, Author, Section, SectionArtefact
 
 
 class TermCategory(models.Model):
@@ -42,7 +42,7 @@ class Term(models.Model):
         return self.highlights.split('/')
 
 
-class TermOccurrence(models.Model):
+class TermOccurrence(SectionArtefact):
     term = models.ForeignKey(Term, related_name='occurrences')
     book = models.ForeignKey(Book, related_name='terms')
     added = models.DateTimeField(auto_now_add=True)
@@ -50,20 +50,27 @@ class TermOccurrence(models.Model):
                                 related_name='terms')
     quote = models.TextField(blank=True)
     comments = models.TextField(blank=True)
-    page = models.CharField(max_length=5)  # Can be in Preface (e.g., vi)
     category = models.ForeignKey(TermCategory)
     is_new = models.BooleanField()
     is_defined = models.BooleanField()  # if the author expects unfamiliarity
     author = models.ForeignKey(Author, blank=True, null=True)  # original author - might be a quote
 
     class Meta:
-        ordering = ['-added']
+        ordering = ['-in_preface', 'page_number']
+
+    @property
+    def display_template(self):
+        return 'term_display.html'
+
+    def save(self, *args, **kwargs):
+        self.section = self.determine_section()
+        super(TermOccurrence, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return "{term} in {book} ({page})".format(
             term=self.term.text,
             book=self.book.title,
-            page=self.page
+            page=self.get_page_display(),
         )
 
     def get_highlighted_quote(self):

@@ -2,7 +2,5 @@
     <strong title="{{ section.subtitle }}">
         {{ section.title }}
     </strong>
-    {% if section.first_page %}
-    ({{ section.first_page }})
-    {% endif %}
+    ({{ section.get_page_display }})
 </a>

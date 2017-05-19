@@ -22,7 +22,11 @@
 
 {% include "pagination.html" with items=terms only %}
 
-{% include 'term_list.html' with terms=terms show_book=False only %}
+<div class="ui grid">
+    {% for term in terms %}
+    {% include 'term_display.html' with x=term only %}
+    {% endfor %}
+</div>
 
 {% include "pagination.html" with items=terms only %}
 

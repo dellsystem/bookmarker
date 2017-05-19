@@ -7,11 +7,9 @@
                 <i class="browser icon"></i>
             </div>
         </div>
-        {% if section.first_page %}
         <div class="right floated content">
-            <div class="ui large circular label">{{ section.first_page }}</div>
+            <div class="ui large circular label">{{ section.get_page_display }}</div>
         </div>
-        {% endif %}
         <div class="content">
             <div class="header">
                 <a href="{{ section.get_absolute_url }}">{{ section.title }}</a>

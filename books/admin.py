@@ -10,7 +10,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    list_display = ['title', 'subtitle', 'first_page', 'book']
+    list_display = ['title', 'subtitle', 'get_page_display', 'book']
     list_filter = ['book']
 
 
@@ -21,4 +21,4 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
-    list_display = ['subject', 'author', 'section', 'book', 'page']
+    list_display = ['subject', 'author', 'section', 'book', 'get_page_display']

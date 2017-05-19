@@ -59,7 +59,7 @@
                         {{ occurrence.comments|markdownify|safe }}
                         {% endif %}
                         <footer title="{{ occurrence.added|naturaltime }}">
-                            &mdash;p.{{ occurrence.page }},
+                            &mdash;p.{{ occurrence.get_page_display }},
                             {% if occurrence.section %}
                             {% include "section_link.html" with section=occurrence.section only %}
                             {% endif %}
