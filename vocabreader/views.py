@@ -150,10 +150,11 @@ def add_term(request, book_id):
             prefix='occurrence',
         )
 
+    recent_terms = book.terms.order_by('-added')
     context = {
         'book': book,
-        'recent_terms_1': book.terms.all()[:3],
-        'recent_terms_2': book.terms.all()[3:6],
+        'recent_terms_1': recent_terms[:3],
+        'recent_terms_2': recent_terms[3:6],
         'term_form': term_form,
         'occurrence_form': occurrence_form,
     }
@@ -264,11 +265,12 @@ def add_note(request, book_id):
 
         form = NoteForm(initial=initial)
 
+    recent_notes = book.notes.order_by('-added')
     context = {
         'book': book,
         'form': form,
-        'recent_notes_1': book.notes.all()[:3],
-        'recent_notes_2': book.notes.all()[3:6],
+        'recent_notes_1': recent_notes[:3],
+        'recent_notes_2': recent_notes[3:6],
     }
 
     return render(request, 'add_note.html', context)
