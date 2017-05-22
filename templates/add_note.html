@@ -37,32 +37,39 @@
     <form class="ui form" method="post">
         {% csrf_token %}
         <div class="ui fields">
-            {% with error=form.subject.errors %}
-            <div class="eleven wide {% if error %}error{% endif %} field">
+            {% with error=note_form.subject.errors %}
+            <div class="ten wide {% if error %}error{% endif %} field">
                 <label>Subject{% if error %} (REQUIRED){% endif %}</label>
-                {{ form.subject }}
+                {{ note_form.subject }}
             </div>
             {% endwith %}
-            <div class="four wide field">
-                <label>Author</label>
-                {{ form.author }}
-            </div>
-            {% with error=form.page_number.errors %}
+            {% with error=note_form.page_number.errors %}
             <div class="one wide {% if error %}error{% endif %} field"
                  {% if error %}title="{{ error|join:"/" }}"{% endif %}>
                 <label>Page</label>
-                {{ form.page_number }}
+                {{ note_form.page_number }}
             </div>
             {% endwith %}
+            {% with error=author_form.mode.errors %}
+            <div class="two wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Author mode</label>
+                {{ author_form.mode }}
+            </div>
+            {% endwith %}
+            <div class="three wide field">
+                <label>Author</label>
+                {{ author_form.author }}
+            </div>
         </div>
         <div class="ui two fields">
             <div class="field">
                 <label>Quote</label>
-                {{ form.quote }}
+                {{ note_form.quote }}
             </div>
             <div class="field">
                 <label>Comment</label>
-                {{ form.comment }}
+                {{ note_form.comment }}
             </div>
         </div>
         <div class="ui basic center aligned segment">

@@ -6,7 +6,7 @@
     <div class="content">
         <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
         <div class="sub header">
-            {% include 'author_list.html' with authors=book.authors only %}
+            {% include 'author_list.html' with authors=book.default_authors only %}
         </div>
     </div>
 </h2>

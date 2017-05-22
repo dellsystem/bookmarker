@@ -32,10 +32,10 @@ class TermForm(forms.ModelForm):
 class TermOccurrenceForm(forms.ModelForm):
     class Meta:
         model = TermOccurrence
-        exclude = ['term', 'added', 'book']
+        exclude = ['term', 'added', 'book', 'authors']
         widgets = {
-            'quote': forms.Textarea(attrs={'rows': 4}),
-            'comments': forms.Textarea(attrs={'rows': 4}),
+            'quote': forms.Textarea(attrs={'rows': 5}),
+            'comments': forms.Textarea(attrs={'rows': 5}),
         }
 
     def save(self, book, term):

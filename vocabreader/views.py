@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from books.api import CLIENT
-from books.forms import NoteForm, SectionForm
+from books.forms import NoteForm, SectionForm, ArtefactAuthorForm
 from books.models import Book, Author, Note, Section
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
@@ -84,20 +84,34 @@ def add_section(request, book_id):
 
     new_form = True
     if request.method == 'POST':
-        form = SectionForm(request.POST)
-        if form.is_valid():
-            section = form.save(book=book)
+        section_form = SectionForm(request.POST, prefix='section')
+        author_form = ArtefactAuthorForm(request.POST, prefix='author')
+
+        if section_form.is_valid() and author_form.is_valid():
+            section = section_form.save(book=book)
+
+            # Set the authors according to author_form. If the mode is 'none',
+            # we don't need to do anything since the section has no authors
+            # by default.
+            author_mode = author_form.cleaned_data['mode']
+            if author_mode == 'default':
+                section.authors.add(*book.default_authors.all())
+            elif author_mode == 'custom':
+                section.authors.add(author_form.cleaned_data['author'])
+
             messages.success(request, u'Added section: {}'.format(section.title))
         else:
             new_form = False
             messages.error(request, 'Failed to add section')
 
     if new_form:
-        form = SectionForm()
+        section_form = SectionForm(prefix='section')
+        author_form = ArtefactAuthorForm(prefix='author')
 
     context = {
         'book': book,
-        'form': form,
+        'section_form': section_form,
+        'author_form': author_form,
     }
 
     return render(request, 'add_section.html', context)
@@ -114,7 +128,13 @@ def add_term(request, book_id):
     if request.method == 'POST':
         term_form = TermForm(request.POST, prefix='term')
         occurrence_form = TermOccurrenceForm(request.POST, prefix='occurrence')
-        if term_form.is_valid() and occurrence_form.is_valid():
+        author_form = ArtefactAuthorForm(request.POST, prefix='author')
+
+        if (
+                term_form.is_valid() and
+                occurrence_form.is_valid() and
+                author_form.is_valid()
+        ):
             term, created = Term.objects.get_or_create(
                 text=term_form.cleaned_data['text'],
                 language=term_form.cleaned_data['language'],
@@ -124,7 +144,17 @@ def add_term(request, book_id):
                 },
             )
 
-            occurrence_form.save(term=term, book=book)
+            occurrence = occurrence_form.save(term=term, book=book)
+
+            # Set the authors according to author_form. If the mode is 'none',
+            # we don't need to do anything since the occurrence has no authors
+            # by default.
+            author_mode = author_form.cleaned_data['mode']
+            if author_mode == 'default':
+                occurrence.set_default_authors()
+            elif author_mode == 'custom':
+                occurrence.authors.add(author_form.cleaned_data['author'])
+
             messages.success(request, u'Added term: {}'.format(term.text))
         else:
             new_forms = False
@@ -135,22 +165,11 @@ def add_term(request, book_id):
             initial={'language': book.language},
             prefix='term',
         )
-
-        latest_addition = book.get_latest_addition()
-
-        # If the book has only one author, set the author to the author of the book
-        # by default.
-        initial_author = None
-        if book.authors.count() == 1:
-            initial_author = book.authors.latest('pk')
-        elif latest_addition is not None:
-            # Otherwise, if this book has multiple authors but we've created
-            # a previous TermOccurrence or note, use the author from that.
-            initial_author = latest_addition.author
-
         occurrence_form = TermOccurrenceForm(
-            initial={'author': initial_author},
             prefix='occurrence',
+        )
+        author_form = ArtefactAuthorForm(
+            prefix='author',
         )
 
     recent_terms = book.terms.order_by('-added')
@@ -160,6 +179,7 @@ def add_term(request, book_id):
         'recent_terms_2': recent_terms[3:6],
         'term_form': term_form,
         'occurrence_form': occurrence_form,
+        'author_form': author_form,
     }
 
     return render(request, 'add_term.html', context)
@@ -245,33 +265,35 @@ def add_note(request, book_id):
 
     new_form = True
     if request.method == 'POST':
-        form = NoteForm(request.POST)
-        if form.is_valid():
-            note = form.save(book=book)
+        note_form = NoteForm(request.POST, prefix='note')
+        author_form = ArtefactAuthorForm(request.POST, prefix='author')
+
+        if note_form.is_valid() and author_form.is_valid():
+            note = note_form.save(book=book)
+
+            # Set the authors according to author_form. If the mode is 'none',
+            # we don't need to do anything since the occurrence has no authors
+            # by default.
+            author_mode = author_form.cleaned_data['mode']
+            if author_mode == 'default':
+                note.set_default_authors()
+            elif author_mode == 'custom':
+                note.authors.add(author_form.cleaned_data['author'])
+
             messages.success(request, u'Added note: {}'.format(note.subject))
         else:
             new_form = False
             messages.error(request, 'Failed to add note')
 
     if new_form:
-        initial = {}
-
-        latest_addition = book.get_latest_addition()
-        # If the book has only one author, set the author to the author of the book
-        # by default.
-        if book.authors.count() == 1:
-            initial['author'] = book.authors.latest('pk')
-        elif latest_addition is not None:
-            # Otherwise, if this book has multiple authors but we've created
-            # a previous note or term, use the author from that.
-            initial['author'] = latest_addition.author
-
-        form = NoteForm(initial=initial)
+        note_form = NoteForm(prefix='note')
+        author_form = ArtefactAuthorForm(prefix='author')
 
     recent_notes = book.notes.order_by('-added')
     context = {
         'book': book,
-        'form': form,
+        'note_form': note_form,
+        'author_form': author_form,
         'recent_notes_1': recent_notes[:3],
         'recent_notes_2': recent_notes[3:6],
     }

@@ -17,7 +17,14 @@
                     <i class="edit icon"></i>
                 </a>
             </div>
-            <em>{{ section.subtitle }}</em>
+            {{ section.subtitle }}
+            {% if section.authors.count %}
+                {% if not section.has_default_authors %}
+                {% include 'author_list.html' with authors=section.authors %}
+                {% endif %}
+            {% else %}
+            (missing author)
+            {% endif %}
         </div>
     </div>
     {% endfor %}

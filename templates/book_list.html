@@ -7,8 +7,11 @@
             </a>
             <h3 class="ui header">
                 <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                <a href="{% url 'admin:books_book_change' book.pk %}">
+                    <i class="edit icon"></i>
+                </a>
                 <div class="sub header">
-                    {% include "author_list.html" with authors=book.authors.all %}
+                    {% include "author_list.html" with authors=book.default_authors %}
                 </div>
             </h3>
             <br />

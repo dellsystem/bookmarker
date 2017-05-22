@@ -53,7 +53,9 @@ class TermOccurrence(SectionArtefact):
     category = models.ForeignKey(TermCategory)
     is_new = models.BooleanField()
     is_defined = models.BooleanField()  # if the author expects unfamiliarity
-    author = models.ForeignKey(Author, blank=True, null=True)  # original author - might be a quote
+    # Should only be empty if the original author isn't in our database.
+    # Will usually inherit from the Section, if present, or the book.
+    authors = models.ManyToManyField(Author, blank=True, related_name='terms')
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

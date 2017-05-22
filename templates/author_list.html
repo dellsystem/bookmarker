@@ -1,3 +1,6 @@
+by
 {% for author in authors.all %}
 <a href="{{ author.get_absolute_url }}">{{ author.name }}</a>{% if not forloop.last %}, {% endif %}
+{% empty %}
+multiple authors
 {% endfor %}

@@ -28,11 +28,12 @@
                 </a>
                 <div class="sub header">
                     {{ section.subtitle }}
-                    {% if section.author %}
-                    by
-                    <a href="{{ section.author.get_absolute_url }}">
-                        {{ section.author }}
-                    </a>
+                    {% if section.authors.count %}
+                        {% if not section.has_default_authors %}
+                        {% include 'author_list.html' with authors=section.authors %}
+                        {% endif %}
+                    {% else %}
+                    (missing author)
                     {% endif %}
                 </div>
             </h3>

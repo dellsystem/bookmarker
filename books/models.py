@@ -37,6 +37,11 @@ class Book(models.Model):
     image_url = models.URLField()
     link = models.URLField()
     authors = models.ManyToManyField(Author, related_name='books')
+    # The default authors set on a Section/Term/Note if they aren't specified.
+    # If empty, then it's assumed that most sections are by different authors.
+    default_authors = models.ManyToManyField(Author,
+                                             blank=True,
+                                             related_name='default_books')
     language = LanguageField(default='en')
     objects = BookManager()
     is_processed = models.BooleanField(default=False)  # terms, notes, sections
@@ -59,31 +64,6 @@ class Book(models.Model):
                 return 100
             else:
                 return 0
-
-    def get_latest_addition(self):
-        if self.notes.count():
-            latest_note = self.notes.latest('pk')
-        else:
-            latest_note = None
-
-        if self.terms.count():
-            latest_term = self.terms.latest('pk')
-        else:
-            latest_term = None
-
-        if latest_note is None:
-            if latest_term is None:
-                return None
-            else:
-                return latest_term
-        else:
-            if latest_term is None:
-                return latest_note
-            else:
-                if latest_term.added > latest_note.added:
-                    return latest_term
-                else:
-                    return latest_note
 
 
 class PageNumberField(models.PositiveSmallIntegerField):
@@ -128,8 +108,7 @@ class PageArtefact(models.Model):
 
 class Section(PageArtefact):
     book = models.ForeignKey(Book, related_name='sections')
-    author = models.ForeignKey(Author, related_name='sections', blank=True,
-                               null=True)
+    authors = models.ManyToManyField(Author, related_name='sections', blank=True)
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)
     summary = models.TextField(blank=True)
@@ -152,6 +131,12 @@ class Section(PageArtefact):
         page (only because PageArtefact defines a custom __cmp__ method)."""
         return merge(self.notes.all(), self.terms.all())
 
+    def has_default_authors(self):
+        return (
+            set(self.authors.values_list('pk')) ==
+            set(self.book.default_authors.values_list('pk'))
+        )
+
 
 class SectionArtefact(PageArtefact):
     """TermOccurrence and Note inherit from this. Section inherits from
@@ -170,6 +155,26 @@ class SectionArtefact(PageArtefact):
         )
         return sections.last()
 
+    def has_default_authors(self):
+        if self.section:
+            return (
+                set(self.authors.values_list('pk')) ==
+                set(self.section.authors.values_list('pk'))
+            )
+        else:
+            return (
+                set(self.authors.values_list('pk')) ==
+                set(self.book.default_authors.values_list('pk'))
+            )
+
+    def set_default_authors(self):
+        if self.section:
+            default_authors = self.section.authors.all()
+        else:
+            default_authors = self.book.default_authors.all()
+
+        self.authors.add(*default_authors)
+
 
 class Note(SectionArtefact):
     book = models.ForeignKey(Book, related_name='notes')
@@ -179,7 +184,9 @@ class Note(SectionArtefact):
     comment = models.TextField(blank=True)
     section = models.ForeignKey(Section, blank=True, null=True,
                                 related_name='notes')
-    author = models.ForeignKey(Author, blank=True, null=True)  # original author - might be a quote
+    # Should only be empty if the original author isn't in our database.
+    # Will usually inherit from the Section, if present, or the book.
+    authors = models.ManyToManyField(Author, blank=True, related_name='notes')
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

@@ -18,39 +18,10 @@ class TermAdmin(admin.ModelAdmin):
     search_fields = ['text', 'definition']
 
 
-class TermOccurrenceActionForm(admin.helpers.ActionForm):
-    author = forms.ModelChoiceField(Author.objects.all())
-
-
-def change_author(modeladmin, request, queryset):
-    author_pk = request.POST['author']
-    try:
-        author = Author.objects.get(pk=author_pk)
-    except Author.DoesNotExist:
-        modeladmin.message_user(
-            request,
-            'Could not find author with pk {pk}'.format(pk=author_pk),
-            messages.ERROR
-        )
-        return
-
-    queryset.update(author=author)
-    modeladmin.message_user(
-        request,
-        'Set author to {author} for {n} instances'.format(
-            author=author,
-            n=queryset.count(),
-        ),
-        messages.SUCCESS
-    )
-
-
 @admin.register(TermOccurrence)
 class TermOccurrenceAdmin(admin.ModelAdmin):
-    action_form = TermOccurrenceActionForm
-    actions = [change_author]
-    list_filter = ('book', 'author')
-    list_display = ('term', 'get_page_display', 'book', 'author', 'is_new',
+    list_filter = ('book', 'authors')
+    list_display = ('term', 'get_page_display', 'book', 'is_new',
                     'is_defined', '_get_category')
 
     def _get_category(self, obj):

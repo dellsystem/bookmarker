@@ -28,13 +28,17 @@
                 <i class="ellipsis vertical icon"></i>
                 {% include "section_link.html" with section=x.section only %}
                 {% endif %}
-                {% if x.author %}
                 <i class="ellipsis vertical icon"></i>
-                <strong>
-                    <a href="{{ x.author.get_absolute_url }}">
-                        {{ x.author }}
-                    </a>
-                </strong>
+                {% if x.authors.count %}
+                    {% if x.has_default_authors %}
+                    <span title="{{ x.authors.all|join:", " }}">
+                        default author
+                    </span>
+                    {% else %}
+                    {% include 'author_list.html' with authors=x.authors %}
+                    {% endif %}
+                {% else %}
+                <span class="ui red label">missing author</span>
                 {% endif %}
             </div>
         </h2>

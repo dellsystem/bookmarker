@@ -88,37 +88,6 @@
     <div class="ui segment">
         <div class="ui three column grid">
             <div class="column">
-                <div class="ui fields">
-                    <div class="twelve wide field">
-                        <label>Author</label>
-                        {{ occurrence_form.author }}
-                    </div>
-                    {% with error=occurrence_form.page_number.errors %}
-                    <div class="four wide {% if error %}error{% endif %} field"
-                         {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                        <label>Page</label>
-                        {{ occurrence_form.page_number }}
-                    </div>
-                    {% endwith %}
-                </div>
-                <div class="ui fields">
-                    {% with error=occurrence_form.category.errors %}
-                    <div class="eight wide {% if error %}error{% endif %} field">
-                        <label>Category{% if error %} (REQUIRED){% endif %}</label>
-                        {{ occurrence_form.category }}
-                    </div>
-                    {% endwith %}
-                    <div class="four wide field">
-                        <label>New?</label>
-                        {{ occurrence_form.is_new }}
-                    </div>
-                    <div class="four wide field">
-                        <label>Defined?</label>
-                        {{ occurrence_form.is_defined }}
-                    </div>
-                </div>
-            </div>
-            <div class="column">
                 <div class="field">
                     <label>Quote</label>
                     {{ occurrence_form.quote }}
@@ -128,6 +97,44 @@
                 <div class="field">
                     <label>Comments</label>
                     {{ occurrence_form.comments }}
+                </div>
+            </div>
+            <div class="column">
+                <div class="ui fields">
+                    {% with error=occurrence_form.page_number.errors %}
+                    <div class="five wide {% if error %}error{% endif %} field"
+                         {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                        <label>Page</label>
+                        {{ occurrence_form.page_number }}
+                    </div>
+                    {% endwith %}
+                    {% with error=occurrence_form.category.errors %}
+                    <div class="six wide {% if error %}error{% endif %} field">
+                        <label>Category{% if error %} (REQ){% endif %}</label>
+                        {{ occurrence_form.category }}
+                    </div>
+                    {% endwith %}
+                    <div class="two wide field">
+                        <label>New?</label>
+                        {{ occurrence_form.is_new }}
+                    </div>
+                    <div class="three wide field">
+                        <label>Defined?</label>
+                        {{ occurrence_form.is_defined }}
+                    </div>
+                </div>
+                <div class="ui fields">
+                    {% with error=author_form.mode.errors %}
+                    <div class="six wide {% if error %}error{% endif %} field"
+                         {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                        <label>Author mode</label>
+                        {{ author_form.mode }}
+                    </div>
+                    {% endwith %}
+                    <div class="ten wide field">
+                        <label>Custom author</label>
+                        {{ author_form.author }}
+                    </div>
                 </div>
             </div>
         </div>

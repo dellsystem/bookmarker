@@ -1,6 +1,6 @@
 from django import forms
 
-from books.models import Note, Section
+from books.models import Author, Note, Section
 from books.utils import roman_to_int
 
 
@@ -43,7 +43,7 @@ class NoteForm(forms.ModelForm):
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section
-        exclude = ['book']
+        exclude = ['book', 'authors']
         widgets = {
             'title': forms.TextInput(attrs={'autofocus': 'autofocus'}),
         }
@@ -73,3 +73,15 @@ class SectionForm(forms.ModelForm):
         section.save()
 
         return section
+
+
+class ArtefactAuthorForm(forms.Form):
+    mode = forms.ChoiceField(
+        choices=(
+            ('default', 'Default'),
+            ('custom', 'Custom'),
+            ('none', 'None'),
+        ),
+        widget=forms.Select,
+    )
+    author = forms.ModelChoiceField(Author.objects.all(), required=False)

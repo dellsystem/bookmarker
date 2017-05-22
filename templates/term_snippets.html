@@ -8,7 +8,7 @@
             <a href="{{ term.book.get_absolute_url }}">{{ term.book }}</a>
             <div class="sub header">
                 by
-                {% include "author_list.html" with authors=term.book.authors %}
+                {% include "author_list.html" with authors=term.book.default_authors %}
             </div>
         </h4>
         {% endif %}
