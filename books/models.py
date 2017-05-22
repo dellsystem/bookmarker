@@ -47,6 +47,7 @@ class Book(models.Model):
     is_processed = models.BooleanField(default=False)  # terms, notes, sections
     completed_sections = models.BooleanField(default=False)  # KEEP
     summary = models.TextField(blank=True)
+    comments = models.TextField(blank=True)  # temporary private notes
 
     def __unicode__(self):
         return self.title

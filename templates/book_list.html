@@ -14,7 +14,11 @@
                     {% include "author_list.html" with authors=book.default_authors %}
                 </div>
             </h3>
+            {% if book.comments %}
+            <pre>{{ book.comments }}</pre>
+            {% else %}
             <br />
+            {% endif %}
             <a class="ui label" href="{% url 'view_terms' book.pk %}">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>
