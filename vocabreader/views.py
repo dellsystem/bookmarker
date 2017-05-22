@@ -379,9 +379,25 @@ def mark_complete(request, book_id):
 def view_section(request, section_id):
     section = Section.objects.get(pk=section_id)
 
+    # Find the previous and next sections (if any) for this book.
+    # TODO: Is there a better way to do this? get_next_by is only for DateField
+    next_section = None
+    previous_section = None
+    book_sections = section.book.sections.all()
+    num_sections = len(book_sections)
+    for i, book_section in enumerate(book_sections):
+        if book_section.pk == section.pk:
+            if i < num_sections - 1:
+                next_section = book_sections[i + 1]
+            if i > 0:
+                previous_section = book_sections[i - 1]
+            break
+
     context = {
         'book': section.book,
         'section': section,
+        'previous_section': previous_section,
+        'next_section': next_section,
     }
 
     return render(request, 'view_section.html', context)

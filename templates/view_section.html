@@ -20,7 +20,7 @@
                 {{ section.get_page_display }}
             </div>
         </div>
-        <div class="twelve wide column">
+        <div class="ten wide column">
             <h3 class="ui header">
                 {{ section.title }}
                 <a href="{% url 'admin:books_section_change' section.pk %}">
@@ -61,6 +61,24 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="two wide column">
+            <div class="ui fluid buttons">
+                {% if previous_section %}
+                <a href="{{ previous_section.get_absolute_url }}"
+                   class="ui icon button"
+                   title="Previous section">
+                    <i class="angle left icon"></i>
+                </a>
+                {% endif %}
+                {% if next_section %}
+                <a href="{{ next_section.get_absolute_url }}"
+                   class="ui icon button"
+                   title="Next section">
+                    <i class="angle right icon"></i>
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
