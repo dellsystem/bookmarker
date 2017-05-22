@@ -7,7 +7,21 @@
 {% endblock %}
 
 {% block content %}
-{% include 'book_header.html' with book=book only %}
+<div class="ui grid">
+    <div class="fourteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="two wide column">
+        <form method="post" action="{% url 'mark_complete' book.id %}">
+            {% csrf_token %}
+            <button class="ui fluid green icon button"
+                    name="mode"
+                    value="sections">
+                <i class="check icon"></i> Done
+            </button>
+        </form>
+    </div>
+</div>
 
 <div class="ui divider"></div>
 
