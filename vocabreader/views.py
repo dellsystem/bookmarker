@@ -78,6 +78,9 @@ def view_terms(request, book_id):
 
 def add_section(request, book_id):
     book = Book.objects.get(pk=book_id)
+    if book.completed_sections:
+        messages.error(request, 'Sections are already completed!')
+        return redirect(book)
 
     new_form = True
     if request.method == 'POST':
