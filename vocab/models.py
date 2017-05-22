@@ -69,10 +69,9 @@ class TermOccurrence(SectionArtefact):
         super(TermOccurrence, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return "{term} in {book} ({page})".format(
+        return "{term} in {book}".format(
             term=self.term.text,
             book=self.book.title,
-            page=self.get_page_display(),
         )
 
     def get_highlighted_quote(self):

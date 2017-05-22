@@ -118,11 +118,7 @@ class Section(PageArtefact):
         ordering = ['-in_preface', 'page_number']
 
     def __unicode__(self):
-        s = self.title
-        if self.page_number:
-            s += ' - %s' % self.get_page_display()
-
-        return s
+        return self.title
 
     def get_absolute_url(self):
         return reverse('view_section', args=[str(self.id)])
