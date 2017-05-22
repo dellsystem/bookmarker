@@ -1,0 +1,34 @@
+<div class="ui two column grid">
+    {% for book in books %}
+    <div class="column">
+        <div class="ui clearing segment book-card">
+            <a href="{{ book.get_absolute_url }}">
+                <img src="{{ book.image_url }}" class="ui rounded small left-floated image" />
+            </a>
+            <h3 class="ui header">
+                <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                <div class="sub header">
+                    {% include "author_list.html" with authors=book.authors.all %}
+                </div>
+            </h3>
+            <br />
+            <a class="ui label" href="{% url 'view_terms' book.pk %}">
+                <i class="flag icon"></i> {{ book.terms.count }}
+            </a>
+            <a class="ui label" href="{% url 'view_notes' book.pk %}">
+                <i class="sticky note icon"></i> {{ book.notes.count }} 
+            </a>
+            <a class="ui label" href="{% url 'view_book' book.pk %}">
+                <i class="sticky angle right icon"></i> {{ book.sections.count }} 
+            </a>
+            {% with summary_pc=book.get_summary_percent %}
+            <a class="ui {% if summary_pc < 100 %}red{% endif %} label"
+               href="">
+                <i title="Summaries: % completed" class="browser icon"></i>
+                {{ summary_pc }}%
+            </a>
+            {% endwith %}
+        </div>
+    </div>
+    {% endfor %}
+</div>

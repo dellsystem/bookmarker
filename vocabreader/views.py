@@ -14,26 +14,26 @@ from vocab.models import Term, TermOccurrence
 
 
 def home(request):
+    books = Book.objects.all().order_by(
+        'is_processed', 'completed_sections', '-pk'
+    )
+
     context = {
-        'num_books': Book.objects.count(),
-        'num_needing_terms': Book.objects.filter(completed_terms=False).count(),
-        'num_needing_notes': Book.objects.filter(completed_notes=False).count(),
-        'num_needing_sections': Book.objects.filter(completed_sections=False).count(),
-        'books': Book.objects.order_by(
-            'completed_notes', 'completed_terms', 'completed_sections', '-pk'
+        'started_books': books.filter(
+            is_processed=False,
+            completed_sections=True
         ),
+        'new_books': books.filter(
+            is_processed=False,
+            completed_sections=False
+        ),
+        'done_books': books.filter(is_processed=True),
     }
     return render(request, 'home.html', context)
 
 
 def view_book(request, book_id):
     book = Book.objects.get(pk=book_id)
-
-    # Divide the sections in half for more compact displaying.
-    sections = book.sections.all()
-    middle = (sections.count() + 1) / 2
-    sections_1 = sections[:middle]
-    sections_2 = sections[middle:]
 
     if book.sections.count() == 0 and book.completed_sections:
         needs_sections = False
@@ -47,8 +47,6 @@ def view_book(request, book_id):
         'book': book,
         'recent_terms': book.terms.order_by('-added')[:5],
         'recent_notes': book.notes.order_by('-added')[:5],
-        'sections_1': sections_1,
-        'sections_2': sections_2,
         'notes_without_section': notes_without_section,
         'terms_without_section': terms_without_section,
         'needs_sections': needs_sections,
@@ -94,17 +92,9 @@ def add_section(request, book_id):
     if new_form:
         form = SectionForm()
 
-    # Divide the sections in half for more compact displaying.
-    sections = book.sections.all()
-    middle = (sections.count() + 1) / 2
-    sections_1 = sections[:middle]
-    sections_2 = sections[middle:]
-
     context = {
         'book': book,
         'form': form,
-        'sections_1': sections_1,
-        'sections_2': sections_2,
     }
 
     return render(request, 'add_section.html', context)
@@ -112,6 +102,10 @@ def add_section(request, book_id):
 
 def add_term(request, book_id):
     book = Book.objects.get(pk=book_id)
+
+    if not book.completed_sections:
+        messages.error(request, 'Sections need to be completed first')
+        return redirect(book)
 
     new_forms = True
     if request.method == 'POST':
@@ -241,6 +235,10 @@ def get_definition(request):
 def add_note(request, book_id):
     book = Book.objects.get(pk=book_id)
 
+    if not book.completed_sections:
+        messages.error(request, 'Sections need to be completed first')
+        return redirect(book)
+
     new_form = True
     if request.method == 'POST':
         form = NoteForm(request.POST)
@@ -353,20 +351,13 @@ def mark_complete(request, book_id):
     book = Book.objects.get(pk=book_id)
 
     mode = request.POST.get('mode')
-    if mode == 'terms':
-        if book.completed_terms:
-            messages.error(request, 'Terms already marked as complete')
+    if mode == 'processed':
+        if book.is_processed:
+            messages.error(request, 'Book already marked as processed')
         else:
-            book.completed_terms = True
+            book.is_processed = True
             book.save()
-            messages.success(request, 'Terms marked as complete')
-    elif mode == 'notes':
-        if book.completed_notes:
-            messages.error(request, 'Notes already marked as complete')
-        else:
-            book.completed_notes = True
-            book.save()
-            messages.success(request, 'Notes marked as complete')
+            messages.success(request, 'Book marked as processed')
     elif mode == 'sections':
         if book.completed_sections:
             messages.error(request, 'Sections already marked as complete')

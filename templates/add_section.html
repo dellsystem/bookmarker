@@ -10,27 +10,6 @@
 {% include 'book_header.html' with book=book only %}
 
 <div class="ui divider"></div>
-{% with count=book.sections.count %}
-{% if count %}
-<h3>
-    Existing sections ({{ count }} total)
-</h3>
-<div class="ui two column celled grid">
-    <div class="column">
-        {% include 'section_list.html' with sections=sections_1 only %}
-    </div>
-    <div class="column">
-        {% include 'section_list.html' with sections=sections_2 only %}
-    </div>
-</div>
-{% else %}
-<div class="ui warning message">
-    <div class="header">
-        No sections yet!
-    </div>
-</div>
-{% endif %}
-{% endwith %}
 
 <div class="ui segment">
     <form class="ui form" method="post">
@@ -70,4 +49,20 @@
         </div>
     </form>
 </div>
+
+{% with count=book.sections.count %}
+{% if count %}
+<h3>
+    Existing sections ({{ count }} total)
+</h3>
+{% include 'section_list.html' with sections=book.sections.all only %}
+{% else %}
+<div class="ui warning message">
+    <div class="header">
+        No sections yet!
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
 {% endblock %}

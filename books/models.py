@@ -39,9 +39,8 @@ class Book(models.Model):
     authors = models.ManyToManyField(Author, related_name='books')
     language = LanguageField(default='en')
     objects = BookManager()
-    completed_terms = models.BooleanField(default=False)
-    completed_notes = models.BooleanField(default=False)
-    completed_sections = models.BooleanField(default=False)
+    is_processed = models.BooleanField(default=False)  # terms, notes, sections
+    completed_sections = models.BooleanField(default=False)  # KEEP
     summary = models.TextField(blank=True)
 
     def __unicode__(self):
@@ -50,17 +49,16 @@ class Book(models.Model):
     def get_absolute_url(self):
         return reverse('view_book', args=[str(self.id)])
 
-    @property
-    def completed_summaries(self):
-        """If there are sections, they must be complete AND each
-        must have a summary. Otherwise, the book must have a summary."""
-        if self.sections.count():
-            return (
-                self.completed_sections and
-                not self.sections.filter(summary='').exists()
-            )
+    def get_summary_percent(self):
+        num_sections = self.sections.count()
+        if num_sections:
+            return self.sections.exclude(summary='').count() * 100 / num_sections
         else:
-            return len(self.summary) > 0
+            # 100% if the book summary is filled in. 0% otherwise.
+            if self.summary:
+                return 100
+            else:
+                return 0
 
     def get_latest_addition(self):
         if self.notes.count():

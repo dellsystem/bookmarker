@@ -6,6 +6,51 @@
 
 {% block content %}
 <div class="ui grid">
+    <div class="thirteen wide column">
+        <h2 class="ui header">
+            {{ book.title }}
+            <a href="{% url 'admin:books_book_change' book.pk %}">
+                <i class="edit icon"></i>
+            </a>
+            <div class="sub header">
+                {% include 'author_list.html' with authors=book.authors only %}
+            </div>
+        </h2>
+    </div>
+    <div class="three wide center aligned column">
+        {% if not book.is_processed %}
+        <form method="post" action="{% url 'mark_complete' book.id %}">
+        {% csrf_token %}
+        {% if not book.completed_sections %}
+            <div class="ui fluid buttons">
+                <a class="ui blue icon button" href="{% url 'add_section' book.pk %}">
+                    <i class="plus icon"></i> Add section
+                </a>
+                <button class="ui green icon button"
+                        name="mode"
+                        value="sections">
+                    <i class="check icon"></i> Done
+                </button>
+            </div>
+        {% else %}
+            <button class="ui fluid black icon button"
+                    title="Summaries can be omitted"
+                    name="mode"
+                    value="processed"
+                    type="submit">
+               <i class="check icon"></i> Mark as processed
+            </button>
+        {% endif %}
+        </form>
+        {% else %}
+        <div class="ui large fluid green basic button">
+            Done
+        </div>
+        {% endif %}
+    </div>
+</div>
+<div class="ui divider"></div>
+<div class="ui grid">
     <div class="four wide column">
         <a href="{{ book.link }}">
             <img src="{{ book.image_url }}"
@@ -14,49 +59,33 @@
         </a>
         <br />
         <div style="text-align: center">
-            <div class="ui icon {% if not book.completed_terms %}red{% endif %} label"
-                 title="Terms">
+            <div class="ui icon label" title="Terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </div>
-            <div class="ui icon {% if not book.completed_notes %}red{% endif %} label"
-                 title="Notes">
+            <div class="ui icon label" title="Notes">
                 <i class="sticky note icon"></i> {{ book.notes.count }}
             </div>
-            <div class="ui icon {% if not book.completed_sections %}red{% endif %} label"
-                 title="Sections">
+            <div class="ui icon label" title="Sections">
                 <i class="angle right icon"></i> {{ book.sections.count }}
             </div>
-            <div class="ui icon {% if not book.completed_summaries %}red{% endif %} label"
-                 title="Summaries">
-                <i class="write icon"></i>
-            </div>
+            {% with summary_pc=book.get_summary_percent %}
+            <a class="ui {% if summary_pc < 100 %}red{% endif %} label"
+               href="">
+                <i title="Summaries: % completed" class="browser icon"></i>
+                {{ summary_pc }}%
+            </a>
+            {% endwith %}
         </div>
-        <br />
-        <a href="{% url 'admin:books_book_change' book.pk %}"
-           class="ui fluid black icon button">
-           <i class="edit icon"></i> Edit
-        </a>
     </div>
     <div class="twelve wide column">
-        <h2 class="ui header">
-            {{ book.title }}
-            <div class="sub header">
-                {% include 'author_list.html' with authors=book.authors only %}
-            </div>
-        </h2>
-        <div class="ui divider"></div>
+        {% if book.sections.count %}
+        {% include 'section_list.html' with sections=book.sections.all only %}
+        {% endif %}
+        {% if book.completed_sections %}
         <div class="ui celled two column grid">
             <div class="column">
                 {% with num_terms=book.terms.count %}
-                <form method="post" action="{% url 'mark_complete' book.id %}">
-                {% csrf_token %}
                 <div class="ui fluid buttons">
-                    {% if not book.completed_terms %}
-                    <button class="ui green icon button" name="mode"
-                            value="terms">
-                        <i class="check icon"></i> Complete
-                    </button>
-                    {% endif %}
                     {% if num_terms %}
                     <a href="{% url 'view_terms' book.pk %}"
                        class="ui basic blue icon button">
@@ -64,15 +93,25 @@
                         View terms ({{ num_terms }})
                     </a>
                     {% endif %}
-                    {% if not book.completed_terms %}
+                    {% if not book.is_processed %}
                     <a href="{% url 'add_term' book.pk %}" class="ui blue icon button">
                         <i class="plus icon"></i> Add term
                     </a>
                     {% endif %}
                 </div>
-                </form>
                 {% if num_terms %}
-                {% include 'term_snippets.html' with terms=recent_terms only %}
+                    {% include 'term_snippets.html' with terms=recent_terms only %}
+                    {% if needs_sections and terms_without_section %}
+                    <div class="ui error icon message">
+                        <i class="x icon"></i>
+                        {{ terms_without_section.count }} sections not filled in
+                    </div>
+                    {% else %}
+                    <div class="ui success icon message">
+                        <i class="checkmark icon"></i>
+                        Sections all filled in
+                    </div>
+                    {% endif %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">
@@ -81,31 +120,10 @@
                 </div>
                 {% endif %}
                 {% endwith %}
-                {% if needs_sections %}
-                {% if terms_without_section %}
-                <div class="ui error icon message">
-                    <i class="x icon"></i>
-                    {{ terms_without_section.count }} sections not filled in
-                </div>
-                {% else %}
-                <div class="ui success icon message">
-                    <i class="checkmark icon"></i>
-                    Sections all filled in
-                </div>
-                {% endif %}
-                {% endif %}
             </div>
             <div class="column">
                 {% with num_notes=book.notes.count %}
-                <form method="post" action="{% url 'mark_complete' book.id %}">
-                {% csrf_token %}
                 <div class="ui fluid buttons">
-                    {% if not book.completed_notes %}
-                    <button class="ui green icon button" name="mode"
-                            value="notes">
-                        <i class="check icon"></i> Complete
-                    </button>
-                    {% endif %}
                     {% if num_notes %}
                     <a href="{% url 'view_notes' book.pk %}"
                        class="ui basic blue icon button">
@@ -113,15 +131,25 @@
                         View all {{ num_notes }} notes
                     </a>
                     {% endif %}
-                    {% if not book.completed_notes %}
+                    {% if not book.is_processed %}
                     <a href="{% url 'add_note' book.pk %}" class="ui blue icon button">
                         <i class="plus icon"></i> Add note
                     </a>
                     {% endif %}
                 </div>
-                </form>
                 {% if num_notes %}
-                {% include 'note_snippets.html' with notes=recent_notes only %}
+                    {% include 'note_snippets.html' with notes=recent_notes only %}
+                    {% if needs_sections and notes_without_section %}
+                    <div class="ui error icon message">
+                        <i class="x icon"></i>
+                        {{ notes_without_section.count }} sections not filled in
+                    </div>
+                    {% else %}
+                    <div class="ui success icon message">
+                        <i class="checkmark icon"></i>
+                        Sections all filled in
+                    </div>
+                    {% endif %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">
@@ -130,52 +158,15 @@
                 </div>
                 {% endif %}
                 {% endwith %}
-                {% if needs_sections %}
-                {% if notes_without_section %}
-                <div class="ui error icon message">
-                    <i class="x icon"></i>
-                    {{ notes_without_section.count }} sections not filled in
-                </div>
-                {% else %}
-                <div class="ui success icon message">
-                    <i class="checkmark icon"></i>
-                    Sections all filled in
-                </div>
-                {% endif %}
-                {% endif %}
             </div>
         </div>
+        {% else %}
+        <div class="ui warning message">
+            You must complete the sections before you can add terms or notes.
+        </div>
+        {% endif %}
     </div>
 </div>
 
-{% if needs_sections %}
-<div class="ui divider"></div>
-{% endif %}
-
-{% if not book.completed_sections %}
-<form method="post" action="{% url 'mark_complete' book.id %}">
-{% csrf_token %}
-<div class="ui fluid buttons">
-    <button class="ui green icon button" name="mode"
-            value="sections">
-        <i class="check icon"></i> Complete
-    </button>
-    <a class="ui blue icon button" href="{% url 'add_section' book.pk %}">
-        <i class="plus icon"></i> Add section
-    </a>
-</div>
-</form>
-{% endif %}
-
-{% if book.sections.count %}
-<div class="ui two column celled grid">
-    <div class="column">
-        {% include 'section_list.html' with sections=sections_1 only %}
-    </div>
-    <div class="column">
-        {% include 'section_list.html' with sections=sections_2 only %}
-    </div>
-</div>
-{% endif %}
 
 {% endblock %}

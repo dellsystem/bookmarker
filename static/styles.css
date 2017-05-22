@@ -35,3 +35,16 @@ blockquote footer {
 .highlight {
     background: #eab18a;
 }
+
+.book-card {
+    padding: 0 !important;
+}
+
+.book-card .image {
+    padding-right: 15px;
+}
+
+.book-card h3 {
+    margin-top: 15px !important;
+    padding-right: 15px !important;
+}
