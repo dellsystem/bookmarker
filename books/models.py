@@ -46,6 +46,7 @@ class Book(models.Model):
     objects = BookManager()
     is_processed = models.BooleanField(default=False)  # terms, notes, sections
     completed_sections = models.BooleanField(default=False)  # KEEP
+    completed_read = models.BooleanField(default=True)
     summary = models.TextField(blank=True)
     comments = models.TextField(blank=True)  # temporary private notes
 

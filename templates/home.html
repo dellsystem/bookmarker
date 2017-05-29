@@ -6,7 +6,7 @@
 <div class="ui grid">
     <div class="nine wide column">
         <div class="ui segment">
-            <div class="ui three mini statistics">
+            <div class="ui four mini statistics">
                 <div class="statistic">
                     <div class="value">
                         {{ started_books.count }}
@@ -29,6 +29,14 @@
                     </div>
                     <div class="label">
                         <a href="#done_books">Done</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ unread_books.count }}
+                    </div>
+                    <div class="label">
+                        <a href="#unread_books">Unread</a>
                     </div>
                 </div>
             </div>
@@ -56,4 +64,7 @@
 
 <h2 id="done_books">Done</h2>
 {% include 'book_list.html' with books=done_books only %}
+
+<h2 id="unread_books">Unread</h2>
+{% include 'book_list.html' with books=unread_books only %}
 {% endblock %}

@@ -25,9 +25,11 @@ def home(request):
         ),
         'new_books': books.filter(
             is_processed=False,
-            completed_sections=False
+            completed_sections=False,
+            completed_read=True,
         ),
         'done_books': books.filter(is_processed=True),
+        'unread_books': books.filter(completed_read=False),
     }
     return render(request, 'home.html', context)
 
