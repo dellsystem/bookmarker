@@ -143,6 +143,10 @@ def add_term(request, book_id):
                     'highlights': term_form.cleaned_data['highlights'],
                 },
             )
+            if not created:
+                term.definition = term_form.cleaned_data['definition']
+                term.highlights = term_form.cleaned_data['highlights']
+                term.save()
 
             occurrence = occurrence_form.save(term=term, book=book)
 
