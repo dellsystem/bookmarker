@@ -22,3 +22,4 @@ class BookAdmin(admin.ModelAdmin):
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
     list_display = ['subject', 'section', 'book', 'get_page_display']
+    search_fields = ['subject', 'quote', 'comment']
