@@ -59,12 +59,12 @@
         </a>
         <br />
         <div style="text-align: center">
-            <div class="ui icon label" title="Terms">
+            <a class="ui icon label" title="Terms" href="#terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
-            </div>
-            <div class="ui icon label" title="Notes">
+            </a>
+            <a class="ui icon label" title="Notes" href="#notes">
                 <i class="sticky note icon"></i> {{ book.notes.count }}
-            </div>
+            </a>
             <div class="ui icon label" title="Sections">
                 <i class="angle right icon"></i> {{ book.sections.count }}
             </div>
@@ -83,7 +83,7 @@
         {% endif %}
         {% if book.completed_sections %}
         <div class="ui celled two column grid">
-            <div class="column">
+            <div class="column" id="terms">
                 {% with num_terms=book.terms.count %}
                 <div class="ui fluid buttons">
                     {% if num_terms %}
@@ -121,7 +121,7 @@
                 {% endif %}
                 {% endwith %}
             </div>
-            <div class="column">
+            <div class="column" id="notes">
                 {% with num_notes=book.notes.count %}
                 <div class="ui fluid buttons">
                     {% if num_notes %}

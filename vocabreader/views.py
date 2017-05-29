@@ -398,6 +398,66 @@ def mark_complete(request, book_id):
     return redirect(book)
 
 
+def edit_section(request, section_id):
+    section = Section.objects.get(pk=section_id)
+
+    initial_author = None
+    if section.authors.count():
+        if section.has_default_authors():
+            author_mode = 'default'
+        else:
+            author_mode = 'custom'
+            initial_author = section.authors.first()
+    else:
+        author_mode = 'none'
+
+    if request.method == 'POST':
+        section_form = SectionForm(
+            request.POST, instance=section, prefix='section'
+        )
+        author_form = ArtefactAuthorForm(
+            request.POST, prefix='author',
+        )
+        if section_form.is_valid() and author_form.is_valid():
+            section = section_form.save()
+
+            # Set the authors according to author_form (only if the mode has
+            # changed).
+            new_author_mode = author_form.cleaned_data['mode']
+            if author_mode != new_author_mode:
+                if new_author_mode == 'default':
+                    section.set_default_authors()
+                else:
+                    # If it's "none", we only need to remove authors.
+                    section.authors.clear()
+                    if new_author_mode == 'custom':
+                        section.authors.add(author_form.cleaned_data['author'])
+
+            messages.success(
+                request, u'Edited section: {}'.format(section.title)
+            )
+            return redirect(section.book)
+
+    section_form = SectionForm(instance=section, prefix='section')
+
+    author_form = ArtefactAuthorForm(
+        prefix='author',
+        initial={
+        'mode': author_mode,
+        'author': initial_author,
+        }
+    )
+
+    context = {
+        'section': section,
+        'book': section.book,
+        'section_form': section_form,
+        'author_form': author_form,
+    }
+
+    return render(request, 'edit_section.html', context)
+
+
 def view_section(request, section_id):
     section = Section.objects.get(pk=section_id)
 

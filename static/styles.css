@@ -48,3 +48,7 @@ blockquote footer {
     margin-top: 15px !important;
     padding-right: 15px !important;
 }
+
+.ui.compact.grid>.row {
+    padding: 0;
+}

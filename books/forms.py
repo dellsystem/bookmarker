@@ -48,12 +48,13 @@ class SectionForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'autofocus': 'autofocus'}),
         }
 
-    def save(self, book):
+    def save(self, book=None):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
         section = super(SectionForm, self).save(commit=False)
 
-        section.book = book
+        if book:
+            section.book = book
 
         page = section.page_number
         try:

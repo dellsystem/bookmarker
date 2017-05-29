@@ -40,6 +40,8 @@ urlpatterns = [
         name='mark_complete'),
     url(r'^section/(?P<section_id>\d+)$', vocabreader.views.view_section,
         name='view_section'),
+    url(r'^section/(?P<section_id>\d+)/edit$', vocabreader.views.edit_section,
+        name='edit_section'),
     url(r'^note/(?P<note_id>\d+)$', vocabreader.views.view_note,
         name='view_note'),
     url(r'^term/(?P<term_id>\d+)$', vocabreader.views.view_term,

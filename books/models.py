@@ -107,12 +107,24 @@ class PageArtefact(models.Model):
             return self.page_number
 
 
+class RatingField(models.IntegerField):
+    def __init__(self, min_value=1, max_value=5, **kwargs):
+        self.min_value, self.max_value = min_value, max_value
+        models.IntegerField.__init__(self, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
+        defaults.update(kwargs)
+        return super(RatingField, self).formfield(**defaults)
+
+
 class Section(PageArtefact):
     book = models.ForeignKey(Book, related_name='sections')
     authors = models.ManyToManyField(Author, related_name='sections', blank=True)
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)
     summary = models.TextField(blank=True)
+    rating = RatingField(default=0)
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

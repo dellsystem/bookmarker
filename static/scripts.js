@@ -31,3 +31,16 @@ function fetchDefinition() {
         }
     });
 }
+
+$('.editable-rating').rating({
+    maxRating: 5,
+    interactive: true,
+    onRate: function(value) {
+        $('#section_rating').val(value);
+    }
+});
+
+$('.display-rating').rating({
+    maxRating: 5,
+    interactive: false,
+});

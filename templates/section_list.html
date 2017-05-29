@@ -1,30 +1,45 @@
-<div class="ui middle aligned divided list">
+{% load markdown_filter %}
+
+
+<br />
+<div class="ui vertically divided compact grid">
     {% for section in sections %}
-    <div class="item">
-        <div class="left floated content">
-            <div title="Summary"
-                 class="ui icon {% if not section.summary %}red{% endif %} label">
-                <i class="browser icon"></i>
-            </div>
-        </div>
-        <div class="right floated content">
+    <div class="row">
+        <div class="one wide column">
             <div class="ui large circular label">{{ section.get_page_display }}</div>
         </div>
-        <div class="content">
-            <div class="header">
-                <a href="{{ section.get_absolute_url }}">{{ section.title }}</a>
-                <a href="{% url 'admin:books_section_change' section.pk %}">
-                    <i class="edit icon"></i>
+        <div class="eleven wide column">
+            <h4 class="ui header">
+                <a href="{{ section.get_absolute_url }}">
+                    {{ section.title|markdownify_title }}
                 </a>
-            </div>
-            {{ section.subtitle }}
-            {% if section.authors.count %}
-                {% if not section.has_default_authors %}
-                {% include 'author_list.html' with authors=section.authors %}
-                {% endif %}
-            {% else %}
-            (missing author)
+                <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
+                </div>
+                <div class="sub header">
+                    {{ section.subtitle|markdownify_title }}
+                    {% if section.authors.count %}
+                        {% if not section.has_default_authors %}
+                        {% include 'author_list.html' with authors=section.authors %}
+                        {% endif %}
+                    {% else %}
+                    (missing author)
+                    {% endif %}
+                </div>
+            </h4>
+            {% if section.summary %}
+            {{ section.summary|markdownify }}
             {% endif %}
+        </div>
+        <div class="three wide right aligned column">
+            {{ section.terms.count }} <i class="flag icon"></i>
+            /
+            {{ section.notes.count }} <i class="sticky note icon"></i>
+        </div>
+        <div class="one wide right aligned column">
+            <a class="ui mini icon {% if not section.summary %}red{% endif %} button"
+               href="{% url 'edit_section' section.pk %}">
+                <i class="edit icon"></i>
+            </a>
         </div>
     </div>
     {% endfor %}

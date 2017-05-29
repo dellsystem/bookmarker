@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<i class="right angle icon divider"></i>
+<a class="section" href="{{ section.get_absolute_url }}">View section</a>
+<i class="right angle icon divider"></i>
+<div class="active section">Edit section</div>
+{% endblock %}
+
+{% block content %}
+{% include 'book_header.html' with book=book only %}
+
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <form class="ui form" method="post">
+        {% csrf_token %}
+        <div class="ui fields">
+            {% with error=section_form.title.errors %}
+            <div class="five wide {% if error %}error{% endif %} field">
+                <label>Title{% if error %} (REQUIRED){% endif %}</label>
+                {{ section_form.title }}
+            </div>
+            {% endwith %}
+            <div class="five wide field">
+                <label>Subtitle</label>
+                {{ section_form.subtitle }}
+            </div>
+            {% with error=section_form.page_number.errors %}
+            <div class="one wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Page</label>
+                {{ section_form.page_number }}
+            </div>
+            {% endwith %}
+            {% with error=author_form.mode.errors %}
+            <div class="two wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Author mode</label>
+                {{ author_form.mode }}
+            </div>
+            {% endwith %}
+            <div class="three wide field">
+                <label>Author</label>
+                {{ author_form.author }}
+            </div>
+        </div>
+        <div class="field">
+            <label>Summary</label>
+            {{ section_form.summary }}
+        </div>
+        <div class="ui basic center aligned segment">
+            <input type="hidden" name="section-rating"
+                   id="section_rating" value="{{ section.rating }}" />
+            <div class="ui heart rating editable-rating"
+                 data-rating="{{ section.rating }}">
+            </div>
+            <br /><br />
+            <button type="submit" name="submit"
+                    class="ui blue button">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
