@@ -76,6 +76,12 @@
             </a>
             {% endwith %}
         </div>
+        <br />
+        {% if book.comments %}
+        <div class="ui message">
+            <code>{{ book.comments }}</code>
+        </div>
+        {% endif %}
     </div>
     <div class="twelve wide column">
         {% if book.sections.count %}

@@ -15,10 +15,10 @@
                 </div>
             </h3>
             {% if book.comments %}
-            <pre>{{ book.comments }}</pre>
-            {% else %}
+            <code>{{ book.comments }}</code>
             <br />
             {% endif %}
+            <br />
             <a class="ui label" href="{% url 'view_terms' book.pk %}">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>
