@@ -208,19 +208,24 @@ def add_book(request):
         )
 
         for gr_author in gr_book.authors:
-            if Author.objects.filter(goodreads_id=gr_author.gid).exists():
-                book.authors.add(Author.objects.get(goodreads_id=gr_author.gid))
-                continue
+            try:
+                author = Author.objects.get(goodreads_id=gr_author.gid)
+            except Author.DoesNotExist:
+                author = None
 
-            author = book.authors.create(
-                goodreads_id=gr_author.gid,
-                name=gr_author.name,
-                link=gr_author.link,
-            )
-            messages.success(
-                request,
-                u'Added author: {}'.format(author.name),
-            )
+            if author is None:
+                author = Author.objects.create(
+                    goodreads_id=gr_author.gid,
+                    name=gr_author.name,
+                    link=gr_author.link,
+                )
+                messages.success(
+                    request,
+                    u'Added author: {}'.format(author.name),
+                )
+
+            book.authors.add(author)
+            book.default_authors.add(author)
 
     return redirect(book)
 
