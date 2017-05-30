@@ -21,7 +21,7 @@
 </div>
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=notes only %}
+{% include "pagination.html" with items=notes author=author only %}
 
 <div class="ui grid">
     {% for note in notes %}
@@ -29,6 +29,6 @@
     {% endfor %}
 </div>
 
-{% include "pagination.html" with items=notes only %}
+{% include "pagination.html" with items=notes author=author only %}
 
 {% endblock %}

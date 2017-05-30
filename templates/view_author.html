@@ -5,35 +5,103 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="ui header">
-    <a href="{{ author.link }}">{{ author.name }}</a>
-    <a href="{% url 'admin:books_author_change' author.pk %}">
-        <i class="edit icon"></i>
-    </a>
-    <div class="sub header">
-        {{ author.goodreads_id }}
+<div class="ui grid">
+    <div class="twelve wide column">
+        <h2 class="ui header">
+            <a href="{{ author.link }}">{{ author.name }}</a>
+            <a href="{% url 'admin:books_author_change' author.pk %}">
+                <i class="edit icon"></i>
+            </a>
+        </h2>
     </div>
-</h2>
-<div class="ui five cards">
-    {% for book in author.books.all %}
-    <a class="ui card" href="{{ book.get_absolute_url }}">
+    <div class="four wide right aligned column">
+        <a class="ui blue button"
+           href="{% url 'view_all_terms' %}?author={{ author.pk }}">
+            {{ num_terms }}
+            terms
+        </a>
+        <a class="ui blue button"
+           href="{% url 'view_all_notes' %}?author={{ author.pk }}">
+            {{ num_notes }}
+            notes
+        </a>
+    </div>
+</div>
+
+<div class="ui divider"></div>
+
+<a name="top"></a>
+
+<div class="ui ten cards">
+    {% for row in books %}
+    <a class="ui card" href="#book-{{ row.book.pk }}" title="{{ row.book.title }}">
         <div class="image">
-            <img src="{{ book.image_url }}" class="ui fluid image" />
-        </div>
-        <div class="content">
-            <div class="header">
-                {{ book.title }}
-            </div>
-        </div>
-        <div class="extra content">
-            <span>
-                <i class="flag icon"></i> {{ book.terms.count }} terms
-            </span>
-            <span>
-                <i class="sticky note icon"></i> {{ book.notes.count }} notes
-            </span>
+            <img src="{{ row.book.image_url }}" class="ui fluid image" />
         </div>
     </a>
+    {% endfor %}
+</div>
+
+<div class="ui divider"></div>
+
+<div class="ui grid">
+    {% for row in books %}
+    <div class="row">
+        <div class="fifteen wide column">
+            <h3 class="ui header" id="book-{{ row.book.pk }}">
+                <div class="content">
+                    <a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a>
+                    <div class="sub header">
+                        {% include 'author_list.html' with authors=row.book.default_authors only %}
+                    </div>
+                </div>
+            </h3>
+        </div>
+        <div class="one wide center aligned column">
+            <a href="#top"><i class="angle up icon"></i> Top</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="three wide column">
+            <a href="{{ row.book.get_absolute_url }}" class="ui fluid image">
+                <img src="{{ row.book.image_url }}"
+                     title="{{ row.book.title }}" />
+            </a>
+        </div>
+        <div class="thirteen wide column">
+            {% if row.sections %}
+            {% include 'section_list.html' with sections=row.sections %}
+            {% else %}
+            <div class="ui celled two column grid">
+                <div class="column">
+                    {% if row.num_terms %}
+                    <a href="{% url 'view_terms' row.book.pk %}?author={{ author.pk }}"
+                       class="ui fluid basic blue icon button">
+                        <i class="list icon"></i>
+                        View terms by {{ author }} ({{ row.num_terms }})
+                    </a>
+                    {% include 'term_snippets.html' with terms=row.terms only %}
+                    {% else %}
+                    <div class="ui messgae">No terms by {{ author }}</div>
+                    {% endif %}
+                </div>
+                <div class="column">
+                    {% if row.num_notes %}
+                    <a href="{% url 'view_notes' row.book.pk %}?author={{ author.pk }}"
+                       class="ui fluid basic blue icon button">
+                        <i class="list icon"></i>
+                        View notes by {{ author }} ({{ row.num_notes }})
+                    </a>
+                    {% include 'note_snippets.html' with notes=row.notes only %}
+                    {% else %}
+                    <div class="ui message">No notes by {{ author }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="ui divider"></div>
     {% endfor %}
 </div>
 {% endblock %}

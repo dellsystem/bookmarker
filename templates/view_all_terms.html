@@ -9,7 +9,7 @@
 
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=terms only %}
+{% include "pagination.html" with items=terms author=author only %}
 
 <div class="ui grid">
     {% for term in terms %}
@@ -17,6 +17,6 @@
     {% endfor %}
 </div>
 
-{% include "pagination.html" with items=terms only %}
+{% include "pagination.html" with items=terms author=author only %}
 
 {% endblock %}

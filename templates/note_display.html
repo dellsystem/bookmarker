@@ -24,6 +24,13 @@
         <h2 class="ui header">
             <div class="sub header">
                 {{ x.added|naturaltime }}
+                {% if show_book %}
+                <i class="ellipsis vertical icon"></i>
+                <a href="{{ x.book.get_absolute_url }}"
+                   title="by {{ x.book.default_authors.all|join:", " }}">
+                    <strong>{{ x.book }}</strong>
+                </a>
+                {% endif %}
                 {% if not hide_section and x.section %}
                 <i class="ellipsis vertical icon"></i>
                 {% include "section_link.html" with section=x.section only %}

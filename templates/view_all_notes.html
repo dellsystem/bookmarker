@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">View all notes</div>
+{% endblock %}
+
+{% block content %}
+<h2>View all notes</h2>
+
+<div class="ui divider"></div>
+
+{% include "pagination.html" with items=notes author=author only %}
+
+<div class="ui grid">
+    {% for note in notes %}
+    {% include 'note_display.html' with x=note show_book=True only %}
+    {% endfor %}
+</div>
+
+{% include "pagination.html" with items=notes author=author only %}
+
+{% endblock %}

@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^$', vocabreader.views.home, name='home'),
     url(r'^addbook$', vocabreader.views.add_book, name='add_book'),
     url(r'^terms$', vocabreader.views.view_all_terms, name='view_all_terms'),
+    url(r'^notes$', vocabreader.views.view_all_notes, name='view_all_notes'),
     url(r'^book/(?P<book_id>\d+)$', vocabreader.views.view_book,
         name='view_book'),
     url(r'^book/(?P<book_id>\d+)/addterm$', vocabreader.views.add_term,

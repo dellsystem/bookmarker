@@ -1,3 +1,5 @@
+import collections
+
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
@@ -59,8 +61,17 @@ def view_book(request, book_id):
 def view_terms(request, book_id):
     book = Book.objects.get(pk=book_id)
     terms = book.terms.all()
-    paginator = Paginator(terms, 10)
 
+    author_pk = request.GET.get('author')
+    try:
+        author = Author.objects.get(pk=author_pk)
+    except Author.DoesNotExist:
+        author = None
+
+    if author:
+        terms = terms.filter(authors=author)
+
+    paginator = Paginator(terms, 10)
     page = request.GET.get('page')
     try:
         terms = paginator.page(page)
@@ -74,6 +85,7 @@ def view_terms(request, book_id):
     context = {
         'book': book,
         'terms': terms,
+        'author': author,
     }
     return render(request, 'view_terms.html', context)
 
@@ -312,11 +324,51 @@ def add_note(request, book_id):
     return render(request, 'add_note.html', context)
 
 
+def view_all_notes(request):
+    notes = Note.objects.order_by('subject')
+
+    author_pk = request.GET.get('author')
+    try:
+        author = Author.objects.get(pk=author_pk)
+    except Author.DoesNotExist:
+        author = None
+
+    if author:
+        notes = notes.filter(authors=author)
+
+    paginator = Paginator(notes, 5)
+    page = request.GET.get('page')
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        notes = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        notes = paginator.page(paginator.num_pages)
+
+    context = {
+        'notes': notes,
+        'author': author,
+    }
+
+    return render(request, 'view_all_notes.html', context)
+
+
 def view_notes(request, book_id):
     book = Book.objects.get(pk=book_id)
     notes = book.notes.all()
-    paginator = Paginator(notes, 5)
 
+    author_pk = request.GET.get('author')
+    try:
+        author = Author.objects.get(pk=author_pk)
+    except Author.DoesNotExist:
+        author = None
+
+    if author:
+        notes = notes.filter(authors=author)
+
+    paginator = Paginator(notes, 5)
     page = request.GET.get('page')
     try:
         notes = paginator.page(page)
@@ -330,6 +382,7 @@ def view_notes(request, book_id):
     context = {
         'book': book,
         'notes': notes,
+        'author': author,
     }
 
     return render(request, 'view_notes.html', context)
@@ -357,16 +410,88 @@ def view_term(request, term_id):
 
 def view_author(request, author_id):
     author = Author.objects.get(pk=author_id)
+    books_by_pk = {book.pk: book for book in author.books.all()}
+    author_section_pks = set()
+
+    # Find all the books for which the author has some sections.
+    sections_by_book = collections.defaultdict(list)
+    for section in author.sections.all():
+        book = section.book
+        if book.pk not in books_by_pk:
+            books_by_pk[book.pk] = book
+
+        sections_by_book[book.pk].append(section)
+        author_section_pks.add(section.pk)
+
+    # Find books for which the author is not listed as an author but has
+    # associated terms or notes.
+    notes_by_book = collections.defaultdict(list)
+    for note in author.notes.all():
+        book = note.book
+
+        section = note.section
+        if section:
+            if section.pk in author_section_pks:
+                continue
+
+        if book.pk not in books_by_pk:
+            books_by_pk[book.pk] = book
+
+        notes_by_book[book.pk].append(note)
+
+    terms_by_book = collections.defaultdict(list)
+    for term in author.terms.all():
+        book = term.book
+
+        section = term.section
+        if section:
+            if section.pk in author_section_pks:
+                continue
+
+        if book.pk not in books_by_pk:
+            books_by_pk[book.pk] = book
+
+        terms_by_book[book.pk].append(term)
+
+    books = []
+    for pk in books_by_pk:
+        # Only show notes if there are no sections.
+        book_sections = sections_by_book[pk]
+        book_notes = notes_by_book[pk]
+        book_terms = terms_by_book[pk]
+
+        books.append({
+            'book': books_by_pk[pk],
+            'sections': book_sections,
+            'notes': book_notes[:5],
+            'terms': book_terms[:5],
+            'num_notes': len(book_notes),
+            'num_terms': len(book_terms),
+        })
+
     context = {
         'author': author,
+        'books': books,
+        'num_terms': author.terms.count(),
+        'num_notes': author.notes.count(),
     }
+
     return render(request, 'view_author.html', context)
 
 
 def view_all_terms(request):
     terms = TermOccurrence.objects.order_by('term')
-    paginator = Paginator(terms, 10)
 
+    author_pk = request.GET.get('author')
+    try:
+        author = Author.objects.get(pk=author_pk)
+    except Author.DoesNotExist:
+        author = None
+
+    if author:
+        terms = terms.filter(authors=author)
+
+    paginator = Paginator(terms, 10)
     page = request.GET.get('page')
     try:
         terms = paginator.page(page)
@@ -379,6 +504,7 @@ def view_all_terms(request):
 
     context = {
         'terms': terms,
+        'author': author,
     }
 
     return render(request, 'view_all_terms.html', context)
