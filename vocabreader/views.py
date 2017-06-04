@@ -574,16 +574,18 @@ def edit_section(request, section_id):
                 request, u'Edited section: {}'.format(section.title)
             )
             return redirect(section.book)
+        else:
+            messages.error(request, 'Failed to save section')
+    else:
+        section_form = SectionForm(instance=section, prefix='section')
 
-    section_form = SectionForm(instance=section, prefix='section')
-
-    author_form = ArtefactAuthorForm(
-        prefix='author',
-        initial={
-        'mode': author_mode,
-        'author': initial_author,
-        }
-    )
+        author_form = ArtefactAuthorForm(
+            prefix='author',
+            initial={
+            'mode': author_mode,
+            'author': initial_author,
+            }
+        )
 
     context = {
         'section': section,

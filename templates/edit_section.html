@@ -53,6 +53,12 @@
         <div class="ui basic center aligned segment">
             <input type="hidden" name="section-rating"
                    id="section_rating" value="{{ section.rating }}" />
+            {% if section_form.rating.errors %}
+            <div class="ui red label">
+                Rating required!
+            </div>
+            <br /><br />
+            {% endif %}
             <div class="ui heart rating editable-rating"
                  data-rating="{{ section.rating }}">
             </div>
