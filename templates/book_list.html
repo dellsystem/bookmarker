@@ -1,3 +1,4 @@
+{% if books %}
 <div class="ui two column grid">
     {% for book in books %}
     <div class="column">
@@ -39,3 +40,8 @@
     </div>
     {% endfor %}
 </div>
+{% else %}
+<div class="ui message">
+    No books!
+</div>
+{% endif %}
