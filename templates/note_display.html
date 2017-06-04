@@ -6,7 +6,11 @@
         <h2 class="ui header">
             <i class="yellow sticky note icon"></i>
             <div class="content">
+                {% if hide_link %}
+                {{ x.subject }}
+                {% else %}
                 <a href="{{ x.get_absolute_url }}">{{ x.subject }}</a>
+                {% endif %}
                 <a href="{% url 'admin:books_note_change' x.pk %}">
                     <i class="edit icon"></i>
                 </a>

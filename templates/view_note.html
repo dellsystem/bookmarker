@@ -26,39 +26,8 @@
     </div>
 </div>
 <div class="ui divider"></div>
+
 <div class="ui grid">
-    <div class="row">
-        <div class="one center aligned wide column">
-            <div class="ui big circular label">
-                {{ note.get_page_display }}
-            </div>
-        </div>
-        <div class="fifteen wide column">
-            <h2 class="ui header">
-                {{ note.subject }}
-                <a href="{% url 'admin:books_note_change' note.pk %}">
-                    <i class="edit icon"></i>
-                </a>
-                <div class="sub header">
-                    {{ note.added|naturaltime }}
-                    {% if note.section %}
-                    :: {% include "section_link.html" with section=note.section only %}
-                    {% endif %}
-                    {% if note.author %}
-                    :: <strong>{{ note.author }}</strong>
-                    {% endif %}
-                </div>
-            </h2>
-            <div class="ui horizontal segments">
-                <div class="ui segment">
-                    <i class="quote left icon left-floated"></i>
-                    {{ note.quote|markdownify|safe }}
-                </div>
-                <div class="ui secondary segment">
-                    {{ note.comment|markdownify|safe }}
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'note_display.html' with x=note hide_link=True only %}
 </div>
 {% endblock %}
