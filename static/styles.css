@@ -52,3 +52,8 @@ blockquote footer {
 .ui.compact.grid>.row {
     padding: 0;
 }
+
+blockquote {
+    border-left: 5px solid #ddd;
+    padding-left: 10px;
+}
