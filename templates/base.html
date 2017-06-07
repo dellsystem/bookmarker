@@ -60,6 +60,24 @@
             {% endblock %}
         </div>
 
+        {% if not request.user.is_staff %}
+        <div class="ui large message">
+            <div class="header">Welcome to Bookmarker!</div>
+            <p>
+                This is a personal project by <a
+                href="https://twitter.com/dellsystem">@dellsystem</a>. I built this to
+                help me retain
+                information from the books I'm reading. Currently can only be used by
+                a single user (myself), but I plan to extend it to support multiple
+                users eventually.</p>
+            <p>
+                Source code on <a
+                href="https://github.com/dellsystem/bookmarker">GitHub</a>
+                (MIT license).
+            </p>
+        </div>
+        {% endif %}
+
         {% block content %}
         {% endblock %}
         <br />
