@@ -23,6 +23,9 @@ function fetchDefinition() {
             linkButton.href = data.view_link;
 
             occurrencesCount.innerText = '(' + data.num_occurrences + ' occurrences)';
+
+            // Also set the category to 'notable'.
+            document.getElementById('id_occurrence-category').value = '1';
         } else {
             definitionInput.disabled = false;
             highlightsInput.disabled = false;
