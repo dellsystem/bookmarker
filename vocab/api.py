@@ -17,15 +17,16 @@ def lookup_term(language, term):
             return e.message
 
         definitions = [
-            '({function}) {d}'.format(function=entry.function, d=d)
+            u'({function}) {d}'.format(function=entry.function, d=d)
             for entry in response
             for d, _ in entry.senses
         ]
     else:
         results = translate_word('{}en'.format(language), term)
         definitions = []
-        for row in results:
-            # Replace linebreaks with semicolons.
-            definitions.append(row[1].replace(' \n', '; ').strip())
+        if results != -1:
+            for row in results:
+                # Replace linebreaks with semicolons.
+                definitions.append(row[1].replace(' \n', '; ').strip())
 
     return ' / '.join(definitions)
