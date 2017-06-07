@@ -1,6 +1,5 @@
 Django==1.9.13
 Markdown==2.6.6
-Merriam-Webster-API==1.0
 django-config-models==0.1.5
 django-language-field==0.0.3
 goodreads==0.3.2
