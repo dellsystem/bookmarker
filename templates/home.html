@@ -3,8 +3,10 @@
 {% block nobreadcrumbs %}{% endblock %}
 
 {% block content %}
+{% if request.user.is_staff %}
 <div class="ui grid">
     <div class="nine wide column">
+{% endif %}
         <div class="ui segment">
             <div class="ui four mini statistics">
                 <div class="statistic">
@@ -41,6 +43,7 @@
                 </div>
             </div>
         </div>
+        {% if request.user.is_staff %}
     </div>
     <div class="seven wide column">
         <div class="ui segment">
@@ -55,6 +58,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 <br />
 <h2 id="started_books">In progress</h2>
 {% include 'book_list.html' with books=started_books only %}
