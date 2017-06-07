@@ -8,12 +8,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui grid">
+<div class="ui stackable grid">
     <div class="fourteen wide column">
         {% include 'book_header.html' with book=book only %}
     </div>
     <div class="two wide column">
-        <a class="ui green icon button" href="{% url 'add_note' book.pk %}">
+        <a class="ui fluid green icon button" href="{% url 'add_note' book.pk %}">
             <i class="plus icon"></i>
             Add note
         </a>

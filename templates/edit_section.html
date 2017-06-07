@@ -23,12 +23,12 @@
                 {{ section_form.title }}
             </div>
             {% endwith %}
-            <div class="five wide field">
+            <div class="four wide field">
                 <label>Subtitle</label>
                 {{ section_form.subtitle }}
             </div>
             {% with error=section_form.page_number.errors %}
-            <div class="one wide {% if error %}error{% endif %} field"
+            <div class="two wide {% if error %}error{% endif %} field"
                  {% if error %}title="{{ error|join:"/" }}"{% endif %}>
                 <label>Page</label>
                 {{ section_form.page_number }}

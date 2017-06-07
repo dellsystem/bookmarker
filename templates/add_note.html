@@ -38,13 +38,13 @@
         {% csrf_token %}
         <div class="ui fields">
             {% with error=note_form.subject.errors %}
-            <div class="ten wide {% if error %}error{% endif %} field">
+            <div class="nine wide {% if error %}error{% endif %} field">
                 <label>Subject{% if error %} (REQUIRED){% endif %}</label>
                 {{ note_form.subject }}
             </div>
             {% endwith %}
             {% with error=note_form.page_number.errors %}
-            <div class="one wide {% if error %}error{% endif %} field"
+            <div class="two wide {% if error %}error{% endif %} field"
                  {% if error %}title="{{ error|join:"/" }}"{% endif %}>
                 <label>Page</label>
                 {{ note_form.page_number }}

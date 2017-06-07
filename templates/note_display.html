@@ -18,8 +18,8 @@
         </h2>
     </div>
 </div>
-<div class="row">
-    <div class="one center aligned wide column">
+<div class="computer only row">
+    <div class="one wide column">
         <div class="ui big circular label">
             {{ x.get_page_display }}
         </div>
@@ -62,5 +62,55 @@
                 {{ x.comment|markdownify|safe }}
             </div>
         </div>
+    </div>
+</div>
+<div class="tablet mobile only row">
+    <div class="center aligned three wide column">
+        <div class="ui big circular label">
+            {{ x.get_page_display }}
+        </div>
+    </div>
+    <div class="thirteen wide column">
+        <h2 class="ui header">
+            <div class="sub header">
+                {{ x.added|naturaltime }}
+                {% if show_book %}
+                <br />
+                <a href="{{ x.book.get_absolute_url }}"
+                   title="by {{ x.book.default_authors.all|join:", " }}">
+                    <strong>{{ x.book }}</strong>
+                </a>
+                {% endif %}
+                {% if not hide_section and x.section %}
+                <br />
+                {% include "section_link.html" with section=x.section only %}
+                {% endif %}
+                <br />
+                {% if x.authors.count %}
+                    {% if x.has_default_authors %}
+                    <span title="{{ x.authors.all|join:", " }}">
+                        default author
+                    </span>
+                    {% else %}
+                    {% include 'author_list.html' with authors=x.authors %}
+                    {% endif %}
+                {% else %}
+                <span class="ui red label">missing author</span>
+                {% endif %}
+            </div>
+        </h2>
+    </div>
+</div>
+<div class="tablet mobile only row">
+    <div class="sixteen wide column">
+        <div class="ui segment">
+            <i class="quote left icon left-floated"></i>
+            {{ x.quote|markdownify|safe }}
+        </div>
+        {% if x.comment %}
+        <div class="ui secondary segment">
+            {{ x.comment|markdownify|safe }}
+        </div>
+        {% endif %}
     </div>
 </div>

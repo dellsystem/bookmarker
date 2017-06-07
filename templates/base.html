@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
     <title>Bookmarker</title>
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.min.css" />
+          href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css" />
     <link rel="stylesheet" href="/static/styles.css" />
     <link rel="apple-touch-icon-precomposed" href="/static/favicon-152.png">
     <link rel="icon" href="/static/favicon-32.png" sizes="32x32">
@@ -11,9 +14,8 @@
 </head>
 <body>
     <div class="ui container">
-        <br />
-        <div class="ui huge menu">
-            <div class="item">
+        <div class="ui large stackable menu" id="navbar">
+            <div class="active item">
                 <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
             </div>
             <div class="item">
@@ -31,12 +33,10 @@
             <div class="item">
                 <a href="{% url 'admin:index' %}">Admin</a>
             </div>
-            <div class="right menu">
-                <div class="item">
-                    <div class="ui icon input">
-                        <input type="text" placeholder="Search...">
-                        <i class="search icon"></i>
-                    </div>
+            <div class="right item">
+                <div class="ui icon input">
+                    <input type="text" placeholder="Search...">
+                    <i class="search icon"></i>
                 </div>
             </div>
         </div>
@@ -51,17 +51,6 @@
             <div class="header">{{ message }}</div>
         </div>
         {% endfor %}
-
-        <div class="ui basic segment">
-            {% block nobreadcrumbs %}
-            <div class="ui breadcrumb">
-                <a class="section" href="{% url 'home' %}">Home</a>
-                <i class="right angle icon divider"></i>
-                {% block breadcrumbs %}
-                {% endblock %}
-            </div>
-            {% endblock %}
-        </div>
 
         {% if not request.user.is_staff %}
         <div class="ui large message">
@@ -80,6 +69,17 @@
             </p>
         </div>
         {% endif %}
+
+        {% block nobreadcrumbs %}
+        <div class="ui basic segment">
+            <div class="ui breadcrumb">
+                <a class="section" href="{% url 'home' %}">Home</a>
+                <i class="right angle icon divider"></i>
+                {% block breadcrumbs %}
+                {% endblock %}
+            </div>
+        </div>
+        {% endblock %}
 
         {% block content %}
         {% endblock %}
