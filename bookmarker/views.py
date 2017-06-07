@@ -1,6 +1,7 @@
 import collections
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
@@ -79,6 +80,7 @@ def view_terms(request, book_id):
     return render(request, 'view_terms.html', context)
 
 
+@staff_member_required
 def add_section(request, book_id):
     book = Book.objects.get(pk=book_id)
     if book.completed_sections:
@@ -120,6 +122,7 @@ def add_section(request, book_id):
     return render(request, 'add_section.html', context)
 
 
+@staff_member_required
 def add_term(request, book_id):
     book = Book.objects.get(pk=book_id)
 
@@ -192,6 +195,7 @@ def add_term(request, book_id):
     return render(request, 'add_term.html', context)
 
 
+@staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
     gr_book = CLIENT.book(goodreads_id)
@@ -268,6 +272,7 @@ def get_definition(request):
     })
 
 
+@staff_member_required
 def add_note(request, book_id):
     book = Book.objects.get(pk=book_id)
 
@@ -509,6 +514,7 @@ def view_all_terms(request):
     return render(request, 'view_all_terms.html', context)
 
 
+@staff_member_required
 @require_POST
 def mark_complete(request, book_id):
     book = Book.objects.get(pk=book_id)
@@ -534,6 +540,7 @@ def mark_complete(request, book_id):
     return redirect(book)
 
 
+@staff_member_required
 def edit_section(request, section_id):
     section = Section.objects.get(pk=section_id)
 
