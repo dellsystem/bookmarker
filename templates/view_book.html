@@ -84,13 +84,11 @@
         {% endif %}
     </div>
     <div class="twelve wide column">
-        {% if book.sections.count %}
-        {% include 'section_list.html' with sections=book.sections.all only %}
-        {% endif %}
         {% if book.completed_sections %}
         <div class="ui celled two column grid">
             <div class="column" id="terms">
                 {% with num_terms=book.terms.count %}
+                {% if num_terms or not book.is_processed %}
                 <div class="ui fluid buttons">
                     {% if num_terms %}
                     <a href="{% url 'view_terms' book.pk %}"
@@ -105,19 +103,9 @@
                     </a>
                     {% endif %}
                 </div>
+                {% endif %}
                 {% if num_terms %}
                     {% include 'term_snippets.html' with terms=recent_terms only %}
-                    {% if needs_sections and terms_without_section %}
-                    <div class="ui error icon message">
-                        <i class="x icon"></i>
-                        {{ terms_without_section.count }} sections not filled in
-                    </div>
-                    {% else %}
-                    <div class="ui success icon message">
-                        <i class="checkmark icon"></i>
-                        Sections all filled in
-                    </div>
-                    {% endif %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">
@@ -129,6 +117,7 @@
             </div>
             <div class="column" id="notes">
                 {% with num_notes=book.notes.count %}
+                {% if num_notes or not book.is_processed %}
                 <div class="ui fluid buttons">
                     {% if num_notes %}
                     <a href="{% url 'view_notes' book.pk %}"
@@ -143,19 +132,9 @@
                     </a>
                     {% endif %}
                 </div>
+                {% endif %}
                 {% if num_notes %}
                     {% include 'note_snippets.html' with notes=recent_notes only %}
-                    {% if needs_sections and notes_without_section %}
-                    <div class="ui error icon message">
-                        <i class="x icon"></i>
-                        {{ notes_without_section.count }} sections not filled in
-                    </div>
-                    {% else %}
-                    <div class="ui success icon message">
-                        <i class="checkmark icon"></i>
-                        Sections all filled in
-                    </div>
-                    {% endif %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">
@@ -170,6 +149,9 @@
         <div class="ui warning message">
             You must complete the sections before you can add terms or notes.
         </div>
+        {% endif %}
+        {% if book.sections.count %}
+        {% include 'section_list.html' with sections=book.sections.all only %}
         {% endif %}
     </div>
 </div>
