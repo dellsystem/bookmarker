@@ -39,21 +39,10 @@ def home(request):
 def view_book(request, book_id):
     book = Book.objects.get(pk=book_id)
 
-    if book.sections.count() == 0 and book.completed_sections:
-        needs_sections = False
-    else:
-        needs_sections = True
-
-    notes_without_section = book.notes.filter(section=None)
-    terms_without_section = book.terms.filter(section=None)
-
     context = {
         'book': book,
         'recent_terms': book.terms.order_by('-added')[:5],
         'recent_notes': book.notes.order_by('-added')[:5],
-        'notes_without_section': notes_without_section,
-        'terms_without_section': terms_without_section,
-        'needs_sections': needs_sections,
     }
     return render(request, 'view_book.html', context)
 
@@ -577,13 +566,19 @@ def edit_section(request, section_id):
         else:
             messages.error(request, 'Failed to save section')
     else:
-        section_form = SectionForm(instance=section, prefix='section')
+        section_form = SectionForm(
+            instance=section,
+            prefix='section',
+            initial={
+                'page_number': section.get_page_display(),
+            }
+        )
 
         author_form = ArtefactAuthorForm(
             prefix='author',
             initial={
-            'mode': author_mode,
-            'author': initial_author,
+                'mode': author_mode,
+                'author': initial_author,
             }
         )
 
