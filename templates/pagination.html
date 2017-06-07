@@ -13,35 +13,43 @@
 <div class="ui center aligned basic segment">
     <div class="ui right pagination menu">
         {% if items.has_previous %}
-        <a class="item" href="?page=1{% if author %}&author={{ author.pk }}{% endif %}">
+        <a class="item"
+           title="First"
+           href="?page=1{% if author %}&author={{ author.pk }}{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
-        <i class="double left angle icon"></i> first</a>
+        <i class="double left angle icon"></i></a>
 
         {% if items.has_previous %}
-        <a class="item" href="?page={{ items.previous_page_number }}{% if author %}&author={{ author.pk }}{% endif %}">
+        <a class="item"
+           title="Previous"
+           href="?page={{ items.previous_page_number }}{% if author %}&author={{ author.pk }}{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
-        <i class="left angle icon"></i> previous</a>
+        <i class="left angle icon"></i></a>
 
         <a class="active item">
-            Page {{ items.number }} of {{ items.paginator.num_pages }}
+            {{ items.number }} of {{ items.paginator.num_pages }}
         </a>
 
         {% if items.has_next %}
-        <a class="item" href="?page={{ items.next_page_number }}{% if author %}&author={{ author.pk }}{% endif %}">
+        <a class="item"
+           title="Next"
+           href="?page={{ items.next_page_number }}{% if author %}&author={{ author.pk }}{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
-        next <i class="angle right icon"></i></a>
+        <i class="angle right icon"></i></a>
 
         {% if items.has_next %}
-        <a class="item" href="?page={{ items.paginator.num_pages }}{% if author %}&author={{ author.pk }}{% endif %}">
+        <a class="item"
+           title="Last"
+           href="?page={{ items.paginator.num_pages }}{% if author %}&author={{ author.pk }}{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
-        last <i class="angle double right icon"></i></a>
+        <i class="angle double right icon"></i></a>
     </div>
 </div>

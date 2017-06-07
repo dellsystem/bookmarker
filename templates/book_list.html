@@ -1,5 +1,5 @@
 {% if books %}
-<div class="ui two column grid">
+<div class="ui two column doubling grid">
     {% for book in books %}
     <div class="column">
         <div class="ui clearing segment book-card">
@@ -18,24 +18,26 @@
             {% if book.comments %}
             <code>{{ book.comments }}</code>
             <br />
-            {% endif %}
             <br />
-            <a class="ui label" href="{% url 'view_terms' book.pk %}">
-                <i class="flag icon"></i> {{ book.terms.count }}
-            </a>
-            <a class="ui label" href="{% url 'view_notes' book.pk %}">
-                <i class="sticky note icon"></i> {{ book.notes.count }} 
-            </a>
-            <a class="ui label" href="{% url 'view_book' book.pk %}">
-                <i class="sticky angle right icon"></i> {{ book.sections.count }} 
-            </a>
-            {% with summary_pc=book.get_summary_percent %}
-            <a class="ui {% if summary_pc < 100 %}red{% endif %} label"
-               href="">
-                <i title="Summaries: % completed" class="browser icon"></i>
-                {{ summary_pc }}%
-            </a>
-            {% endwith %}
+            {% endif %}
+            <div class="ui labels">
+                <a class="ui label" href="{% url 'view_terms' book.pk %}">
+                    <i class="flag icon"></i> {{ book.terms.count }}
+                </a>
+                <a class="ui label" href="{% url 'view_notes' book.pk %}">
+                    <i class="sticky note icon"></i> {{ book.notes.count }} 
+                </a>
+                <a class="ui label" href="{% url 'view_book' book.pk %}">
+                    <i class="sticky angle right icon"></i> {{ book.sections.count }} 
+                </a>
+                {% with summary_pc=book.get_summary_percent %}
+                <a class="ui {% if summary_pc < 100 %}red{% endif %} label"
+                   href="">
+                    <i title="Summaries: % completed" class="browser icon"></i>
+                    {{ summary_pc }}%
+                </a>
+                {% endwith %}
+            </div>
         </div>
     </div>
     {% endfor %}

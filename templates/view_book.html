@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui grid">
+<div class="ui stackable grid">
     <div class="thirteen wide column">
         <h2 class="ui header">
             {{ book.title }}
@@ -50,7 +50,7 @@
     </div>
 </div>
 <div class="ui divider"></div>
-<div class="ui grid">
+<div class="ui stackable grid">
     <div class="four wide column">
         <a href="{{ book.link }}">
             <img src="{{ book.image_url }}"
@@ -85,7 +85,7 @@
     </div>
     <div class="twelve wide column">
         {% if book.completed_sections %}
-        <div class="ui celled two column grid">
+        <div class="ui celled two column stackable grid">
             <div class="column" id="terms">
                 {% with num_terms=book.terms.count %}
                 {% if num_terms or not book.is_processed %}
