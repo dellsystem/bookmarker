@@ -1,12 +1,18 @@
-<h2 class="ui header">
-    <a href="{{ book.get_absolute_url }}" class="ui mini image">
-        <img src="{{ book.image_url }}"
-             title="{{ book.title }}" />
-    </a>
-    <div class="content">
-        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
-        <div class="sub header">
-            {% include 'author_list.html' with authors=book.default_authors only %}
-        </div>
+<div class="ui grid">
+    <div class="one wide column">
+        <a href="{{ book.get_absolute_url }}" class="ui fluid image">
+            <img src="{{ book.image_url }}"
+                 title="{{ book.title }}" />
+        </a>
     </div>
-</h2>
+    <div class="fifteen wide column">
+        <h2 class="ui header">
+            <div class="content">
+                <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                <div class="sub header">
+                    {% include 'author_list.html' with authors=book.default_authors only %}
+                </div>
+            </div>
+        </h2>
+    </div>
+</div>
