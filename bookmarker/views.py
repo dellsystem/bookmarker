@@ -313,6 +313,16 @@ def add_note(request, book_id):
     return render(request, 'add_note.html', context)
 
 
+def view_all_authors(request):
+    authors = Author.objects.all()
+
+    context = {
+        'authors': authors,
+    }
+
+    return render(request, 'view_all_authors.html', context)
+
+
 def view_all_notes(request):
     notes = Note.objects.order_by('subject')
 

@@ -25,6 +25,20 @@ class Author(models.Model):
     def get_absolute_url(self):
         return reverse('view_author', args=[str(self.id)])
 
+    def get_associated_books(self):
+        """Get books the author is associated with, by section, by note, by
+        term, or as a direct author."""
+        books = set()
+        for book in self.books.all():
+            books.add(book)
+        for section in self.sections.all():
+            books.add(section.book)
+        for note in self.notes.all():
+            books.add(note.book)
+        for term in self.terms.all():
+            books.add(term.book)
+        return books
+
 
 class BookManager(models.Manager):
     def create_book(self, goodreads_id):

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', bookmarker.views.home, name='home'),
     url(r'^addbook$', bookmarker.views.add_book, name='add_book'),
+    url(r'^authors$', bookmarker.views.view_all_authors, name='view_all_authors'),
     url(r'^terms$', bookmarker.views.view_all_terms, name='view_all_terms'),
     url(r'^notes$', bookmarker.views.view_all_notes, name='view_all_notes'),
     url(r'^book/(?P<book_id>\d+)$', bookmarker.views.view_book,

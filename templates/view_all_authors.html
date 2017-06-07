@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">View all authors</div>
+{% endblock %}
+
+{% block content %}
+<h2>View all authors</h2>
+
+<div class="ui divider"></div>
+
+<div class="ui three column grid">
+    {% for author in authors %}
+    <div class="column">
+        <div class="ui segment">
+            <h3 class="ui header">
+                <a href="{{ author.get_absolute_url }}">
+                    {{ author.name }}
+                </a>
+            </h3>
+            {% for book in author.get_associated_books %}
+            <a href="{{ book.get_absolute_url }}">
+                <img class="ui mini spaced image"
+                     title="{{ book.title }}"
+                     src="{{ book.image_url }}" />
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
