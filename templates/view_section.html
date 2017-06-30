@@ -35,6 +35,11 @@
                     {% else %}
                     (missing author)
                     {% endif %}
+                    {% if section.source_url %}
+                    <a href="{{ section.source_url }}">
+                        <i class="external icon"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </h3>
         </div>

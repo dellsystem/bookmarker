@@ -82,6 +82,14 @@
             <code>{{ book.comments }}</code>
         </div>
         {% endif %}
+        {% if book.source_url %}
+        <br />
+        <div style="text-align: center">
+            <a href="{{ book.source_url }}">
+                <i class="large external icon"></i>
+            </a>
+        </div>
+        {% endif %}
     </div>
     <div class="twelve wide column">
         {% if book.completed_sections %}

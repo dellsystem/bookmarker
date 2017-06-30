@@ -63,6 +63,7 @@ class Book(models.Model):
     completed_read = models.BooleanField(default=True)
     summary = models.TextField(blank=True)
     comments = models.TextField(blank=True)  # temporary private notes
+    source_url = models.URLField(blank=True)
 
     def __unicode__(self):
         return self.title
@@ -140,6 +141,7 @@ class Section(PageArtefact):
     subtitle = models.CharField(max_length=255, blank=True)
     summary = models.TextField(blank=True)
     rating = RatingField(default=0, blank=True)
+    source_url = models.URLField(blank=True)
 
     class Meta:
         ordering = ['-in_preface', 'page_number']
