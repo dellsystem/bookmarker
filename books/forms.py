@@ -69,6 +69,9 @@ class SectionForm(forms.ModelForm):
             if page_number:
                 in_preface = True
 
+        if section.rating is None:
+            section.rating = 0
+
         section.page_number = page_number
         section.in_preface = in_preface
         section.save()

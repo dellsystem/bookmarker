@@ -139,7 +139,7 @@ class Section(PageArtefact):
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)
     summary = models.TextField(blank=True)
-    rating = RatingField(default=0)
+    rating = RatingField(default=0, blank=True)
 
     class Meta:
         ordering = ['-in_preface', 'page_number']
