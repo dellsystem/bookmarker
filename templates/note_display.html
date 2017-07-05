@@ -1,5 +1,6 @@
 {% load humanize %}
 {% load markdown_filter %}
+{% load highlight_filter %}
 
 <div class="row">
     <div class="column">
@@ -9,7 +10,13 @@
                 {% if hide_link %}
                 {{ x.subject }}
                 {% else %}
-                <a href="{{ x.get_absolute_url }}">{{ x.subject }}</a>
+                <a href="{{ x.get_absolute_url }}">
+                    {% if highlight %}
+                    {{ x.subject|highlight_term:highlight }}
+                    {% else %}
+                    {{ x.subject }}
+                    {% endif %}
+                </a>
                 {% endif %}
                 <a href="{% url 'admin:books_note_change' x.pk %}">
                     <i class="edit icon"></i>
@@ -56,10 +63,18 @@
         <div class="ui horizontal segments">
             <div class="ui segment">
                 <i class="quote left icon left-floated"></i>
-                {{ x.quote|markdownify|safe }}
+                {% if highlight %}
+                {{ x.quote|markdownify|highlight_term:highlight }}
+                {% else %}
+                {{ x.quote|markdownify }}
+                {% endif %}
             </div>
             <div class="ui secondary segment">
-                {{ x.comment|markdownify|safe }}
+                {% if highlight %}
+                {{ x.comment|markdownify|highlight_term:highlight }}
+                {% else %}
+                {{ x.comment|markdownify }}
+                {% endif %}
             </div>
         </div>
     </div>

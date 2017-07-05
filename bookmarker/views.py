@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
@@ -634,3 +635,48 @@ def view_section(request, section_id):
     }
 
     return render(request, 'view_section.html', context)
+
+
+def search(request):
+    query = request.GET.get('q')
+    mode = request.GET.get('mode')
+
+    # Split out the meta options. TODO
+    term = query
+
+    results = collections.defaultdict(list)
+    for note in Note.objects.filter(
+        Q(subject__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(comment__icontains=term)
+    ):
+        results['notes'].append(note)
+
+    for term_occurrence in TermOccurrence.objects.filter(
+        Q(term__text__icontains=term) |
+        Q(term__definition__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(quote__icontains=term)
+    ).order_by('term'):
+        results['terms'].append(term_occurrence)
+
+    for section in Section.objects.filter(
+        Q(title__icontains=term) |
+        Q(subtitle__icontains=term) |
+        Q(summary__icontains=term)
+    ):
+        results['sections'].append(section)
+
+    for book in Book.objects.filter(
+        Q(title__icontains=term) |
+        Q(summary__icontains=term)
+    ):
+        results['books'].append(book)
+
+    context = {
+        'results': results,
+        'query': query,
+        'mode': mode,
+    }
+
+    return render(request, 'search.html', context)
