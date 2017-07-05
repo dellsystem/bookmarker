@@ -28,6 +28,9 @@
                 </a>
                 <div class="sub header">
                     {{ section.subtitle }}
+                    {% if section.rating %}
+                    Rating: {{ section.rating }}
+                    {% endif %}
                     {% if section.authors.count %}
                         {% if not section.has_default_authors %}
                         {% include 'author_list.html' with authors=section.authors %}
