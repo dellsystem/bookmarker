@@ -7,7 +7,25 @@
 {% endblock %}
 
 {% block content %}
-{% include 'book_header.html' with book=book only %}
+<div class="ui grid">
+    <div class="thirteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="three wide center aligned column">
+        {% if not book.is_processed %}
+        <form method="post" action="{% url 'mark_complete' book.id %}">
+            {% csrf_token %}
+            <button class="ui fluid black icon button"
+                    title="Summaries can be omitted"
+                    name="mode"
+                    value="processed"
+                    type="submit">
+               <i class="check icon"></i> Mark as processed
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
 
 <div class="ui divider"></div>
 {% with num_notes=book.notes.count %}
