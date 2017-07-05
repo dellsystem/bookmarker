@@ -9,13 +9,14 @@
 
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=terms author=author only %}
+{% include "pagination.html" with items=occurrences author=author only %}
 
-<div class="ui grid">
-    {% for term in terms %}
-    {% include 'term_display.html' with x=term show_book=True only %}
-    {% endfor %}
-</div>
+{% regroup occurrences by term as term_list %}
+
+{% for term in term_list %}
+    {% include 'term_header.html' with term=term.grouper only %}
+    {% include 'term_list_with_books.html' with occurrences=term.list only %}
+{% endfor %}
 
 {% include "pagination.html" with items=terms author=author only %}
 

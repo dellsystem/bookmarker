@@ -1,0 +1,42 @@
+{% load markdown_filter %}
+{% load highlight_filter %}
+
+<div class="ui horizontal segments no-top-margin">
+    <div class="ui segment">
+        <i class="quote left icon left-floated"></i>
+        {% if highlight %}
+        {{ note.quote|markdownify|highlight_term:highlight }}
+        {% else %}
+        {{ note.quote|markdownify }}
+        {% endif %}
+    </div>
+    <div class="ui secondary segment">
+        {% if highlight %}
+        {{ note.comment|markdownify|highlight_term:highlight }}
+        {% else %}
+        {{ note.comment|markdownify }}
+        {% endif %}
+    </div>
+</div>
+
+{% if not hide_page %}
+    &mdash;p.{{ note.get_page_display }}
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
+{% if not hide_section and note.section %}
+    {% include "section_link.html" with section=note.section only %}
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
+{% if note.authors.count %}
+    {% if note.has_default_authors %}
+    <span title="{{ note.authors.all|join:", " }}">
+        default author
+    </span>
+    {% else %}
+    {% include 'author_list.html' with authors=note.authors %}
+    {% endif %}
+{% else %}
+<span class="ui red label">missing author</span>
+{% endif %}
+<i class="ellipsis vertical icon"></i>
+<span title="{{ note.added }}">{{ note.added|timesince }} ago</a>

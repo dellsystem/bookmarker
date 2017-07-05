@@ -1,0 +1,57 @@
+{% load humanize %}
+{% load markdown_filter %}
+{% load highlight_filter %}
+
+{% if o.quote or o.comments %}
+<div class="ui horizontal segments no-top-margin">
+    {% if o.quote %}
+    <div class="ui segment">
+        <i class="left quote icon left-floated"></i>
+        {% if highlight %}
+        {{ o.quote|markdownify|highlight_term:highlight }}
+        {% else %}
+        {{ o.get_highlighted_quote|safe }}
+        {% endif %}
+    </div>
+    {% endif %}
+    {% if o.comments %}
+    <div class="ui secondary segment">
+        {{ o.comments|markdownify }}
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if not hide_page %}
+    &mdash;p.{{ o.get_page_display }}
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
+{% if not hide_section and o.section %}
+    {% include "section_link.html" with section=o.section only %}
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
+{% if o.authors.count %}
+    {% if o.has_default_authors %}
+    <span title="{{ o.authors.all|join:", " }}">
+        default author
+    </span>
+    {% else %}
+    {% include 'author_list.html' with authors=o.authors %}
+    {% endif %}
+{% else %}
+<span class="ui red label">missing author</span>
+{% endif %}
+<i class="ellipsis vertical icon"></i>
+{% if o.is_new %}
+<i class="certificate icon" title="New"></i>
+{% endif %}
+{% if o.is_defined %}
+<i class="quote left icon" title="Defined"></i>
+{% endif %}
+<strong>{{ o.category }}</strong>
+<i class="ellipsis vertical icon"></i>
+<span title="{{ o.added }}">{{ o.added|timesince }} ago</a>
+<i class="ellipsis vertical icon"></i>
+<a href="{% url 'admin:vocab_termoccurrence_change' o.pk %}">
+    <i class="edit icon"></i>
+</a>

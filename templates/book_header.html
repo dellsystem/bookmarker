@@ -1,3 +1,5 @@
+{% load highlight_filter %}
+
 <div class="ui stackable grid">
     <div class="one wide column">
         <a href="{{ book.get_absolute_url }}" class="ui fluid image">
@@ -8,7 +10,13 @@
     <div class="fifteen wide column">
         <h2 class="ui header">
             <div class="content">
-                <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                <a href="{{ book.get_absolute_url }}">
+                    {% if highlight %}
+                    {{ book.title|highlight_term:highlight }}
+                    {% else %}
+                    {{ book.title }}
+                    {% endif %}
+                </a>
                 <div class="sub header">
                     {% include 'author_list.html' with authors=book.default_authors only %}
                 </div>

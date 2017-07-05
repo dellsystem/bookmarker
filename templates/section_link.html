@@ -1,6 +1,8 @@
+{% load markdown_filter %}
+
 <a href="{{ section.get_absolute_url }}">
     <strong title="{{ section.subtitle }}{% if section.authors.count %} by {{ section.authors.all|join:", " }}{% endif %}">
-        {{ section.title }}
+        {{ section.title|markdownify_title }}
     </strong>
     ({{ section.get_page_display }})
 </a>

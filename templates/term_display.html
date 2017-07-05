@@ -5,23 +5,7 @@
 {% ifchanged x.term %}
 <div class="row">
     <div class="column">
-        <h2 class="ui header">
-            <i class="blue flag icon"></i>
-            <div class="content">
-                <a href="{{ x.term.get_absolute_url }}">
-                    {{ x.term.text }}
-                </a>
-                ({{ x.term.language }})
-                <a href="{% url 'admin:vocab_term_change' x.term.pk %}">
-                    <i class="edit icon"></i>
-                </a>
-            </div>
-        </h2>
-        {% if highlight %}
-        {{ x.term.definition|markdownify|highlight_term:highlight }}
-        {% else %}
-        {{ x.term.definition|markdownify }}
-        {% endif %}
+        {% include 'term_header.html' with term=x.term only %}
     </div>
 </div>
 {% endifchanged %}
@@ -32,129 +16,11 @@
         </div>
     </div>
     <div class="fifteen wide column">
-        <h2 class="ui header">
-            <div class="sub header">
-                {{ x.added|naturaltime }}
-                {% if show_book %}
-                <i class="ellipsis vertical icon"></i>
-                <a href="{{ x.book.get_absolute_url }}"
-                   title="by {{ x.book.default_authors.all|join:", " }}">
-                    <strong>{{ x.book }}</strong>
-                </a>
-                {% endif %}
-                {% if not hide_section and x.section %}
-                <i class="ellipsis vertical icon"></i>
-                {% include "section_link.html" with section=x.section only %}
-                {% endif %}
-                <i class="ellipsis vertical icon"></i>
-                {% if x.authors.count %}
-                    {% if x.has_default_authors %}
-                    <span title="{{ x.authors.all|join:", " }}">
-                        default author
-                    </span>
-                    {% else %}
-                    {% include 'author_list.html' with authors=x.authors %}
-                    {% endif %}
-                {% else %}
-                <span class="ui red label">missing author</span>
-                {% endif %}
-                <i class="ellipsis vertical icon"></i>
-                {% if x.is_new %}
-                <i class="certificate icon" title="New"></i>
-                {% endif %}
-                {% if x.is_defined %}
-                <i class="quote left icon" title="Defined"></i>
-                {% endif %}
-                <strong>{{ x.category }}</strong>
-                <i class="ellipsis vertical icon"></i>
-                <a href="{% url 'admin:vocab_termoccurrence_change' x.pk %}">
-                    <i class="edit icon"></i>
-                </a>
-            </div>
-        </h2>
-        {% if x.quote or x.comments %}
-        <div class="ui horizontal segments">
-            {% if x.quote %}
-            <div class="ui segment">
-                <i class="left quote icon left-floated"></i>
-                {% if highlight %}
-                {{ x.quote|highlight_term:highlight }}
-                {% else %}
-                {{ x.get_highlighted_quote|safe }}
-                {% endif %}
-            </div>
-            {% endif %}
-            {% if x.comments %}
-            <div class="ui secondary segment">
-                {{ x.comments|markdownify }}
-            </div>
-            {% endif %}
-        </div>
-        {% endif %}
+        {% include 'term_occurrence_display.html' with o=x hide_section=hide_section hide_page=True only %}
     </div>
 </div>
 <div class="mobile tablet only row">
-    <div class="center aligned three wide column">
-        <div class="ui big circular label">
-            {{ x.get_page_display }}
-        </div>
-    </div>
-    <div class="thirteen wide column">
-        <h2 class="ui header">
-            <div class="sub header">
-                {{ x.added|naturaltime }}
-                {% if show_book %}
-                <br />
-                <a href="{{ x.book.get_absolute_url }}"
-                   title="by {{ x.book.default_authors.all|join:", " }}">
-                    <strong>{{ x.book }}</strong>
-                </a>
-                {% endif %}
-                {% if not hide_section and x.section %}
-                <br />
-                {% include "section_link.html" with section=x.section only %}
-                {% endif %}
-                <br />
-                {% if x.authors.count %}
-                    {% if x.has_default_authors %}
-                    <span title="{{ x.authors.all|join:", " }}">
-                        default author
-                    </span>
-                    {% else %}
-                    {% include 'author_list.html' with authors=x.authors %}
-                    {% endif %}
-                {% else %}
-                <span class="ui red label">missing author</span>
-                {% endif %}
-                <br />
-                {% if x.is_new %}
-                <i class="certificate icon" title="New"></i>
-                {% endif %}
-                {% if x.is_defined %}
-                <i class="quote left icon" title="Defined"></i>
-                {% endif %}
-                <strong>{{ x.category }}</strong>
-                <a href="{% url 'admin:vocab_termoccurrence_change' x.pk %}">
-                    <i class="edit icon"></i>
-                </a>
-            </div>
-        </h2>
-    </div>
-</div>
-{% if x.quote or x.comments %}
-<div class="tablet mobile only row">
     <div class="sixteen wide column">
-        {% if x.quote %}
-        <div class="ui segment">
-            <i class="quote left icon left-floated"></i>
-            {{ x.get_highlighted_quote|safe }}
-        </div>
-        {% endif %}
-        {% if x.comment %}
-        <div class="ui secondary segment">
-            {{ x.comment|markdownify|safe }}
-        </div>
-        {% endif %}
+        {% include 'term_occurrence_display.html' with o=x hide_section=hide_section %}
     </div>
 </div>
-{% endif %}

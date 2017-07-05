@@ -338,7 +338,7 @@ def view_all_authors(request):
 
 
 def view_all_notes(request):
-    notes = Note.objects.order_by('subject')
+    notes = Note.objects.order_by('book')
 
     author_pk = request.GET.get('author')
     try:
@@ -403,10 +403,12 @@ def view_notes(request, book_id):
 
 def view_note(request, note_id):
     note = Note.objects.get(pk=note_id)
+    query = request.GET.get('q')
 
     context = {
         'book': note.book,
         'note': note,
+        'query': query,
     }
 
     return render(request, 'view_note.html', context)
@@ -414,10 +416,14 @@ def view_note(request, note_id):
 
 def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
+    query = request.GET.get('q')
+
     context = {
         'term': term,
-        'occurrences': term.occurrences.all(),
+        'occurrences': term.occurrences.order_by('book__title'),
+        'query': query,
     }
+
     return render(request, 'view_term.html', context)
 
 
@@ -493,7 +499,7 @@ def view_author(request, author_id):
 
 
 def view_all_terms(request):
-    terms = TermOccurrence.objects.order_by('term')
+    occurrences = TermOccurrence.objects.order_by('term')
 
     author_pk = request.GET.get('author')
     try:
@@ -502,21 +508,21 @@ def view_all_terms(request):
         author = None
 
     if author:
-        terms = terms.filter(authors=author)
+        occurrences = occurrences.filter(authors=author)
 
-    paginator = Paginator(terms, 10)
+    paginator = Paginator(occurrences, 10)
     page = request.GET.get('page')
     try:
-        terms = paginator.page(page)
+        occurrences = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        terms = paginator.page(1)
+        occurrences = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        terms = paginator.page(paginator.num_pages)
+        occurrences = paginator.page(paginator.num_pages)
 
     context = {
-        'terms': terms,
+        'occurrences': occurrences,
         'author': author,
     }
 
@@ -657,7 +663,7 @@ def search(request):
         Q(subject__icontains=term) |
         Q(quote__icontains=term) |
         Q(comment__icontains=term)
-    ):
+    ).order_by('book'):
         results['notes'].append(note)
 
     for term_occurrence in TermOccurrence.objects.filter(
@@ -685,6 +691,7 @@ def search(request):
         'results': results,
         'query': query,
         'mode': mode,
+        'qs': '?q=' + query,
     }
 
     return render(request, 'search.html', context)

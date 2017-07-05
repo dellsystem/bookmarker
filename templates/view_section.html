@@ -22,7 +22,7 @@
         </div>
         <div class="ten wide column">
             <h3 class="ui header">
-                {{ section.title }}
+                {{ section.title|markdownify_title }}
                 <a href="{% url 'edit_section' section.pk %}">
                     <i class="edit icon"></i>
                 </a>

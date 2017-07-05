@@ -1,0 +1,20 @@
+{% load markdown_filter %}
+{% load highlight_filter %}
+
+<h2 class="ui header">
+    <i class="blue flag icon"></i>
+    <div class="content">
+        <a href="{{ term.get_absolute_url }}">
+            {{ term.text }}
+        </a>
+        ({{ term.language }})
+        <a href="{% url 'admin:vocab_term_change' term.pk %}">
+            <i class="edit icon"></i>
+        </a>
+    </div>
+</h2>
+{% if highlight %}
+{{ term.definition|markdownify|highlight_term:highlight }}
+{% else %}
+{{ term.definition|markdownify }}
+{% endif %}

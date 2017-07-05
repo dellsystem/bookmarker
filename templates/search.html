@@ -7,7 +7,7 @@
 {% block content %}
 <div class="ui two column grid">
     <div class="column">
-        <h2>Search</h2>
+        <h1>Search</h1>
     </div>
     <div class="column">
         <div class="ui message">
@@ -24,12 +24,12 @@
     </div>
     <div class="right aligned column">
         {% if mode == 'notes' %}
-        <a href="?q={{ query }}" class="ui basic blue icon button">
+        <a href="{{ qs }}" class="ui basic blue icon button">
             <i class="minus icon"></i>
             Minimize
         </a>
         {% else %}
-        <a href="?mode=notes&q={{ query }}" class="ui blue icon button">
+        <a href="{{ qs }}&mode=notes" class="ui blue icon button">
             <i class="plus icon"></i>
             Expand
         </a>
@@ -40,12 +40,12 @@
     </div>
     <div class="right aligned column">
         {% if mode == 'terms' %}
-        <a href="?q={{ query }}" class="ui basic blue icon button">
+        <a href="{{ qs }}" class="ui basic blue icon button">
             <i class="minus icon"></i>
             Minimize
         </a>
         {% else %}
-        <a href="?mode=terms&q={{ query }}" class="ui blue icon button">
+        <a href="{{ qs }}&mode=terms" class="ui blue icon button">
             <i class="plus icon"></i>
             Expand
         </a>
@@ -56,12 +56,12 @@
     </div>
     <div class="right aligned column">
         {% if mode == 'sections' %}
-        <a href="?q={{ query }}" class="ui basic blue icon button">
+        <a href="{{ qs }}" class="ui basic blue icon button">
             <i class="minus icon"></i>
             Minimize
         </a>
         {% else %}
-        <a href="?mode=sections&q={{ query }}" class="ui blue icon button">
+        <a href="{{ qs }}&mode=sections" class="ui blue icon button">
             <i class="plus icon"></i>
             Expand
         </a>
@@ -72,12 +72,12 @@
     </div>
     <div class="right aligned column">
         {% if mode == 'books' %}
-        <a href="?q={{ query }}" class="ui basic blue icon button">
+        <a href="{{ qs }}" class="ui basic blue icon button">
             <i class="minus icon"></i>
             Minimize
         </a>
         {% else %}
-        <a href="?mode=books&q={{ query }}" class="ui blue icon button">
+        <a href="{{ qs }}&mode=books" class="ui blue icon button">
             <i class="plus icon"></i>
             Expand
         </a>
@@ -86,31 +86,31 @@
 </div>
 
 {% if mode == 'notes' %}
-<div class="ui grid">
     {% if results.notes %}
-    {% for note in results.notes %}
-    {% include 'note_display.html' with x=note highlight=query show_book=True %}
-    {% endfor %}
+        {% include 'note_list_with_books.html' with notes=results.notes highlight=query %}
     {% else %}
     <div class="ui message">
         No notes found
     </div>
     {% endif %}
-</div>
 {% elif mode == 'terms' %}
-<div class="ui grid">
     {% if results.terms %}
-    {% for term in results.terms %}
-    {% include 'term_display.html' with x=term highlight=query show_book=True %}
-    {% endfor %}
+        {% regroup results.terms by term as term_list %}
+
+        {% for term in term_list %}
+            {% include 'term_header.html' with term=term.grouper highlight=query only %}
+
+            {% include 'term_list_with_books.html' with occurrences=term.list query=query only %}
+        {% endfor %}
+
     {% else %}
     <div class="ui message">
         No terms found
     </div>
     {% endif %}
-</div>
 {% elif mode == 'sections' %}
     {% if results.sections %}
+    <br />
     {% include 'section_list.html' with sections=results.sections highlight=query show_book=True %}
     {% else %}
     <div class="ui message">
@@ -120,7 +120,7 @@
 {% elif mode == 'books' %}
     {% if results.books %}
     {% for book in results.books %}
-        {% include 'book_header.html' with book=book only %}
+        {% include 'book_header.html' with book=book highlight=query only %}
     {% endfor %}
     {% else %}
     <div class="ui message">
@@ -134,7 +134,7 @@
         <div class="ui bulleted list">
             {% for note in results.notes %}
             <div class="item">
-                <a href="{{ note.get_absolute_url }}">
+                <a href="{{ note.get_absolute_url }}{{ qs }}">
                     <strong>{{ note.subject }}</strong>
                 </a>
                 from
@@ -156,7 +156,7 @@
             {% for term in results.terms %}
             {% ifchanged term.term.text %}
             <div class="item">
-                <a href="{{ term.term.get_absolute_url }}">
+                <a href="{{ term.term.get_absolute_url }}{{ qs }}">
                     <strong>{{ term.term.text }}</strong>
                 </a> from
                 <a href="{{ term.book.get_absolute_url }}">
@@ -177,7 +177,7 @@
         <div class="ui bulleted list">
             {% for section in results.sections %}
             <div class="item">
-                <a href="{{ section.get_absolute_url }}">
+                <a href="{{ section.get_absolute_url }}{{ qs }}">
                     <strong>{{ section.title }}</strong>
                 </a> from
                 <a href="{{ section.book.get_absolute_url }}">

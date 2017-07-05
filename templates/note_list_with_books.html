@@ -1,0 +1,18 @@
+{% regroup notes by book as book_list %}
+{% for book in book_list %}
+    <div class="ui grid">
+        <div class="one wide column">
+            {% include 'book_image.html' with book=book.grouper only %}
+        </div>
+        <div class="fifteen wide column">
+            {% include 'book_title.html' with book=book.grouper only %}
+            {% for note in book.list %}
+                {% include 'note_header.html' with note=note only %}
+                {% include 'note_body.html' with note=note highlight=query %}
+                {% if not forloop.last %}
+                <br />
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}

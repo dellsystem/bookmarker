@@ -11,11 +11,7 @@
 
 {% include "pagination.html" with items=notes author=author only %}
 
-<div class="ui grid">
-    {% for note in notes %}
-    {% include 'note_display.html' with x=note show_book=True only %}
-    {% endfor %}
-</div>
+{% include 'note_list_with_books.html' with notes=notes %}
 
 {% include "pagination.html" with items=notes author=author only %}
 

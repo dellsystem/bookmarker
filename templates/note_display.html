@@ -1,28 +1,9 @@
 {% load humanize %}
 {% load markdown_filter %}
-{% load highlight_filter %}
 
 <div class="row">
     <div class="column">
-        <h2 class="ui header">
-            <i class="yellow sticky note icon"></i>
-            <div class="content">
-                {% if hide_link %}
-                {{ x.subject }}
-                {% else %}
-                <a href="{{ x.get_absolute_url }}">
-                    {% if highlight %}
-                    {{ x.subject|highlight_term:highlight }}
-                    {% else %}
-                    {{ x.subject }}
-                    {% endif %}
-                </a>
-                {% endif %}
-                <a href="{% url 'admin:books_note_change' x.pk %}">
-                    <i class="edit icon"></i>
-                </a>
-            </div>
-        </h2>
+        {% include 'note_header.html' with note=x highlight=highlight only %}
     </div>
 </div>
 <div class="computer only row">
@@ -32,100 +13,11 @@
         </div>
     </div>
     <div class="fifteen wide column">
-        <h2 class="ui header">
-            <div class="sub header">
-                {{ x.added|naturaltime }}
-                {% if show_book %}
-                <i class="ellipsis vertical icon"></i>
-                <a href="{{ x.book.get_absolute_url }}"
-                   title="by {{ x.book.default_authors.all|join:", " }}">
-                    <strong>{{ x.book }}</strong>
-                </a>
-                {% endif %}
-                {% if not hide_section and x.section %}
-                <i class="ellipsis vertical icon"></i>
-                {% include "section_link.html" with section=x.section only %}
-                {% endif %}
-                <i class="ellipsis vertical icon"></i>
-                {% if x.authors.count %}
-                    {% if x.has_default_authors %}
-                    <span title="{{ x.authors.all|join:", " }}">
-                        default author
-                    </span>
-                    {% else %}
-                    {% include 'author_list.html' with authors=x.authors %}
-                    {% endif %}
-                {% else %}
-                <span class="ui red label">missing author</span>
-                {% endif %}
-            </div>
-        </h2>
-        <div class="ui horizontal segments">
-            <div class="ui segment">
-                <i class="quote left icon left-floated"></i>
-                {% if highlight %}
-                {{ x.quote|markdownify|highlight_term:highlight }}
-                {% else %}
-                {{ x.quote|markdownify }}
-                {% endif %}
-            </div>
-            <div class="ui secondary segment">
-                {% if highlight %}
-                {{ x.comment|markdownify|highlight_term:highlight }}
-                {% else %}
-                {{ x.comment|markdownify }}
-                {% endif %}
-            </div>
-        </div>
+        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section hide_page=True only %}
     </div>
 </div>
-<div class="tablet mobile only row">
-    <div class="center aligned three wide column">
-        <div class="ui big circular label">
-            {{ x.get_page_display }}
-        </div>
-    </div>
-    <div class="thirteen wide column">
-        <h2 class="ui header">
-            <div class="sub header">
-                {{ x.added|naturaltime }}
-                {% if show_book %}
-                <br />
-                <a href="{{ x.book.get_absolute_url }}"
-                   title="by {{ x.book.default_authors.all|join:", " }}">
-                    <strong>{{ x.book }}</strong>
-                </a>
-                {% endif %}
-                {% if not hide_section and x.section %}
-                <br />
-                {% include "section_link.html" with section=x.section only %}
-                {% endif %}
-                <br />
-                {% if x.authors.count %}
-                    {% if x.has_default_authors %}
-                    <span title="{{ x.authors.all|join:", " }}">
-                        default author
-                    </span>
-                    {% else %}
-                    {% include 'author_list.html' with authors=x.authors %}
-                    {% endif %}
-                {% else %}
-                <span class="ui red label">missing author</span>
-                {% endif %}
-            </div>
-        </h2>
-    </div>
-</div>
-<div class="tablet mobile only row">
+<div class="mobile tablet only row">
     <div class="sixteen wide column">
-        <div class="ui segment">
-            <i class="quote left icon left-floated"></i>
-            {{ x.quote|markdownify|safe }}
-        </div>
-        {% if x.comment %}
-        <div class="ui secondary segment">
-            {{ x.comment|markdownify|safe }}
-        </div>
-        {% endif %}
+        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section %}
     </div>
 </div>

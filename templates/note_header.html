@@ -1,0 +1,21 @@
+{% load highlight_filter %}
+
+<h2 class="ui header">
+    <i class="yellow sticky note icon"></i>
+    <div class="content">
+        {% if hide_link %}
+        {{ note.subject }}
+        {% else %}
+        <a href="{{ note.get_absolute_url }}">
+            {% if highlight %}
+            {{ note.subject|highlight_term:highlight }}
+            {% else %}
+            {{ note.subject }}
+            {% endif %}
+        </a>
+        {% endif %}
+        <a href="{% url 'admin:books_note_change' note.pk %}">
+            <i class="edit icon"></i>
+        </a>
+    </div>
+</h2>

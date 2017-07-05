@@ -41,7 +41,8 @@
             <div class="right item">
                 <form action="{% url 'search' %}">
                     <div class="ui icon input">
-                        <input name="q" type="text" placeholder="Search...">
+                        <input name="q" type="text" placeholder="Search..."
+                               value="{% if query %}{{ query }}{% endif %}">
                         <i class="search icon"></i>
                     </div>
                 </form>

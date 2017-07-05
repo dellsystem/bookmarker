@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 
-{% load humanize %}
-{% load markdown_filter %}
-
 {% block breadcrumbs %}
 <div class="active section">View term</div>
 {% endblock %}
@@ -10,13 +7,7 @@
 {% block content %}
 <div class="ui grid">
     <div class="twelve wide column">
-        <h2>
-            {{ term.text }}
-            <a href="{% url 'admin:vocab_term_change' term.pk %}">
-                <i class="edit icon"></i>
-            </a>
-        </h2>
-        <p>{{ term.definition }}</p>
+        {% include 'term_header.html' with term=term highlight=query %}
     </div>
     <div class="four wide column">
         <h4>Highlighted phrases</h4>
@@ -30,65 +21,6 @@
     </div>
 </div>
 
-<div class="ui two column grid">
-    {% for occurrence in occurrences %}
-    {% with book=occurrence.book %}
-    <div class="ui column">
-        <div class="ui segment">
-            <div class="ui grid">
-                <div class="ui four wide column">
-                    <img src="{{ book.image_url }}" class="ui fluid image" />
-                </div>
-                <div class="ui twelve wide column">
-                    <h3 class="ui header">
-                        <a href="{{ book.get_absolute_url }}">
-                            {{ book.title }}
-                        </a>
-                        <div class="sub header">
-                            {% include 'author_list.html' with authors=book.default_authors only %}
-                        </div>
-                    </h3>
-                    <blockquote>
-                        {% if occurrence.quote %}
-                        <i class="left quote icon left-floated"></i>
-                        {{ occurrence.get_highlighted_quote|safe }}
-                        {% endif %}
-                        {% if occurrence.comments %}
-                        <br />
-                        <i class="comment icon left-floated"></i>
-                        {{ occurrence.comments|markdownify|safe }}
-                        {% endif %}
-                        <footer title="{{ occurrence.added|naturaltime }}">
-                            &mdash;p.{{ occurrence.get_page_display }},
-                            {% if occurrence.section %}
-                            {% include "section_link.html" with section=occurrence.section only %}
-                            {% endif %}
-                            <a href="{% url 'admin:vocab_termoccurrence_change' occurrence.pk %}">
-                                <i class="edit icon"></i>
-                            </a>
-                        </footer>
-                    </blockquote>
-                    <div class="ui divider"></div>
-                    <div class="ui label">
-                        {{ occurrence.category }}
-                    </div>
-                    {% if occurrence.is_new %}
-                    <div class="ui icon label">
-                        <i class="certificate icon"></i>
-                        New
-                    </div>
-                    {% endif %}
-                    {% if occurrence.is_defined %}
-                    <div class="ui icon label">
-                        <i class="left quote icon"></i>
-                        Defined
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endwith %}
-    {% endfor %}
-</div>
+{% include 'term_list_with_books.html' with occurrences=occurrences query=query %}
+
 {% endblock %}
