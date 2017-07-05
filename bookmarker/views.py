@@ -260,7 +260,7 @@ def get_definition(request):
             num_occurrences = existing_term.occurrences.count()
         else:
             definition = lookup_term(language, term)
-            highlights = term.lower()
+            highlights = term.lower().replace('-', ' ')
 
     return JsonResponse({
         'term': term,

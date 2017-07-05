@@ -19,6 +19,14 @@ class TermForm(forms.ModelForm):
         term = cleaned_data.get('text')
         language = cleaned_data.get('language')
         definition = cleaned_data.get('definition')
+        highlights = cleaned_data.get('highlights')
+
+        # Make sure the highlights are specified and don't contain " or -.
+        if not highlights:
+            self.add_error('highlights', 'REQUIRED')
+        else:
+            if '-' in highlights or '"' in highlights:
+                self.add_error('highlights', 'INVALID CHARS: - OR "')
 
         if not definition:
             term_exists = Term.objects.filter(

@@ -76,10 +76,12 @@ class TermOccurrence(SectionArtefact):
 
     def get_highlighted_quote(self):
         q = self.quote
-        q_lower = self.quote.lower()  # for more efficient (?) searching
+        # For more efficient searching.
+        q_search = self.quote.lower().replace('-', ' ').replace('"', '')
         highlights = self.term.highlights.splitlines()
         for h in highlights:
-            if h in q_lower:
+            if h in q_search:
+                h = h.replace(' ', '[-" ]*')
                 q = re.sub('(' + h + ')', r'<span class="highlight">\1</span>', q,
                            flags=re.I)
 

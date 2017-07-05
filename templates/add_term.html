@@ -96,7 +96,7 @@
             {% with error=term_form.highlights.errors %}
             <div class="{% if error %}error{% endif %} four wide field">
                 <label>
-                    Highlights{% if error %} (REQUIRED){% endif %}
+                    Highlights{% if error %} ({{ error|join:"" }}){% endif %}
                 </label>
                 {{ term_form.highlights }}
             </div>
