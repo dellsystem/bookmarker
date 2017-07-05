@@ -39,7 +39,7 @@ class Term(models.Model):
         return reverse('view_term', args=[str(self.id)])
 
     def get_highlights(self):
-        return self.highlights.split('/')
+        return self.highlights.splitlines()
 
 
 class TermOccurrence(SectionArtefact):
@@ -77,7 +77,7 @@ class TermOccurrence(SectionArtefact):
     def get_highlighted_quote(self):
         q = self.quote
         q_lower = self.quote.lower()  # for more efficient (?) searching
-        highlights = self.term.highlights.split('/')
+        highlights = self.term.highlights.splitlines()
         for h in highlights:
             if h in q_lower:
                 q = re.sub('(' + h + ')', r'<span class="highlight">\1</span>', q,
