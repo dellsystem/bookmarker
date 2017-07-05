@@ -7,8 +7,8 @@
         <div class="fifteen wide column">
             {% include 'book_title.html' with book=book.grouper only %}
             {% for note in book.list %}
-                {% include 'note_header.html' with note=note only %}
-                {% include 'note_body.html' with note=note highlight=query %}
+                {% include 'note_header.html' with note=note highlight=highlight only %}
+                {% include 'note_body.html' with note=note highlight=highlight %}
                 {% if not forloop.last %}
                 <br />
                 {% endif %}
