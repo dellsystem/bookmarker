@@ -36,10 +36,12 @@
                 <a href="{% url 'admin:index' %}">Admin</a>
             </div>
             <div class="right item">
-                <div class="ui icon input">
-                    <input type="text" placeholder="Search...">
-                    <i class="search icon"></i>
-                </div>
+                <form action="{% url 'search' %}">
+                    <div class="ui icon input">
+                        <input name="q" type="text" placeholder="Search...">
+                        <i class="search icon"></i>
+                    </div>
+                </form>
             </div>
         </div>
 

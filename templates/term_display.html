@@ -1,6 +1,8 @@
 {% load humanize %}
 {% load markdown_filter %}
+{% load highlight_filter %}
 
+{% ifchanged x.term %}
 <div class="row">
     <div class="column">
         <h2 class="ui header">
@@ -15,9 +17,14 @@
                 </a>
             </div>
         </h2>
+        {% if highlight %}
+        {{ x.term.definition|markdownify|highlight_term:highlight }}
+        {% else %}
         {{ x.term.definition|markdownify }}
+        {% endif %}
     </div>
 </div>
+{% endifchanged %}
 <div class="computer only row">
     <div class="center aligned one wide column">
         <div class="ui big circular label">
@@ -70,7 +77,11 @@
             {% if x.quote %}
             <div class="ui segment">
                 <i class="left quote icon left-floated"></i>
+                {% if highlight %}
+                {{ x.quote|highlight_term:highlight }}
+                {% else %}
                 {{ x.get_highlighted_quote|safe }}
+                {% endif %}
             </div>
             {% endif %}
             {% if x.comments %}

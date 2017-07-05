@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">Search</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui two column grid">
+    <div class="column">
+        <h2>Search</h2>
+    </div>
+    <div class="column">
+        <div class="ui message">
+            <code>{{ query }}</code>
+        </div>
+    </div>
+</div>
+
+<div class="ui divider"></div>
+
+<div class="ui eight column grid">
+    <div class="column">
+        <h3>Notes ({{ results.notes|length }})</h3>
+    </div>
+    <div class="right aligned column">
+        {% if mode == 'notes' %}
+        <a href="?q={{ query }}" class="ui basic blue icon button">
+            <i class="minus icon"></i>
+            Minimize
+        </a>
+        {% else %}
+        <a href="?mode=notes&q={{ query }}" class="ui blue icon button">
+            <i class="plus icon"></i>
+            Expand
+        </a>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h3>Terms ({{ results.terms|length }})</h3>
+    </div>
+    <div class="right aligned column">
+        {% if mode == 'terms' %}
+        <a href="?q={{ query }}" class="ui basic blue icon button">
+            <i class="minus icon"></i>
+            Minimize
+        </a>
+        {% else %}
+        <a href="?mode=terms&q={{ query }}" class="ui blue icon button">
+            <i class="plus icon"></i>
+            Expand
+        </a>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h3>Sections ({{ results.sections|length }})</h3>
+    </div>
+    <div class="right aligned column">
+        {% if mode == 'sections' %}
+        <a href="?q={{ query }}" class="ui basic blue icon button">
+            <i class="minus icon"></i>
+            Minimize
+        </a>
+        {% else %}
+        <a href="?mode=sections&q={{ query }}" class="ui blue icon button">
+            <i class="plus icon"></i>
+            Expand
+        </a>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h3>Books ({{ results.books|length }})</h3>
+    </div>
+    <div class="right aligned column">
+        {% if mode == 'books' %}
+        <a href="?q={{ query }}" class="ui basic blue icon button">
+            <i class="minus icon"></i>
+            Minimize
+        </a>
+        {% else %}
+        <a href="?mode=books&q={{ query }}" class="ui blue icon button">
+            <i class="plus icon"></i>
+            Expand
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if mode == 'notes' %}
+<div class="ui grid">
+    {% if results.notes %}
+    {% for note in results.notes %}
+    {% include 'note_display.html' with x=note highlight=query show_book=True %}
+    {% endfor %}
+    {% else %}
+    <div class="ui message">
+        No notes found
+    </div>
+    {% endif %}
+</div>
+{% elif mode == 'terms' %}
+<div class="ui grid">
+    {% if results.terms %}
+    {% for term in results.terms %}
+    {% include 'term_display.html' with x=term highlight=query show_book=True %}
+    {% endfor %}
+    {% else %}
+    <div class="ui message">
+        No terms found
+    </div>
+    {% endif %}
+</div>
+{% elif mode == 'sections' %}
+    {% if results.sections %}
+    {% include 'section_list.html' with sections=results.sections highlight=query show_book=True %}
+    {% else %}
+    <div class="ui message">
+        No sections found
+    </div>
+    {% endif %}
+{% elif mode == 'books' %}
+    {% if results.books %}
+    {% for book in results.books %}
+        {% include 'book_header.html' with book=book only %}
+    {% endfor %}
+    {% else %}
+    <div class="ui message">
+        No sections found
+    </div>
+    {% endif %}
+{% else %}
+<div class="ui four column grid">
+    <div class="column">
+        {% if results.notes %}
+        <div class="ui bulleted list">
+            {% for note in results.notes %}
+            <div class="item">
+                <a href="{{ note.get_absolute_url }}">
+                    <strong>{{ note.subject }}</strong>
+                </a>
+                from
+                <a href="{{ note.book.get_absolute_url }}">
+                    {{ note.book.title }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ui message">
+        No notes found
+        </div>
+        {% endif %}
+    </div>
+    <div class="column">
+        {% if results.terms %}
+        <div class="ui bulleted list">
+            {% for term in results.terms %}
+            {% ifchanged term.term.text %}
+            <div class="item">
+                <a href="{{ term.term.get_absolute_url }}">
+                    <strong>{{ term.term.text }}</strong>
+                </a> from
+                <a href="{{ term.book.get_absolute_url }}">
+                    {{ term.book.title }}
+                </a>
+            </div>
+            {% endifchanged %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ui message">
+        No terms found
+        </div>
+        {% endif %}
+    </div>
+    <div class="column">
+        {% if results.sections %}
+        <div class="ui bulleted list">
+            {% for section in results.sections %}
+            <div class="item">
+                <a href="{{ section.get_absolute_url }}">
+                    <strong>{{ section.title }}</strong>
+                </a> from
+                <a href="{{ section.book.get_absolute_url }}">
+                    {{ section.book.title }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ui message">
+        No sections found
+        </div>
+        {% endif %}
+    </div>
+    <div class="column">
+        {% if results.books %}
+        <div class="ui bulleted list">
+            {% for book in results.books %}
+            <div class="item">
+                <a href="{{ book.get_absolute_url }}">
+                    <strong>{{ book.title }}</strong>
+                </a>
+                {% include 'author_list.html' with authors=book.default_authors only %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ui message">
+        No book found
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

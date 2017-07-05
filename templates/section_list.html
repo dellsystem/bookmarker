@@ -1,4 +1,5 @@
 {% load markdown_filter %}
+{% load highlight_filter %}
 
 
 <br />
@@ -11,7 +12,11 @@
         <div class="eleven wide column">
             <h4 class="ui header">
                 <a href="{{ section.get_absolute_url }}">
+                    {% if highlight %}
+                    {{ section.title|markdownify_title|highlight_term:highlight }}
+                    {% else %}
                     {{ section.title|markdownify_title }}
+                    {% endif %}
                 </a>
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
