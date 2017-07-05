@@ -8,7 +8,7 @@
     <div class="nine wide column">
 {% endif %}
         <div class="ui segment">
-            <div class="ui four mini statistics">
+            <div class="ui three small statistics">
                 <div class="statistic">
                     <div class="value">
                         {{ started_books.count }}
@@ -23,14 +23,6 @@
                     </div>
                     <div class="label">
                         <a href="#new_books">New</a>
-                    </div>
-                </div>
-                <div class="statistic">
-                    <div class="value">
-                        {{ done_books.count }}
-                    </div>
-                    <div class="label">
-                        <a href="#done_books">Done</a>
                     </div>
                 </div>
                 <div class="statistic">
@@ -65,9 +57,6 @@
 
 <h2 id="new_books">New</h2>
 {% include 'book_list.html' with books=new_books only %}
-
-<h2 id="done_books">Done</h2>
-{% include 'book_list.html' with books=done_books only %}
 
 <h2 id="unread_books">Unread</h2>
 {% include 'book_list.html' with books=unread_books only %}

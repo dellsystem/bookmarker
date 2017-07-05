@@ -16,10 +16,12 @@
     <div class="ui container">
         <div class="ui large stackable menu" id="navbar">
             <div class="active item">
-                <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
+                <a href="{% url 'home' %}">
+                    <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
+                </a>
             </div>
             <div class="item">
-                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'view_complete' %}">Complete</a>
             </div>
             <div class="item">
                 <a href="{% url 'view_all_authors' %}">Authors</a>

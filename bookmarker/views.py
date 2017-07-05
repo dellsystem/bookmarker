@@ -17,7 +17,7 @@ from vocab.models import Term, TermOccurrence
 
 
 def home(request):
-    books = Book.objects.all().order_by(
+    books = Book.objects.filter(is_processed=False).order_by(
         'is_processed', 'completed_sections', '-pk'
     )
 
@@ -31,10 +31,17 @@ def home(request):
             completed_sections=False,
             completed_read=True,
         ),
-        'done_books': books.filter(is_processed=True),
         'unread_books': books.filter(completed_read=False),
     }
     return render(request, 'home.html', context)
+
+
+def view_complete(request):
+    books = Book.objects.filter(is_processed=True).order_by('title')
+    context = {
+        'books': books,
+    }
+    return render(request, 'view_complete.html', context)
 
 
 def view_book(request, book_id):
