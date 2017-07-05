@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<h1>Reading stats</h1>
+<div class="ui two huge statistics">
+    <div class="statistic">
+        <div class="value">
+            {{ num_to_read }}
+        </div>
+        <div class="label">
+            Books to read
+        </div>
+    </div>
+    <div class="statistic">
+        <div class="value">
+            {{ end_date|date:"M Y" }}
+        </div>
+        <div class="label">
+            Estimated completion date
+        </div>
+    </div>
+</div>
+{% endblock %}
+

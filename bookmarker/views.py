@@ -1,4 +1,5 @@
 import collections
+import datetime
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -687,3 +688,20 @@ def search(request):
     }
 
     return render(request, 'search.html', context)
+
+
+def view_stats(request):
+    shelf = CLIENT.user(60292716).shelves()[2]
+    num_to_read = shelf.count
+
+    # Estimate the end date.
+    num_per_year = 208
+    days_left = num_to_read / float(num_per_year) * 365
+    end_date = datetime.datetime.today() + datetime.timedelta(days=days_left)
+
+    context = {
+        'num_to_read': num_to_read,
+        'end_date': end_date,
+    }
+
+    return render(request, 'view_stats.html', context)
