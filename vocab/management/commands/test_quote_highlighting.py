@@ -19,8 +19,9 @@ class TestChronology(unittest.TestCase):
             highlighted_quote = o.get_highlighted_quote()
             if '<span class="highlight">' not in highlighted_quote:
                 self.fail(
-                    u"Failed: looking for {highlights} in '{quote}'".format(
-                        quote=o.quote,
-                        highlights=o.term.highlights
+                    u"Failed: looking for {h} in '{q}' (pk: {pk})'".format(
+                        q=o.quote,
+                        h=o.term.highlights,
+                        pk=o.term.pk,
                     )
                 )

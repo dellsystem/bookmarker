@@ -20,6 +20,11 @@
                 </a>
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
+                {% if section.source_url %}
+                <a href="{{ section.source_url }}">
+                    <i class="external icon"></i>
+                </a>
+                {% endif %}
                 <div class="sub header">
                     {{ section.subtitle|markdownify_title }}
                     {% if section.authors.count %}
@@ -58,6 +63,11 @@
                 </a>
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
+                {% if section.source_url %}
+                <a href="{{ section.source_url }}">
+                    <i class="external icon"></i>
+                </a>
+                {% endif %}
                 <div class="sub header">
                     {{ section.subtitle|markdownify_title }}
                     {% if section.authors.count %}

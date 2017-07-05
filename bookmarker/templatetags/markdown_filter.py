@@ -8,7 +8,9 @@ register = template.Library()
 
 @register.filter
 def markdownify(text):
-    return mark_safe(markdown.markdown(text, safe_mode='escape'))
+    return mark_safe(
+        markdown.markdown(text, ['superscript'], safe_mode='escape')
+    )
 
 
 @register.filter
