@@ -3,13 +3,19 @@
 <div class="ui comments">
     {% for note in notes %}
     <div class="comment">
+        {% if show_page %}
         <div class="avatar">
             p.{{ note.get_page_display }}
         </div>
+        {% endif %}
         <div class="content">
             <span class="author">
                 <a href="{{ note.get_absolute_url }}">
+                    {% if show_page %}
                     {{ note.subject|truncatechars:50 }}
+                    {% else %}
+                    {{ note.subject|truncatechars:65 }}
+                    {% endif %}
                 </a>
                 <a href="{% url 'admin:books_note_change' note.pk %}">
                     <i class="edit icon"></i>
@@ -21,8 +27,11 @@
                 </div>
             </div>
             <div class="text">
-                <i class="left quote icon"></i>
+                {% if show_page %}
                 {{ note.quote|truncatechars:50 }}
+                {% else %}
+                {{ note.quote|truncatechars:60 }}
+                {% endif %}
             </div>
         </div>
     </div>

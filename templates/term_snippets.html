@@ -12,9 +12,11 @@
             </div>
         </h4>
         {% endif %}
+        {% if show_page %}
         <div class="avatar">
             p.{{ term.get_page_display }}
         </div>
+        {% endif %}
         <div class="content">
             <a class="author" href="{{ term.term.get_absolute_url }}">
                 {{ term.term }} &raquo;
@@ -37,7 +39,11 @@
                 </div>
             </div>
             <div class="text">
+                {% if show_page %}
                 {{ term.term.definition|truncatechars:50 }}
+                {% else %}
+                {{ term.term.definition|truncatechars:60 }}
+                {% endif %}
             </div>
         </div>
     </div>

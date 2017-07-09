@@ -24,7 +24,7 @@
 
 <div class="ui grid">
     {% for term in terms %}
-    {% include 'term_display.html' with x=term only %}
+    {% include 'term_display.html' with x=term show_page=book.has_pages only %}
     {% endfor %}
 </div>
 

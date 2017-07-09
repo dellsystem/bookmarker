@@ -7,12 +7,16 @@
     </div>
 </div>
 <div class="computer only row">
+    {% if show_page %}
     <div class="one wide column">
         <div class="ui big circular label">
             {{ x.get_page_display }}
         </div>
     </div>
     <div class="fifteen wide column">
+    {% else %}
+    <div class="sixteen wide column">
+    {% endif %}
         {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section hide_page=True only %}
     </div>
 </div>

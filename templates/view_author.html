@@ -80,7 +80,7 @@
                         <i class="list icon"></i>
                         View terms by {{ author }} ({{ row.num_terms }})
                     </a>
-                    {% include 'term_snippets.html' with terms=row.terms only %}
+                    {% include 'term_snippets.html' with terms=row.terms show_page=row.book.has_pages only %}
                     {% else %}
                     <div class="ui messgae">No terms by {{ author }}</div>
                     {% endif %}
@@ -92,7 +92,7 @@
                         <i class="list icon"></i>
                         View notes by {{ author }} ({{ row.num_notes }})
                     </a>
-                    {% include 'note_snippets.html' with notes=row.notes only %}
+                    {% include 'note_snippets.html' with notes=row.notes only show_page=book.has_pages %}
                     {% else %}
                     <div class="ui message">No notes by {{ author }}</div>
                     {% endif %}

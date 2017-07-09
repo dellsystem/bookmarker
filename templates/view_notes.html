@@ -25,7 +25,7 @@
 
 <div class="ui grid">
     {% for note in notes %}
-    {% include 'note_display.html' with x=note only %}
+    {% include 'note_display.html' with x=note show_page=book.has_pages only %}
     {% endfor %}
 </div>
 

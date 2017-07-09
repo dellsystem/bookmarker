@@ -28,6 +28,6 @@
 <div class="ui divider"></div>
 
 <div class="ui grid">
-    {% include 'note_display.html' with x=note hide_link=True highlight=query only %}
+    {% include 'note_display.html' with x=note hide_link=True highlight=query show_page=book.has_pages only %}
 </div>
 {% endblock %}

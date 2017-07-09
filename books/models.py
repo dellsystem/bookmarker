@@ -64,6 +64,7 @@ class Book(models.Model):
     summary = models.TextField(blank=True)
     comments = models.TextField(blank=True)  # temporary private notes
     source_url = models.URLField(blank=True)
+    has_pages = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.title

@@ -113,7 +113,7 @@
                 </div>
                 {% endif %}
                 {% if num_terms %}
-                    {% include 'term_snippets.html' with terms=recent_terms only %}
+                    {% include 'term_snippets.html' with terms=recent_terms show_page=book.has_pages only %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">
@@ -142,7 +142,7 @@
                 </div>
                 {% endif %}
                 {% if num_notes %}
-                    {% include 'note_snippets.html' with notes=recent_notes only %}
+                    {% include 'note_snippets.html' with notes=recent_notes show_page=book.has_pages only %}
                 {% else %}
                 <div class="ui warning message">
                     <div class="header">

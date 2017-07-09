@@ -38,10 +38,10 @@
 </h3>
 <div class="ui celled two column grid">
     <div class="column">
-        {% include 'term_snippets.html' with terms=recent_terms_1 only %}
+        {% include 'term_snippets.html' with terms=recent_terms_1 show_page=book.has_pages only %}
     </div>
     <div class="column">
-        {% include 'term_snippets.html' with terms=recent_terms_2 only %}
+        {% include 'term_snippets.html' with terms=recent_terms_2 show_page=book.has_pages only %}
     </div>
 </div>
 {% else %}
@@ -125,6 +125,7 @@
             </div>
             <div class="column">
                 <div class="ui fields">
+                    {% if book.has_pages %}
                     {% with error=occurrence_form.page_number.errors %}
                     <div class="five wide {% if error %}error{% endif %} field"
                          {% if error %}title="{{ error|join:"/" }}"{% endif %}>
@@ -132,8 +133,12 @@
                         {{ occurrence_form.page_number }}
                     </div>
                     {% endwith %}
+                    {% else %}
+                    <input type="hidden" name="occurrence-page_number"
+                           value="1" />
+                    {% endif %}
                     {% with error=occurrence_form.category.errors %}
-                    <div class="six wide {% if error %}error{% endif %} field">
+                    <div class="{% if book.has_pages %}six{% else %}eleven{% endif %} wide {% if error %}error{% endif %} field">
                         <label>Category{% if error %} (REQ){% endif %}</label>
                         {{ occurrence_form.category }}
                     </div>
