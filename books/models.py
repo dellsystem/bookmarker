@@ -125,7 +125,7 @@ class PageArtefact(models.Model):
 
 
 class RatingField(models.IntegerField):
-    def __init__(self, min_value=1, max_value=5, **kwargs):
+    def __init__(self, min_value=0, max_value=5, **kwargs):
         self.min_value, self.max_value = min_value, max_value
         models.IntegerField.__init__(self, **kwargs)
 
