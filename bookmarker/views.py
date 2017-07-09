@@ -354,6 +354,13 @@ def view_all_authors(request):
 def view_all_notes(request):
     notes = Note.objects.order_by('book')
 
+    commented = request.GET.get('commented')
+    if commented:
+        notes = notes.exclude(comment='')
+    untagged = request.GET.get('untagged')
+    if untagged:
+        notes = notes.filter(tags=None)
+
     author_pk = request.GET.get('author')
     try:
         author = Author.objects.get(pk=author_pk)
