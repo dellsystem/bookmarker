@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm
-from books.models import Book, Author, Note, Section
+from books.models import Book, Author, Note, NoteTag, Section
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
 from vocab.models import Term, TermOccurrence
@@ -309,16 +309,7 @@ def add_note(request, book_id):
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if note_form.is_valid() and author_form.is_valid():
-            note = note_form.save(book=book)
-
-            # Set the authors according to author_form. If the mode is 'none',
-            # we don't need to do anything since the occurrence has no authors
-            # by default.
-            author_mode = author_form.cleaned_data['mode']
-            if author_mode == 'default':
-                note.set_default_authors()
-            elif author_mode == 'custom':
-                note.authors.add(author_form.cleaned_data['author'])
+            note = note_form.save(book=book, author_form=author_form)
 
             messages.success(request, u'Added note: {}'.format(note.subject))
         else:
@@ -733,3 +724,77 @@ def view_stats(request):
     }
 
     return render(request, 'view_stats.html', context)
+
+
+@staff_member_required
+def edit_note(request, note_id):
+    note = Note.objects.get(pk=note_id)
+
+    initial_author = None
+    if note.authors.count():
+        if note.has_default_authors():
+            author_mode = 'default'
+        else:
+            author_mode = 'custom'
+            initial_author = note.authors.first()
+    else:
+        author_mode = 'none'
+
+    if request.method == 'POST':
+        note_form = NoteForm(request.POST, instance=note, prefix='note')
+        author_form = ArtefactAuthorForm(request.POST, prefix='author')
+        if note_form.is_valid() and author_form.is_valid():
+            note = note_form.save(book=note.book, author_form=author_form)
+            messages.success(
+                request, u'Edited note: {}'.format(note.subject)
+            )
+            return redirect(note)
+        else:
+            messages.error(request, 'Failed to save note')
+    else:
+        note_form = NoteForm(
+            instance=note,
+            prefix='note',
+            initial={
+                'page_number': note.get_page_display(),
+            }
+        )
+
+        author_form = ArtefactAuthorForm(
+            prefix='author',
+            initial={
+                'mode': author_mode,
+                'author': initial_author,
+            }
+        )
+
+    context = {
+        'note': note,
+        'book': note.book,
+        'note_form': note_form,
+        'author_form': author_form,
+    }
+
+    return render(request, 'edit_note.html', context)
+
+
+def view_tag(request, slug):
+    tag = NoteTag.objects.get(slug=slug)
+
+    paginator = Paginator(tag.notes.all(), 10)
+    page = request.GET.get('page')
+    try:
+        notes = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        notes = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        notes = paginator.page(paginator.num_pages)
+
+    context = {
+        'tag': tag,
+        'notes': notes,
+    }
+
+    return render(request, 'view_tag.html', context)

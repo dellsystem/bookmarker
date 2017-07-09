@@ -1,22 +1,36 @@
 {% load markdown_filter %}
 {% load highlight_filter %}
 
-<h2 class="ui header">
-    <i class="yellow sticky note icon"></i>
-    <div class="content">
-        {% if hide_link %}
-        {{ note.subject|markdownify_title }}
-        {% else %}
-        <a href="{{ note.get_absolute_url }}">
-            {% if highlight %}
-            {{ note.subject|markdownify_title|highlight_term:highlight }}
-            {% else %}
-            {{ note.subject|markdownify_title }}
-            {% endif %}
-        </a>
-        {% endif %}
-        <a href="{% url 'admin:books_note_change' note.pk %}">
-            <i class="edit icon"></i>
-        </a>
+<div class="ui vertically padded grid">
+    <div class="one wide column">
+        <i class="big yellow sticky note icon"></i>
     </div>
-</h2>
+    <div class="twelve wide column">
+        <h2 class="ui header">
+            <div class="content">
+                {% if hide_link %}
+                {{ note.subject|markdownify_title }}
+                {% else %}
+                <a href="{{ note.get_absolute_url }}">
+                    {% if highlight %}
+                    {{ note.subject|markdownify_title|highlight_term:highlight }}
+                    {% else %}
+                    {{ note.subject|markdownify_title }}
+                    {% endif %}
+                </a>
+                {% endif %}
+                <a href="{% url 'edit_note' note.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </div>
+        </h2>
+    </div>
+    <div class="three wide right aligned column">
+        {% for tag in note.tags.all %}
+        <a class="ui {{ tag.colour }} label" title="{{ tag.description }}"
+           href="{{ tag.get_absolute_url }}">
+            {{ tag.slug }}
+        </a>
+        {% endfor %}
+    </div>
+</div>

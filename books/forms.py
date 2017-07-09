@@ -10,12 +10,19 @@ class NoteForm(forms.ModelForm):
         exclude = ['book']
         widgets = {
             'subject': forms.TextInput(attrs={'autofocus': 'autofocus'}),
+            'tags': forms.SelectMultiple(
+                attrs={
+                    'class': 'ui fluid dropdown multi-select',
+                }
+            ),
         }
 
-    def save(self, book):
+    def save(self, book, author_form):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
+        # This will blank out the authors. We need to add them back later.
         note = super(NoteForm, self).save(commit=False)
+        self.save_m2m()
 
         note.book = book
 
@@ -35,7 +42,16 @@ class NoteForm(forms.ModelForm):
         note.page_number = page_number
         note.in_preface = in_preface
         note.section = note.determine_section()
+        note.author_mode = author_form.cleaned_data['mode']
+
         note.save()
+
+        if note.author_mode == 'default':
+            note.set_default_authors()
+        else:
+            note.authors.clear()
+            if note.author_mode == 'custom':
+                note.authors.add(author_form.cleaned_data['author'])
 
         return note
 

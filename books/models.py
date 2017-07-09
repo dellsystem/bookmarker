@@ -203,6 +203,18 @@ class SectionArtefact(PageArtefact):
         self.authors.add(*default_authors)
 
 
+class NoteTag(models.Model):
+    slug = models.SlugField(primary_key=True)
+    description = models.TextField(blank=True)
+    colour = models.CharField(max_length=20, unique=True)
+
+    def __unicode__(self):
+        return self.slug
+
+    def get_absolute_url(self):
+        return reverse('view_tag', args=[self.slug])
+
+
 class Note(SectionArtefact):
     book = models.ForeignKey(Book, related_name='notes')
     added = models.DateTimeField(auto_now_add=True)
@@ -214,6 +226,7 @@ class Note(SectionArtefact):
     # Should only be empty if the original author isn't in our database.
     # Will usually inherit from the Section, if present, or the book.
     authors = models.ManyToManyField(Author, blank=True, related_name='notes')
+    tags = models.ManyToManyField(NoteTag, blank=True, related_name='notes')
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

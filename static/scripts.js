@@ -98,3 +98,5 @@ $('.display-rating').rating({
     maxRating: 5,
     interactive: false,
 });
+
+$('.multi-select').dropdown();

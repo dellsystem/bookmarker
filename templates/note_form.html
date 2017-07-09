@@ -1,0 +1,56 @@
+<div class="ui segment">
+    <form class="ui form" method="post">
+        {% csrf_token %}
+        <div class="ui fields">
+            {% with error=note_form.subject.errors %}
+            <div class="{% if book.has_pages %}nine{% else %}eleven{% endif %} wide {% if error %}error{% endif %} field">
+                <label>Subject{% if error %} (REQUIRED){% endif %}</label>
+                {{ note_form.subject }}
+            </div>
+            {% endwith %}
+            {% if book.has_pages %}
+            {% with error=note_form.page_number.errors %}
+            <div class="two wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Page</label>
+                {{ note_form.page_number }}
+            </div>
+            {% endwith %}
+            {% else %}
+            <input type="hidden" name="note-page_number" value="1" />
+            {% endif %}
+            {% with error=author_form.mode.errors %}
+            <div class="two wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Author mode</label>
+                {{ author_form.mode }}
+            </div>
+            {% endwith %}
+            <div class="three wide field">
+                <label>Author</label>
+                {{ author_form.author }}
+            </div>
+        </div>
+        <div class="ui two fields">
+            <div class="field">
+                <label>Quote</label>
+                {{ note_form.quote }}
+            </div>
+            <div class="field">
+                <label>Comment</label>
+                {{ note_form.comment }}
+            </div>
+        </div>
+        <div class="ui field">
+            <label>Tags</label>
+            {{ note_form.tags }}
+        </div>
+        <div class="ui basic center aligned segment">
+            <button type="submit" name="submit"
+                    class="ui blue button">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
+

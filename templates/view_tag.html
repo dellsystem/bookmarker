@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load markdown_filter %}
+
+{% block breadcrumbs %}
+<div class="active section">View tag</div>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <span class="ui big {{ tag.colour }} label">
+        {{ tag.slug }}
+    </span>
+</h1>
+<p>{{ tag.description }}</p>
+
+<div class="ui divider"></div>
+
+{% include "pagination.html" with items=notes only %}
+
+<div class="ui grid">
+    {% for note in notes %}
+    {% include 'note_display.html' with x=note show_page=note.book.has_pages only %}
+    {% endfor %}
+</div>
+
+{% include "pagination.html" with items=notes only %}
+{% endblock %}
