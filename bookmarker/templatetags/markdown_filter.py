@@ -19,4 +19,6 @@ def markdownify_title(text):
     output = markdown.markdown(text, safe_mode='escape')
     if output.startswith('<p>') and output.endswith('</p>'):
         output = output[3:-4]
+    if output.startswith('<h1>') and output.endswith('</h1>'):
+        output = output[4:-5]
     return mark_safe(output)
