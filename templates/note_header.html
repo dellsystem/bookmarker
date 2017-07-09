@@ -1,16 +1,17 @@
+{% load markdown_filter %}
 {% load highlight_filter %}
 
 <h2 class="ui header">
     <i class="yellow sticky note icon"></i>
     <div class="content">
         {% if hide_link %}
-        {{ note.subject }}
+        {{ note.subject|markdownify_title }}
         {% else %}
         <a href="{{ note.get_absolute_url }}">
             {% if highlight %}
-            {{ note.subject|highlight_term:highlight }}
+            {{ note.subject|markdownify_title|highlight_term:highlight }}
             {% else %}
-            {{ note.subject }}
+            {{ note.subject|markdownify_title }}
             {% endif %}
         </a>
         {% endif %}
