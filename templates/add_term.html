@@ -59,8 +59,14 @@
         <div class="ui fields">
             {% with error=term_form.text.errors %}
             <div class="eight wide {% if error %}error{% endif %} field">
-                <label>Term{% if error %} (REQUIRED){% endif %}</label>
+                <label>
+                    Term{% if error %} (REQUIRED){% endif %}
+                </label>
                 {{ term_form.text }}
+                <div class="ui dropdown">
+                    <div class="ui compact menu" id="suggested-terms">
+                    </div>
+                </div>
             </div>
             {% endwith %}
             {% with error=term_form.language.errors %}

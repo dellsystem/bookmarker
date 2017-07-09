@@ -52,6 +52,7 @@ urlpatterns = [
     url(r'^author/(?P<author_id>\d+)$', bookmarker.views.view_author,
         name='view_author'),
     url(r'^stats', bookmarker.views.view_stats, name='view_stats'),
+    url(r'^api/suggest.json$', bookmarker.views.suggest_terms),
     url(r'^api/define.json$', bookmarker.views.get_definition),
     url(r'^search$', bookmarker.views.search, name='search'),
 ]

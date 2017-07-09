@@ -1,3 +1,52 @@
+function suggestTerms() {
+    var term = document.getElementById('id_term-text').value;
+    var url = '/api/suggest.json?term=' + term;
+
+    if (term.length >= 3) {
+        fetch(url).then(
+            function (response) {
+                return response.json();
+            }
+        ).then(
+            function (data) {
+                var terms = data.terms;
+                var row;
+                var labels = [];
+
+                if (terms.length) {
+                    for (var i = 0; i < terms.length; i++) {
+                        row = terms[i];
+                        labels.push(
+                            '<div class="item">' + row.text + ' - ' +
+                            row.language + '</div>'
+                        );
+                    }
+                    $('#suggested-terms').html(labels.join(''));
+                    $('#suggested-terms').show();
+                } else {
+                    $('#suggested-terms').html('');
+                }
+            }
+        )
+    } else {
+        $('#suggested-terms').html('');
+    }
+}
+
+$('#suggested-terms').on('click', '.item', function() {
+    var details = $(this).text().split(' - ');
+    var lang = details[1];  // may not always work lol
+    var term = details[0];
+
+    $('#id_term-text').val(term);
+    $('#id_term-language').val(lang);
+
+    $('#suggested-terms').html('');
+    $('#suggested-terms').hide();
+    fetchDefinition();
+});
+
+
 function fetchDefinition() {
     var term = document.getElementById('id_term-text').value;
     var language = document.getElementById('id_term-language').value;
@@ -32,6 +81,8 @@ function fetchDefinition() {
             linkButton.className = 'ui disabled button';
             occurrencesCount.innerText = '';
         }
+        $('#suggested-terms').hide();
+        $('#suggested-terms').html('');
     });
 }
 

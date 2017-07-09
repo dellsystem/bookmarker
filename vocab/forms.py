@@ -9,7 +9,12 @@ class TermForm(forms.ModelForm):
         model = Term
         fields = ['text', 'definition', 'language', 'highlights']
         widgets = {
-            'text': forms.TextInput(attrs={'autofocus': 'autofocus'}),
+            'text': forms.TextInput(
+                attrs={
+                    'autofocus': 'autofocus',
+                    'onkeypress': 'suggestTerms()',
+                }
+            ),
             'definition': forms.Textarea(attrs={'rows': 4}),
             'highlights': forms.Textarea(attrs={'rows': 4}),
         }

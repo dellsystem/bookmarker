@@ -246,6 +246,20 @@ def add_book(request):
     return redirect(book)
 
 
+def suggest_terms(request):
+    term = request.GET.get('term')
+
+    # Find terms of all languages that start with these characters.
+    if term and len(term) >= 3:
+        terms = Term.objects.filter(text__startswith=term).values(
+            'text', 'language'
+        )
+
+    return JsonResponse({
+        'terms': list(terms)[:5],
+    })
+
+
 def get_definition(request):
     term = request.GET.get('term', '')
     language = request.GET.get('language', 'en')
