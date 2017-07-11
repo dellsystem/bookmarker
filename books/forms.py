@@ -22,9 +22,10 @@ class NoteForm(forms.ModelForm):
         accordingly)."""
         # This will blank out the authors. We need to add them back later.
         note = super(NoteForm, self).save(commit=False)
-        self.save_m2m()
-
         note.book = book
+        note.save()
+
+        self.save_m2m()
 
         page = note.page_number
         try:
