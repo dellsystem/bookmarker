@@ -60,3 +60,26 @@ blockquote {
 .no-top-margin {
     margin-top: 0 !important;
 }
+
+.ui.label.unknown-category {
+    color: white;
+    background: black;
+}
+
+.ui.label.uncertain-category {
+    color: white;
+    background: #666;
+}
+
+.ui.label.strange-category {
+    color: white;
+    background: #999;
+}
+
+.ui.label.confirm-category {
+    background: #ccc;
+}
+
+.ui.label.notable-category {
+    /* background set at 91% (232) by default */
+}

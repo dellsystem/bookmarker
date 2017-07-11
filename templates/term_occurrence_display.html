@@ -48,7 +48,7 @@
 {% if o.is_defined %}
 <i class="quote left icon" title="Defined"></i>
 {% endif %}
-<strong>{{ o.category }}</strong>
+<div class="ui label {{ o.category }}-category">{{ o.category }}</div>
 <i class="ellipsis vertical icon"></i>
 <span title="{{ o.added }}">{{ o.added|timesince }} ago</a>
 <i class="ellipsis vertical icon"></i>
