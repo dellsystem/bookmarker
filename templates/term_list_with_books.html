@@ -1,18 +1,38 @@
 {% regroup occurrences by book as books %}
 <div class="ui grid">
 {% for book in books %}
-    <div class="one wide column">
-        {% include 'book_image.html' with book=book.grouper only %}
-    </div>
-    <div class="fifteen wide column">
-        {% include 'book_title.html' with book=book.grouper only %}
+    <div class="computer only row">
+        <div class="one wide column">
+            {% include 'book_image.html' with book=book.grouper only %}
+        </div>
+        <div class="fifteen wide column">
+            {% include 'book_title.html' with book=book.grouper only %}
 
-        {% for occurrence in book.list %}
-            {% include 'term_occurrence_display.html' with o=occurrence highlight=query %}
-            {% if not forloop.last %}
-            <br /><br />
-            {% endif %}
-        {% endfor %}
+            {% for occurrence in book.list %}
+                {% include 'term_occurrence_display.html' with o=occurrence highlight=query only %}
+                {% if not forloop.last %}
+                <br /><br />
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="mobile tablet only row">
+        <div class="six wide column">
+            {% include 'book_image.html' with book=book.grouper only %}
+        </div>
+        <div class="ten wide column">
+            {% include 'book_title.html' with book=book.grouper only %}
+        </div>
+    </div>
+    <div class="mobile tablet only row">
+        <div class="sixteen wide column">
+            {% for occurrence in book.list %}
+                {% include 'term_occurrence_display.html' with o=occurrence highlight=query only %}
+                {% if not forloop.last %}
+                <br /><br />
+                {% endif %}
+            {% endfor %}
+        </div>
     </div>
 {% endfor %}
 </div>

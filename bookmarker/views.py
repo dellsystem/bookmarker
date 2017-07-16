@@ -665,7 +665,11 @@ def view_section(request, section_id):
 
 def search(request):
     query = request.GET.get('q')
+
+    MODES = ('notes', 'terms', 'sections', 'books')
     mode = request.GET.get('mode')
+    if mode not in MODES:
+        mode = None
 
     # Split out the meta options. TODO
     term = query
@@ -703,6 +707,7 @@ def search(request):
         'results': results,
         'query': query,
         'mode': mode,
+        'modes': MODES,
         'qs': '?q=' + query,
     }
 

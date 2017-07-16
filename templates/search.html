@@ -18,69 +18,98 @@
 
 <div class="ui divider"></div>
 
-<div class="ui eight column grid">
+<div class="ui stackable four column grid">
     <div class="column">
-        <h3>Notes ({{ results.notes|length }})</h3>
-    </div>
-    <div class="right aligned column">
-        {% if mode == 'notes' %}
-        <a href="{{ qs }}" class="ui basic blue icon button">
-            <i class="minus icon"></i>
-            Minimize
-        </a>
-        {% else %}
-        <a href="{{ qs }}&mode=notes" class="ui blue icon button">
-            <i class="plus icon"></i>
-            Expand
-        </a>
+        {% include "search_header.html" with key="notes" %}
+        {% if not mode %}
+            {% if results.notes %}
+                <div class="ui bulleted list">
+                    {% for note in results.notes %}
+                    <div class="item">
+                        <a href="{{ note.get_absolute_url }}{{ qs }}">
+                            <strong>{{ note.subject }}</strong>
+                        </a>
+                        from
+                        <a href="{{ note.book.get_absolute_url }}">
+                            {{ note.book.title }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+            <div class="ui message">
+                No notes found
+            </div>
+            {% endif %}
         {% endif %}
     </div>
     <div class="column">
-        <h3>Terms ({{ results.terms|length }})</h3>
-    </div>
-    <div class="right aligned column">
-        {% if mode == 'terms' %}
-        <a href="{{ qs }}" class="ui basic blue icon button">
-            <i class="minus icon"></i>
-            Minimize
-        </a>
-        {% else %}
-        <a href="{{ qs }}&mode=terms" class="ui blue icon button">
-            <i class="plus icon"></i>
-            Expand
-        </a>
+        {% include "search_header.html" with key="terms" %}
+        {% if not mode %}
+            {% if results.terms %}
+                <div class="ui bulleted list">
+                    {% for term in results.terms %}
+                    {% ifchanged term.term.text %}
+                    <div class="item">
+                        <a href="{{ term.term.get_absolute_url }}{{ qs }}">
+                            <strong>{{ term.term.text }}</strong>
+                        </a> from
+                        <a href="{{ term.book.get_absolute_url }}">
+                            {{ term.book.title }}
+                        </a>
+                    </div>
+                    {% endifchanged %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="ui message">
+                    No terms found
+                </div>
+            {% endif %}
         {% endif %}
     </div>
     <div class="column">
-        <h3>Sections ({{ results.sections|length }})</h3>
-    </div>
-    <div class="right aligned column">
-        {% if mode == 'sections' %}
-        <a href="{{ qs }}" class="ui basic blue icon button">
-            <i class="minus icon"></i>
-            Minimize
-        </a>
-        {% else %}
-        <a href="{{ qs }}&mode=sections" class="ui blue icon button">
-            <i class="plus icon"></i>
-            Expand
-        </a>
+        {% include "search_header.html" with key="sections" %}
+        {% if not mode %}
+            {% if results.sections %}
+                <div class="ui bulleted list">
+                    {% for section in results.sections %}
+                    <div class="item">
+                        <a href="{{ section.get_absolute_url }}{{ qs }}">
+                            <strong>{{ section.title }}</strong>
+                        </a> from
+                        <a href="{{ section.book.get_absolute_url }}">
+                            {{ section.book.title }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="ui message">
+                No sections found
+                </div>
+            {% endif %}
         {% endif %}
     </div>
     <div class="column">
-        <h3>Books ({{ results.books|length }})</h3>
-    </div>
-    <div class="right aligned column">
-        {% if mode == 'books' %}
-        <a href="{{ qs }}" class="ui basic blue icon button">
-            <i class="minus icon"></i>
-            Minimize
-        </a>
-        {% else %}
-        <a href="{{ qs }}&mode=books" class="ui blue icon button">
-            <i class="plus icon"></i>
-            Expand
-        </a>
+        {% include "search_header.html" with key="books" %}
+        {% if not mode %}
+            {% if results.books %}
+                <div class="ui bulleted list">
+                    {% for book in results.books %}
+                    <div class="item">
+                        <a href="{{ book.get_absolute_url }}">
+                            <strong>{{ book.title }}</strong>
+                        </a>
+                        {% include 'author_list.html' with authors=book.default_authors only %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+            <div class="ui message">
+                No books found
+            </div>
+            {% endif %}
         {% endif %}
     </div>
 </div>
@@ -89,9 +118,9 @@
     {% if results.notes %}
         {% include 'note_list_with_books.html' with notes=results.notes highlight=query %}
     {% else %}
-    <div class="ui message">
-        No notes found
-    </div>
+        <div class="ui message">
+            No notes found
+        </div>
     {% endif %}
 {% elif mode == 'terms' %}
     {% if results.terms %}
@@ -102,114 +131,28 @@
 
             {% include 'term_list_with_books.html' with occurrences=term.list query=query only %}
         {% endfor %}
-
     {% else %}
-    <div class="ui message">
-        No terms found
-    </div>
+        <div class="ui message">
+            No terms found
+        </div>
     {% endif %}
 {% elif mode == 'sections' %}
     {% if results.sections %}
     <br />
-    {% include 'section_list.html' with sections=results.sections highlight=query show_book=True %}
+        {% include 'section_list.html' with sections=results.sections highlight=query show_book=True %}
     {% else %}
-    <div class="ui message">
-        No sections found
-    </div>
+        <div class="ui message">
+            No sections found
+        </div>
     {% endif %}
 {% elif mode == 'books' %}
-    {% if results.books %}
     {% for book in results.books %}
         {% include 'book_header.html' with book=book highlight=query only %}
-    {% endfor %}
-    {% else %}
+    {% empty %}
     <div class="ui message">
-        No sections found
+        No books found
     </div>
-    {% endif %}
-{% else %}
-<div class="ui four column grid">
-    <div class="column">
-        {% if results.notes %}
-        <div class="ui bulleted list">
-            {% for note in results.notes %}
-            <div class="item">
-                <a href="{{ note.get_absolute_url }}{{ qs }}">
-                    <strong>{{ note.subject }}</strong>
-                </a>
-                from
-                <a href="{{ note.book.get_absolute_url }}">
-                    {{ note.book.title }}
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="ui message">
-        No notes found
-        </div>
-        {% endif %}
-    </div>
-    <div class="column">
-        {% if results.terms %}
-        <div class="ui bulleted list">
-            {% for term in results.terms %}
-            {% ifchanged term.term.text %}
-            <div class="item">
-                <a href="{{ term.term.get_absolute_url }}{{ qs }}">
-                    <strong>{{ term.term.text }}</strong>
-                </a> from
-                <a href="{{ term.book.get_absolute_url }}">
-                    {{ term.book.title }}
-                </a>
-            </div>
-            {% endifchanged %}
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="ui message">
-        No terms found
-        </div>
-        {% endif %}
-    </div>
-    <div class="column">
-        {% if results.sections %}
-        <div class="ui bulleted list">
-            {% for section in results.sections %}
-            <div class="item">
-                <a href="{{ section.get_absolute_url }}{{ qs }}">
-                    <strong>{{ section.title }}</strong>
-                </a> from
-                <a href="{{ section.book.get_absolute_url }}">
-                    {{ section.book.title }}
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="ui message">
-        No sections found
-        </div>
-        {% endif %}
-    </div>
-    <div class="column">
-        {% if results.books %}
-        <div class="ui bulleted list">
-            {% for book in results.books %}
-            <div class="item">
-                <a href="{{ book.get_absolute_url }}">
-                    <strong>{{ book.title }}</strong>
-                </a>
-                {% include 'author_list.html' with authors=book.default_authors only %}
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="ui message">
-        No book found
-        </div>
-        {% endif %}
-    </div>
-</div>
+    {% endfor %}
 {% endif %}
+
 {% endblock %}

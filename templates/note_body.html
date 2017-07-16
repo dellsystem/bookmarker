@@ -1,7 +1,7 @@
 {% load markdown_filter %}
 {% load highlight_filter %}
 
-<div class="ui horizontal segments no-top-margin">
+<div class="ui segments no-top-margin">
     <div class="ui segment">
         <i class="quote left icon left-floated"></i>
         {% if highlight %}
@@ -10,6 +10,7 @@
         {{ note.quote|markdownify }}
         {% endif %}
     </div>
+    {% if note.comment %}
     <div class="ui secondary segment">
         {% if highlight %}
         {{ note.comment|markdownify|highlight_term:highlight }}
@@ -17,6 +18,7 @@
         {{ note.comment|markdownify }}
         {% endif %}
     </div>
+    {% endif %}
 </div>
 
 {% if not hide_page %}
