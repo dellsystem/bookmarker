@@ -8,6 +8,7 @@
         <div class="one wide column">
         </div>
         <div class="fifteen wide column">
+            <br />
             {% for occurrence in book.list %}
                 {% include 'term_occurrence_display.html' with o=occurrence highlight=query only %}
                 <br />
