@@ -64,6 +64,9 @@ class TermOccurrence(SectionArtefact):
     def display_template(self):
         return 'term_display.html'
 
+    def get_absolute_url(self):
+        return reverse('view_occurrence', args=[str(self.id)])
+
     def save(self, *args, **kwargs):
         self.section = self.determine_section()
         super(TermOccurrence, self).save(*args, **kwargs)

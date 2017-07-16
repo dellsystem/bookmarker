@@ -426,6 +426,20 @@ def view_note(request, note_id):
     return render(request, 'view_note.html', context)
 
 
+def view_occurrence(request, occurrence_id):
+    occurrence = TermOccurrence.objects.get(pk=occurrence_id)
+    query = request.GET.get('q')
+
+    context = {
+        'occurrence': occurrence,
+        'term': occurrence.term,
+        'book': occurrence.book,
+        'query': query,
+    }
+
+    return render(request, 'view_occurrence.html', context)
+
+
 def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
     query = request.GET.get('q')

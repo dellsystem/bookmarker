@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<a class="section" href="{{ term.get_absolute_url }}">View term</a>
+<i class="right angle icon divider"></i>
+<div class="active section">View occurrence</div>
+{% endblock %}
+
+{% block content %}
+{% include 'term_header.html' with term=term highlight=query %}
+
+{% include 'book_header.html' with book=book %}
+<br />
+
+{% include 'term_occurrence_display.html' with o=occurrence highlight=query %}
+
+{% endblock %}

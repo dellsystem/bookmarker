@@ -50,7 +50,9 @@
 {% endif %}
 <div class="ui label {{ o.category }}-category">{{ o.category }}</div>
 <i class="ellipsis vertical icon"></i>
-<span title="{{ o.added }}">{{ o.added|timesince }} ago</a>
+<a href="{{ o.get_absolute_url }}" title="{{ o.added }}">
+    {{ o.added|timesince }} ago
+</a>
 <i class="ellipsis vertical icon"></i>
 <a href="{% url 'admin:vocab_termoccurrence_change' o.pk %}">
     <i class="edit icon"></i>
