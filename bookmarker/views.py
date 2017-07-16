@@ -708,7 +708,7 @@ def search(request):
         Q(title__icontains=term) |
         Q(subtitle__icontains=term) |
         Q(summary__icontains=term)
-    ):
+    ).order_by('book'):
         results['sections'].append(section)
 
     for book in Book.objects.filter(

@@ -5,6 +5,9 @@
 <br />
 <div class="ui vertically divided compact grid">
     {% for section in sections %}
+    {% ifchanged section.book %}
+        {% include "book_small_header.html" with book=section.book only %}
+    {% endifchanged %}
     <div class="computer only row">
         <div class="one wide column">
             <div class="ui large circular label">{{ section.get_page_display }}</div>
@@ -37,7 +40,11 @@
                 </div>
             </h4>
             {% if section.summary %}
-            {{ section.summary|markdownify }}
+                {% if highlight %}
+                    {{ section.summary|markdownify|highlight_term:highlight }}
+                {% else %}
+                    {{ section.summary|markdownify }}
+                {% endif %}
             {% endif %}
         </div>
         <div class="three wide right aligned column">
@@ -59,7 +66,11 @@
         <div class="thirteen wide column">
             <h4 class="ui header">
                 <a href="{{ section.get_absolute_url }}">
+                    {% if highlight %}
+                    {{ section.title|markdownify_title|highlight_term:highlight }}
+                    {% else %}
                     {{ section.title|markdownify_title }}
+                    {% endif %}
                 </a>
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
@@ -79,8 +90,10 @@
                     {% endif %}
                 </div>
             </h4>
-            {% if section.summary %}
-            {{ section.summary|markdownify }}
+            {% if highlight %}
+                {{ section.summary|markdownify|highlight_term:highlight }}
+            {% else %}
+                {{ section.summary|markdownify }}
             {% endif %}
             {{ section.terms.count }} <i class="flag icon"></i>
             /
