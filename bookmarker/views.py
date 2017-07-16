@@ -630,12 +630,12 @@ def edit_section(request, section_id):
             # Set the authors according to author_form (only if the mode has
             # changed).
             new_author_mode = author_form.cleaned_data['mode']
-            if author_mode != new_author_mode:
+            if author_mode != new_author_mode or new_author_mode == 'custom':
+                section.authors.clear()
                 if new_author_mode == 'default':
-                    section.set_default_authors()
+                    section.authors.add(*section.book.default_authors.all())
                 else:
                     # If it's "none", we only need to remove authors.
-                    section.authors.clear()
                     if new_author_mode == 'custom':
                         section.authors.add(author_form.cleaned_data['author'])
 
