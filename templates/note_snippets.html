@@ -17,7 +17,7 @@
                     {{ note.subject|truncatechars:65 }}
                     {% endif %}
                 </a>
-                <a href="{% url 'admin:books_note_change' note.pk %}">
+                <a href="{% url 'edit_note' note.pk %}">
                     <i class="edit icon"></i>
                 </a>
             </span>
