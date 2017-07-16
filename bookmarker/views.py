@@ -34,6 +34,7 @@ def home(request):
             completed_read=True,
         ),
         'unread_books': books.filter(completed_read=False),
+        'complete_books': Book.objects.filter(is_processed=True),
     }
     return render(request, 'home.html', context)
 

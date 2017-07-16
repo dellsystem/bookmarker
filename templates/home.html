@@ -8,7 +8,7 @@
     <div class="eight wide column">
 {% endif %}
         <div class="ui segment">
-            <div class="ui three small statistics">
+            <div class="ui four small statistics">
                 <div class="statistic">
                     <div class="value">
                         {{ started_books.count }}
@@ -31,6 +31,14 @@
                     </div>
                     <div class="label">
                         <a href="#unread_books">Unread</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ complete_books.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_complete' %}">Complete</a>
                     </div>
                 </div>
             </div>
