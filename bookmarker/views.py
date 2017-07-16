@@ -205,6 +205,27 @@ def add_term(request, book_id):
 
 
 @staff_member_required
+def add_author(request):
+    goodreads_id = request.POST.get('goodreads_id')
+    gr_author = CLIENT.author(goodreads_id)
+
+    try:
+        author = Author.objects.get(goodreads_id=goodreads_id)
+    except Author.DoesNotExist:
+        author = Author.objects.create(
+            goodreads_id=goodreads_id,
+            name=gr_author.name,
+            link=gr_author.link,
+        )
+        messages.success(
+            request,
+            u'Added author: {}'.format(author.name),
+        )
+
+    return redirect(author)
+
+
+@staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
     gr_book = CLIENT.book(goodreads_id)
