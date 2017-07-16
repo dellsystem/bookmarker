@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui grid">
+<div class="ui stackable grid">
     <div class="row">
         <div class="fourteen wide column">
             {% include 'book_header.html' with book=book only %}
@@ -27,7 +27,6 @@
 </div>
 <div class="ui divider"></div>
 
-<div class="ui grid">
-    {% include 'note_display.html' with x=note hide_link=True highlight=query show_page=book.has_pages only %}
-</div>
+{% include 'note_header.html' with note=note highlight=query only %}
+{% include 'note_body.html' with note=note highlight=query only %}
 {% endblock %}
