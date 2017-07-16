@@ -32,6 +32,7 @@
 
 <a name="top"></a>
 
+{% if books %}
 <div class="ui doubling ten cards">
     {% for row in books %}
     <a class="ui card" href="#book-{{ row.book.pk }}" title="{{ row.book.title }}">
@@ -92,7 +93,7 @@
                         <i class="list icon"></i>
                         View notes by {{ author }} ({{ row.num_notes }})
                     </a>
-                    {% include 'note_snippets.html' with notes=row.notes only show_page=book.has_pages %}
+                    {% include 'note_snippets.html' with notes=row.notes show_page=book.has_pages only %}
                     {% else %}
                     <div class="ui message">No notes by {{ author }}</div>
                     {% endif %}
@@ -104,4 +105,9 @@
     <div class="ui divider"></div>
     {% endfor %}
 </div>
+{% else %}
+<div class="ui message">
+    No books yet.
+</div>
+{% endif %}
 {% endblock %}
