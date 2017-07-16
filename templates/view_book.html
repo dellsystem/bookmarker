@@ -50,6 +50,12 @@
     </div>
 </div>
 <div class="ui divider"></div>
+{% if book.summary %}
+    <div class="ui message">
+        {% load markdown_filter %}
+        {{ book.summary|markdownify }}
+    </div>
+{% endif %}
 <div class="ui stackable grid">
     <div class="four wide column">
         <a href="{{ book.link }}">
