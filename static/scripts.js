@@ -1,3 +1,42 @@
+function reformatQuote() {
+    var field = document.getElementById('id_note-quote');
+    var lines = field.value.split(/\n/g);
+
+    var newLines = [];
+    var newLine = [];
+    var line, nextLine, n;
+    for (var i = 0; i < lines.length; i++) {
+        line = lines[i];
+        if (i == lines.length - 1) {
+            nextLine = '';
+        } else {
+            nextLine = lines[i+1];
+        }
+
+        n = line.length;
+        if (n > 0) {
+            if (line[n-1] === '-' && (n == 1 || line[n-2] != '-')) {
+                // Get rid of the -.
+                newLine.push(line.substring(0, n-1) + nextLine);
+                i++;
+            } else {
+                newLine.push(line);
+            }
+        } else {
+            // Preserve the empty line.
+            newLines.push(newLine.join(' '));
+            newLines.push('');
+            newLine = [];
+        }
+    }
+    if (newLine) {
+        newLines.push(newLine.join(' '));
+    }
+
+    field.value = newLines.join('\n');
+}
+
+
 function suggestTerms() {
     var term = document.getElementById('id_term-text').value;
     var url = '/api/suggest.json?term=' + term;
