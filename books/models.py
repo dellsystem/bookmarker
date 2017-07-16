@@ -12,7 +12,7 @@ from .utils import int_to_roman, roman_to_int
 
 
 class Author(models.Model):
-    goodreads_id = models.CharField(max_length=20, unique=True)
+    goodreads_id = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=100)
     link = models.URLField()
 
