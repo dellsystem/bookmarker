@@ -165,7 +165,7 @@
         </div>
         {% endif %}
         {% if book.sections.count %}
-        {% include 'section_list.html' with sections=book.sections.all only %}
+        {% include 'section_list.html' with sections=book.sections.all hide_book=True only %}
         {% endif %}
     </div>
 </div>

@@ -5,9 +5,11 @@
 <br />
 <div class="ui vertically divided compact grid">
     {% for section in sections %}
+    {% if not hide_book %}
     {% ifchanged section.book %}
         {% include "book_small_header.html" with book=section.book only %}
     {% endifchanged %}
+    {% endif %}
     <div class="computer only row">
         <div class="one wide column">
             <div class="ui large circular label">{{ section.get_page_display }}</div>
