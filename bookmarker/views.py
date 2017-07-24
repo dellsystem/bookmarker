@@ -40,7 +40,7 @@ def home(request):
 
 
 def view_complete(request):
-    books = Book.objects.filter(is_processed=True).order_by('title')
+    books = Book.objects.filter(is_processed=True).order_by('-id')
     context = {
         'books': books,
     }
