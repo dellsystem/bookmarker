@@ -1,5 +1,5 @@
-function reformatQuote() {
-    var field = document.getElementById('id_note-quote');
+function reformatQuote(elementId) {
+    var field = document.getElementById(elementId);
     var lines = field.value.split(/\n/g);
 
     var newLines = [];
