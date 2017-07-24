@@ -23,9 +23,6 @@ class NoteForm(forms.ModelForm):
         # This will blank out the authors. We need to add them back later.
         note = super(NoteForm, self).save(commit=False)
         note.book = book
-        note.save()
-
-        self.save_m2m()
 
         page = note.page_number
         try:
@@ -46,6 +43,7 @@ class NoteForm(forms.ModelForm):
         note.author_mode = author_form.cleaned_data['mode']
 
         note.save()
+        self.save_m2m()
 
         if note.author_mode == 'default':
             note.set_default_authors()
