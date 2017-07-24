@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<div class="active section">View all tags</div>
+{% endblock %}
+
+{% block content %}
+<h2>View all tags</h2>
+
+<div class="ui divider"></div>
+
+<div class="ui three column grid">
+    {% for tag in tags %}
+    <div class="column">
+        <div class="ui segment">
+            <p>
+                <a class="ui big {{ tag.colour }} label"
+                   href="{{ tag.get_absolute_url }}">
+                    {{ tag }} ({{ tag.notes.count }})
+                </a>
+            </p>
+            <p>
+                {{ tag.description }}
+                <a href="{% url 'admin:books_notetag_change' tag.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

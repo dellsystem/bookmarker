@@ -839,3 +839,13 @@ def view_tag(request, slug):
     }
 
     return render(request, 'view_tag.html', context)
+
+
+def view_all_tags(request):
+    tags = NoteTag.objects.all()
+
+    context = {
+        'tags': tags,
+    }
+
+    return render(request, 'view_all_tags.html', context)

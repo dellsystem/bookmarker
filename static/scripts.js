@@ -138,4 +138,4 @@ $('.display-rating').rating({
     interactive: false,
 });
 
-$('.multi-select').dropdown();
+$('.ui.dropdown').dropdown();

@@ -20,17 +20,31 @@
                     <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
                 </a>
             </div>
-            <div class="item">
-                <a href="{% url 'view_complete' %}">Complete</a>
-            </div>
-            <div class="item">
-                <a href="{% url 'view_all_authors' %}">Authors</a>
-            </div>
-            <div class="item">
-                <a href="{% url 'view_all_terms' %}">Terms</a>
-            </div>
-            <div class="item">
-                <a href="{% url 'view_all_notes' %}">Notes</a>
+            <div class="ui dropdown item">
+                Browse
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item" href="{% url 'view_complete' %}">
+                        <i class="book icon"></i>
+                        Complete
+                    </a>
+                    <a class="item" href="{% url 'view_all_authors' %}">
+                        <i class="user icon"></i>
+                        Authors
+                    </a>
+                    <a class="item" href="{% url 'view_all_terms' %}">
+                        <i class="flag icon"></i>
+                        Terms
+                    </a>
+                    <a class="item" href="{% url 'view_all_notes' %}">
+                        <i class="sticky note icon"></i>
+                        Notes
+                    </a>
+                    <a class="item" href="{% url 'view_all_tags' %}">
+                        <i class="tag icon"></i>
+                        Tags
+                    </a>
+                </div>
             </div>
             <div class="item">
                 <a href="{% url 'view_stats' %}">Stats</a>
