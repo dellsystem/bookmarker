@@ -13,16 +13,18 @@
         {{ tag.slug }}
     </span>
 </h1>
-<p>{{ tag.description }}</p>
-
+<p>
+    {{ tag.description }}
+    <a href="{% url 'admin:books_notetag_change' tag.pk %}">
+        <i class="edit icon"></i>
+    </a>
+</p>
 <div class="ui divider"></div>
 
 {% include "pagination.html" with items=notes only %}
 
 <div class="ui grid">
-    {% for note in notes %}
-    {% include 'note_display.html' with x=note show_page=note.book.has_pages only %}
-    {% endfor %}
+    {% include 'note_list_with_books.html' with notes=notes %}
 </div>
 
 {% include "pagination.html" with items=notes only %}

@@ -822,7 +822,7 @@ def edit_note(request, note_id):
 def view_tag(request, slug):
     tag = NoteTag.objects.get(slug=slug)
 
-    paginator = Paginator(tag.notes.all(), 10)
+    paginator = Paginator(tag.notes.order_by('book'), 10)
     page = request.GET.get('page')
     try:
         notes = paginator.page(page)
