@@ -23,14 +23,16 @@
         <div class="ten wide column">
             <h3 class="ui header">
                 {{ section.title|markdownify_title }}
+                {% if section.rating %}
+                <div class="ui heart rating display-rating"
+                     data-rating="{{ section.rating }}">
+                </div>
+                {% endif %}
                 <a href="{% url 'edit_section' section.pk %}">
                     <i class="edit icon"></i>
                 </a>
                 <div class="sub header">
                     {{ section.subtitle }}
-                    {% if section.rating %}
-                    Rating: {{ section.rating }}
-                    {% endif %}
                     {% if section.authors.count %}
                         {% if not section.has_default_authors %}
                         {% include 'author_list.html' with authors=section.authors %}
