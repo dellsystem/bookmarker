@@ -9,22 +9,35 @@
     <div class="twelve wide column">
         <h2 class="ui header">
             <a href="{{ author.link }}">{{ author.name }}</a>
-            <a href="{% url 'admin:books_author_change' author.pk %}">
-                <i class="edit icon"></i>
-            </a>
+            <div class="sub header">
+                <a href="{% url 'view_all_terms' %}?author={{ author.pk }}">
+                    {{ num_terms }}
+                    <i class="flag icon"></i>
+                </a>
+                /
+                <a href="{% url 'view_all_notes' %}?author={{ author.pk }}">
+                    {{ num_notes }}
+                    <i class="sticky note icon"></i>
+                </a>
+                /
+                <a href="{% url 'admin:books_author_change' author.pk %}">
+                    <i class="edit icon"></i>
+                </a>
+            </div>
         </h2>
     </div>
     <div class="four wide right aligned column">
-        <a class="ui blue button"
-           href="{% url 'view_all_terms' %}?author={{ author.pk }}">
-            {{ num_terms }}
-            terms
-        </a>
-        <a class="ui blue button"
-           href="{% url 'view_all_notes' %}?author={{ author.pk }}">
-            {{ num_notes }}
-            notes
-        </a>
+        <form method="post" action="{% url 'add_author' %}">
+            <div class="ui fluid labeled action input">
+                <div class="ui label">Author</div>
+                <input type="text" name="goodreads_id"
+                       placeholder="GoodReads ID" />
+                <button type="submit" class="ui icon green button">
+                    <i class="plus icon"></i>
+                </button>
+            </div>
+            {% csrf_token %}
+        </form>
     </div>
 </div>
 
