@@ -83,3 +83,8 @@ blockquote {
 .ui.label.notable-category {
     /* background set at 91% (232) by default */
 }
+
+.collapsed.column {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}

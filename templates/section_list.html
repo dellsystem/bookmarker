@@ -5,6 +5,7 @@
 <br />
 <div class="ui vertically divided compact grid">
     {% for section in sections %}
+    {% with related=section.related_to %}
     {% if not hide_book %}
     {% ifchanged section.book %}
         {% include "book_small_header.html" with book=section.book only %}
@@ -15,16 +16,22 @@
             <div class="ui large circular label">{{ section.get_page_display }}</div>
         </div>
         <div class="eleven wide column">
-            <h4 class="ui header">
+            <h4 class="ui {% if related %}disabled{% endif %} header">
+                {% if related %}
+                <a href="{{ related.get_absolute_url }}">
+                {% else %}
                 <a href="{{ section.get_absolute_url }}">
+                {% endif %}
                     {% if highlight %}
                     {{ section.title|markdownify_title|highlight_term:highlight }}
                     {% else %}
                     {{ section.title|markdownify_title }}
                     {% endif %}
                 </a>
+                {% if not related %}
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
+                {% endif %}
                 {% if section.source_url %}
                 <a href="{{ section.source_url }}">
                     <i class="external icon"></i>
@@ -39,6 +46,12 @@
                     {% else %}
                     (missing author)
                     {% endif %}
+                    {% if related %}
+                    &mdash;also in
+                    <a href="{{ related.book.get_absolute_url }}">
+                        {{ related.book }}
+                    </a>
+                    {% endif %}
                 </div>
             </h4>
             {% if section.summary %}
@@ -50,9 +63,15 @@
             {% endif %}
         </div>
         <div class="three wide right aligned column">
+            {% if related %}
+            {{ related.terms.count }} <i class="flag icon"></i>
+            /
+            {{ related.notes.count }} <i class="sticky note icon"></i>
+            {% else %}
             {{ section.terms.count }} <i class="flag icon"></i>
             /
             {{ section.notes.count }} <i class="sticky note icon"></i>
+            {% endif %}
         </div>
         <div class="one wide right aligned column">
             <a class="ui mini icon {% if not section.summary %}red{% endif %} button"
@@ -106,5 +125,6 @@
             </a>
         </div>
     </div>
+    {% endwith %}
     {% endfor %}
 </div>

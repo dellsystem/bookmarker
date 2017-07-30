@@ -103,17 +103,7 @@ def add_section(request, book_id):
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if section_form.is_valid() and author_form.is_valid():
-            section = section_form.save(book=book)
-
-            # Set the authors according to author_form. If the mode is 'none',
-            # we don't need to do anything since the section has no authors
-            # by default.
-            author_mode = author_form.cleaned_data['mode']
-            if author_mode == 'default':
-                section.authors.add(*book.default_authors.all())
-            elif author_mode == 'custom':
-                section.authors.add(author_form.cleaned_data['author'])
-
+            section = section_form.save(author_form, book=book)
             messages.success(request, u'Added section: {}'.format(section.title))
         else:
             new_form = False
@@ -130,6 +120,64 @@ def add_section(request, book_id):
     }
 
     return render(request, 'add_section.html', context)
+
+
+@staff_member_required
+def edit_occurrence(request, occurrence_id):
+    occurrence = TermOccurrence.objects.get(pk=occurrence_id)
+
+    if request.POST:
+        term_form = TermForm(
+            request.POST,
+            instance=occurrence.term,
+            prefix='term',
+        )
+        author_form = ArtefactAuthorForm(
+            request.POST,
+            prefix='author',
+        )
+        occurrence_form = TermOccurrenceForm(
+            request.POST,
+            instance=occurrence,
+            prefix='occurrence',
+        )
+        if (
+                term_form.is_valid() and
+                author_form.is_valid() and
+                occurrence_form.is_valid()
+        ):
+            occurrence_form.save(author_form)
+            occurrence.term.definition = term_form.cleaned_data['definition']
+            occurrence.term.highlights = term_form.cleaned_data['highlights']
+            occurrence.term.save()
+            messages.success(request, 'Theoretically worked')
+            return redirect(occurrence)
+        else:
+            messages.error(request, 'Failed to save term')
+    else:
+        term_form = TermForm(
+            instance=occurrence.term,
+            prefix='term',
+        )
+        author_form = ArtefactAuthorForm(
+            prefix='author',
+            initial=occurrence.get_author_data(),
+        )
+        occurrence_form = TermOccurrenceForm(
+            instance=occurrence,
+            prefix='occurrence',
+        )
+
+    context = {
+        'occurrence': occurrence,
+        'book': occurrence.book,
+        'term_form': term_form,
+        'occurrence_form': occurrence_form,
+        'author_form': author_form,
+        'term': occurrence.term,
+    }
+
+    return render(request, 'edit_occurrence.html', context)
 
 
 @staff_member_required
@@ -164,16 +212,7 @@ def add_term(request, book_id):
                 term.highlights = term_form.cleaned_data['highlights']
                 term.save()
 
-            occurrence = occurrence_form.save(term=term, book=book)
-
-            # Set the authors according to author_form. If the mode is 'none',
-            # we don't need to do anything since the occurrence has no authors
-            # by default.
-            author_mode = author_form.cleaned_data['mode']
-            if author_mode == 'default':
-                occurrence.set_default_authors()
-            elif author_mode == 'custom':
-                occurrence.authors.add(author_form.cleaned_data['author'])
+            occurrence = occurrence_form.save(author_form, term=term, book=book)
 
             messages.success(request, u'Added term: {}'.format(term.text))
         else:
@@ -331,7 +370,7 @@ def add_note(request, book_id):
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if note_form.is_valid() and author_form.is_valid():
-            note = note_form.save(book=book, author_form=author_form)
+            note = note_form.save(author_form, book=book)
 
             messages.success(request, u'Added note: {}'.format(note.subject))
         else:
@@ -607,16 +646,6 @@ def mark_complete(request, book_id):
 def edit_section(request, section_id):
     section = Section.objects.get(pk=section_id)
 
-    initial_author = None
-    if section.authors.count():
-        if section.has_default_authors():
-            author_mode = 'default'
-        else:
-            author_mode = 'custom'
-            initial_author = section.authors.first()
-    else:
-        author_mode = 'none'
-
     if request.method == 'POST':
         section_form = SectionForm(
             request.POST, instance=section, prefix='section'
@@ -625,19 +654,7 @@ def edit_section(request, section_id):
             request.POST, prefix='author',
         )
         if section_form.is_valid() and author_form.is_valid():
-            section = section_form.save()
-
-            # Set the authors according to author_form (only if the mode has
-            # changed).
-            new_author_mode = author_form.cleaned_data['mode']
-            if author_mode != new_author_mode or new_author_mode == 'custom':
-                section.authors.clear()
-                if new_author_mode == 'default':
-                    section.authors.add(*section.book.default_authors.all())
-                else:
-                    # If it's "none", we only need to remove authors.
-                    if new_author_mode == 'custom':
-                        section.authors.add(author_form.cleaned_data['author'])
+            section = section_form.save(author_form)
 
             messages.success(
                 request, u'Edited section: {}'.format(section.title)
@@ -656,10 +673,7 @@ def edit_section(request, section_id):
 
         author_form = ArtefactAuthorForm(
             prefix='author',
-            initial={
-                'mode': author_mode,
-                'author': initial_author,
-            }
+            initial=section.get_author_data(),
         )
 
     context = {
@@ -771,21 +785,11 @@ def view_stats(request):
 def edit_note(request, note_id):
     note = Note.objects.get(pk=note_id)
 
-    initial_author = None
-    if note.authors.count():
-        if note.has_default_authors():
-            author_mode = 'default'
-        else:
-            author_mode = 'custom'
-            initial_author = note.authors.first()
-    else:
-        author_mode = 'none'
-
     if request.method == 'POST':
         note_form = NoteForm(request.POST, instance=note, prefix='note')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
         if note_form.is_valid() and author_form.is_valid():
-            note = note_form.save(book=note.book, author_form=author_form)
+            note = note_form.save(author_form)
             messages.success(
                 request, u'Edited note: {}'.format(note.subject)
             )
@@ -803,10 +807,7 @@ def edit_note(request, note_id):
 
         author_form = ArtefactAuthorForm(
             prefix='author',
-            initial={
-                'mode': author_mode,
-                'author': initial_author,
-            }
+            initial=note.get_author_data(),
         )
 
     context = {

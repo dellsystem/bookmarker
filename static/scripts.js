@@ -139,3 +139,4 @@ $('.display-rating').rating({
 });
 
 $('.ui.dropdown').dropdown();
+$('.ui.checkbox').checkbox();

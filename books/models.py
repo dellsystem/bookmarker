@@ -104,6 +104,25 @@ class PageArtefact(models.Model):
     class Meta:
         abstract = True
 
+    def get_author_data(self):
+        """Returns the mode and authors list (needed for
+        populating ArtefactAuthorForm)"""
+        authors = []
+
+        if self.authors.count():
+            if self.has_default_authors():
+                mode = 'default'
+            else:
+                mode = 'custom'
+                authors = self.authors.all()
+        else:
+            mode = 'none'
+
+        return {
+            'mode': mode,
+            'authors': authors,
+        }
+
     def __cmp__(self, other):
         """So we can compare notes with terms."""
         if self.in_preface:
@@ -143,6 +162,7 @@ class Section(PageArtefact):
     summary = models.TextField(blank=True)
     rating = RatingField(default=0, blank=True)
     source_url = models.URLField(blank=True)
+    related_to = models.ForeignKey('self', blank=True, null=True)
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

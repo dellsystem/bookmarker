@@ -1,0 +1,72 @@
+<div class="ui segment">
+    <form class="ui form" method="post">
+        {% csrf_token %}
+        <div class="ui stackable grid">
+            <div class="five wide column">
+                {% with error=section_form.title.errors %}
+                <div class="{% if error %}error{% endif %} field">
+                    <label>Title{% if error %} (REQUIRED){% endif %}</label>
+                    {{ section_form.title }}
+                </div>
+                {% endwith %}
+            </div>
+            <div class="four wide column">
+                <div class="field">
+                    <label>Subtitle</label>
+                    {{ section_form.subtitle }}
+                </div>
+            </div>
+            <div class="one wide collapsed column">
+                {% with error=section_form.page_number.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Page</label>
+                    {{ section_form.page_number }}
+                </div>
+                {% endwith %}
+            </div>
+            <div class="two wide column">
+                {% with error=author_form.mode.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Author mode</label>
+                    {{ author_form.mode }}
+                </div>
+                {% endwith %}
+            </div>
+            <div class="four wide collapsed column">
+                <div class="field">
+                    <label>Author(s)</label>
+                    {{ author_form.authors }}
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="field">
+            <label>Summary</label>
+            {{ section_form.summary }}
+        </div>
+        <div class="field">
+            <label>Source URL</label>
+            {{ section_form.source_url }}
+        </div>
+        <div class="ui basic center aligned segment">
+            <input type="hidden" name="section-rating"
+                   id="section_rating" value="{{ section.rating }}" />
+            {% if section_form.rating.errors %}
+            <div class="ui red label">
+                Rating required!
+            </div>
+            <br /><br />
+            {% endif %}
+            <div class="ui heart rating editable-rating"
+                 data-rating="{{ section.rating }}">
+            </div>
+            <br /><br />
+            <button type="submit" name="submit"
+                    class="ui blue button">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
