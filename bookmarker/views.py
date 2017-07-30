@@ -273,7 +273,7 @@ def suggest_terms(request):
 
     # Find terms of all languages that start with these characters.
     if term and len(term) >= 3:
-        terms = Term.objects.filter(text__startswith=term).values(
+        terms = Term.objects.filter(text__icontains=term).values(
             'text', 'language'
         )
 
