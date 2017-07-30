@@ -3,7 +3,7 @@
 {% block breadcrumbs %}
 <a class="section" href="{% url 'view_book' book.pk %}">View book</a>
 <i class="right angle icon divider"></i>
-<a class="section" href="{{ note.get_absolute_ur }}">View note</a>
+<a class="section" href="{{ note.get_absolute_url }}">View note</a>
 <i class="right angle icon divider"></i>
 <div class="active section">Edit</div>
 {% endblock %}
