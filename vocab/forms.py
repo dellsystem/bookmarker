@@ -13,6 +13,7 @@ class TermForm(forms.ModelForm):
                 attrs={
                     'autofocus': 'autofocus',
                     'onkeypress': 'suggestTerms()',
+                    'autocomplete': 'off',
                 }
             ),
             'definition': forms.Textarea(attrs={'rows': 4}),
