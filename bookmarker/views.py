@@ -752,7 +752,8 @@ def search(request):
 
     for book in Book.objects.filter(
         Q(title__icontains=term) |
-        Q(summary__icontains=term)
+        Q(summary__icontains=term) |
+        Q(authors__name__icontains=term)
     ):
         results['books'].append(book)
 
