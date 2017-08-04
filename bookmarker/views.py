@@ -166,6 +166,9 @@ def edit_occurrence(request, occurrence_id):
         occurrence_form = TermOccurrenceForm(
             instance=occurrence,
             prefix='occurrence',
+            initial={
+                'page_number': occurrence.get_page_display(),
+            }
         )
 
     context = {
