@@ -50,7 +50,7 @@ class Book(models.Model):
     title = models.CharField(max_length=255)
     image_url = models.URLField()
     link = models.URLField()
-    authors = models.ManyToManyField(Author, related_name='books')
+    authors = models.ManyToManyField(Author, blank=True, related_name='books')
     # The default authors set on a Section/Term/Note if they aren't specified.
     # If empty, then it's assumed that most sections are by different authors.
     default_authors = models.ManyToManyField(Author,
