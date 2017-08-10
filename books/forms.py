@@ -58,6 +58,11 @@ class NoteForm(forms.ModelForm):
 
 
 class SectionForm(forms.ModelForm):
+    related_to = forms.ModelChoiceField(
+        queryset=Section.objects.all().order_by('book__title', 'title'),
+        required=False,
+    )
+
     class Meta:
         model = Section
         exclude = ['book', 'authors']
@@ -105,18 +110,6 @@ class SectionForm(forms.ModelForm):
             section.authors.add(*section.book.default_authors.all())
         elif author_form.cleaned_data['mode'] == 'custom':
                 section.authors.add(*author_form.cleaned_data['authors'])
-
-        # Check if there's another section by the same author and title.
-        if section.authors.exists():
-            other_section = Section.objects.filter(
-                title=section.title,
-                authors=section.authors.all(),
-            ).exclude(
-                pk=section.pk
-            )
-            if other_section.exists():
-                section.related_to = other_section.get()
-                section.save()
 
         return section
 

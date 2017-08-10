@@ -46,9 +46,15 @@
             <label>Summary</label>
             {{ section_form.summary }}
         </div>
-        <div class="field">
-            <label>Source URL</label>
-            {{ section_form.source_url }}
+        <div class="two fields">
+            <div class="field">
+                <label>Source URL</label>
+                {{ section_form.source_url }}
+            </div>
+            <div class="field">
+                <label>Related section</label>
+                {{ section_form.related_to }}
+            </div>
         </div>
         <div class="ui basic center aligned segment">
             <input type="hidden" name="section-rating"
