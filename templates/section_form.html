@@ -10,12 +10,6 @@
                 </div>
                 {% endwith %}
             </div>
-            <div class="four wide column">
-                <div class="field">
-                    <label>Subtitle</label>
-                    {{ section_form.subtitle }}
-                </div>
-            </div>
             <div class="one wide collapsed column">
                 {% with error=section_form.page_number.errors %}
                 <div class="{% if error %}error{% endif %} field"
@@ -24,6 +18,12 @@
                     {{ section_form.page_number }}
                 </div>
                 {% endwith %}
+            </div>
+            <div class="four wide column">
+                <div class="field">
+                    <label>Subtitle</label>
+                    {{ section_form.subtitle }}
+                </div>
             </div>
             <div class="two wide column">
                 {% with error=author_form.mode.errors %}
