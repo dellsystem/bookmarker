@@ -67,10 +67,6 @@ class TermOccurrence(SectionArtefact):
     def get_absolute_url(self):
         return reverse('view_occurrence', args=[str(self.id)])
 
-    def save(self, *args, **kwargs):
-        self.section = self.determine_section()
-        super(TermOccurrence, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return "{term} in {book}".format(
             term=self.term.text,

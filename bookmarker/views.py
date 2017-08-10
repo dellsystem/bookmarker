@@ -194,7 +194,7 @@ def add_term(request, book_id):
     new_forms = True
     if request.method == 'POST':
         term_form = TermForm(request.POST, prefix='term')
-        occurrence_form = TermOccurrenceForm(request.POST, prefix='occurrence')
+        occurrence_form = TermOccurrenceForm(request.POST, book=book, prefix='occurrence')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if (
@@ -215,9 +215,17 @@ def add_term(request, book_id):
                 term.highlights = term_form.cleaned_data['highlights']
                 term.save()
 
-            occurrence = occurrence_form.save(author_form, term=term, book=book)
+            occurrence = occurrence_form.save(author_form, term=term)
 
-            messages.success(request, u'Added term: {}'.format(term.text))
+            if occurrence.section:
+                message = u'Added term {term} to section {section}'.format(
+                    term=term.text,
+                    section=occurrence.section.title,
+                )
+            else:
+                message = u'Added term: {}'.format(term.text)
+
+            messages.success(request, message)
         else:
             new_forms = False
             messages.error(request, 'Failed to add term')
@@ -229,6 +237,7 @@ def add_term(request, book_id):
         )
         occurrence_form = TermOccurrenceForm(
             prefix='occurrence',
+            book=book,
         )
         author_form = ArtefactAuthorForm(
             prefix='author',
@@ -369,19 +378,27 @@ def add_note(request, book_id):
 
     new_form = True
     if request.method == 'POST':
-        note_form = NoteForm(request.POST, prefix='note')
+        note_form = NoteForm(request.POST, prefix='note', book=book)
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if note_form.is_valid() and author_form.is_valid():
-            note = note_form.save(author_form, book=book)
+            note = note_form.save(author_form)
 
-            messages.success(request, u'Added note: {}'.format(note.subject))
+            if note.section:
+                message = u'Added note {note} to section {section}'.format(
+                    note=note.subject,
+                    section=note.section.title,
+                )
+            else:
+                message = u'Added note: {}'.format(note.subject)
+
+            messages.success(request, message)
         else:
             new_form = False
             messages.error(request, 'Failed to add note')
 
     if new_form:
-        note_form = NoteForm(prefix='note')
+        note_form = NoteForm(prefix='note', book=book)
         author_form = ArtefactAuthorForm(prefix='author')
 
     recent_notes = book.notes.order_by('-added')
@@ -694,23 +711,12 @@ def view_section(request, section_id):
 
     # Find the previous and next sections (if any) for this book.
     # TODO: Is there a better way to do this? get_next_by is only for DateField
-    next_section = None
-    previous_section = None
-    book_sections = section.book.sections.all()
-    num_sections = len(book_sections)
-    for i, book_section in enumerate(book_sections):
-        if book_section.pk == section.pk:
-            if i < num_sections - 1:
-                next_section = book_sections[i + 1]
-            if i > 0:
-                previous_section = book_sections[i - 1]
-            break
 
     context = {
         'book': section.book,
         'section': section,
-        'previous_section': previous_section,
-        'next_section': next_section,
+        'previous_section': section.get_previous(),
+        'next_section': section.get_next(),
     }
 
     return render(request, 'view_section.html', context)

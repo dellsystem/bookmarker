@@ -131,6 +131,15 @@
                     {{ author_form.authors }}
                 </div>
             </div>
+            <div class="sixteen wide column">
+                {% with error=note_form.section.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Section (only set this if there is ambiguity)</label>
+                    {{ occurrence_form.section }}
+                </div>
+                {% endwith %}
+            </div>
         </div>
         <div class="ui basic center aligned segment">
             <button type="submit" name="submit"

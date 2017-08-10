@@ -4,7 +4,56 @@ from books.models import Author, Note, Section
 from books.utils import roman_to_int
 
 
-class NoteForm(forms.ModelForm):
+class SectionChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return '{title} ({page})'.format(
+            title=obj.title,
+            page=obj.page_number,
+        )
+
+
+class SectionChoiceForm:
+    def clean(self):
+        cleaned_data = super(NoteForm, self).clean()
+
+        # Make sure the section-page combination is possible.
+        section = cleaned_data.get('section')
+        if section:
+            # Assume that the page number is a valid one by this time. Just
+            # check the bounds.
+            page_number = int(cleaned_data.get('page_number'))
+            if section.page_number > page_number:
+                self.add_error('section', 'Page number too small for section')
+            else:
+                # The page number might be right. Make sure it doesn't belong
+                # to a later section, if one exists.
+                next_section = section.get_next()
+                if next_section and next_section.page_number < page_number:
+                    self.add_error('section', 'Page number too large for section')
+
+
+class NoteForm(forms.ModelForm, SectionChoiceForm):
+    # This has to be here and not in SectionChoiceForm, otherwise the label
+    # won't show up correctly (it'll default to __unicode__)
+    section = SectionChoiceField(
+        queryset=Section.objects.none(),
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        # Store the book so we can use it for populating the sections and also
+        # for updating the Note in save() (but only if there isn't already a
+        # book).
+        if kwargs.get('instance'):
+            book = kwargs['instance'].book
+            self.book = None
+        else:
+            book = kwargs.pop('book')
+            self.book = book
+
+        super(NoteForm, self).__init__(*args, **kwargs)
+        self.fields['section'].queryset = book.sections.all()
+
     class Meta:
         model = Note
         exclude = ['book', 'related_to']
@@ -23,8 +72,8 @@ class NoteForm(forms.ModelForm):
         accordingly)."""
         # This will blank out the authors. We need to add them back later.
         note = super(NoteForm, self).save(commit=False)
-        if book:
-            note.book = book
+        if self.book:
+            note.book = self.book
         else:
             # Clear the authors in case they've changed.
             note.authors.clear()
@@ -44,7 +93,11 @@ class NoteForm(forms.ModelForm):
 
         note.page_number = page_number
         note.in_preface = in_preface
-        note.section = note.determine_section()
+        section = self.cleaned_data.get('section')
+        if section:
+            note.section = section
+        else:
+            note.section = note.determine_section()
 
         note.save()
         self.save_m2m()

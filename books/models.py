@@ -187,6 +187,24 @@ class Section(PageArtefact):
             set(self.book.default_authors.values_list('pk'))
         )
 
+    def get_next(self):
+        """Probably inefficient but the alternative is fairly complex so"""
+        found_next = False
+        for section in self.book.sections.all():
+            if found_next:
+                return section
+
+            if section.pk == self.pk:
+                found_next = True
+
+    def get_previous(self):
+        previous = None
+        for section in self.book.sections.all():
+            if section.pk == self.pk:
+                return previous
+
+            previous = section
+
 
 class SectionArtefact(PageArtefact):
     """TermOccurrence and Note inherit from this. Section inherits from
@@ -257,10 +275,6 @@ class Note(SectionArtefact):
     @property
     def display_template(self):
         return 'note_display.html'
-
-    def save(self, *args, **kwargs):
-        self.section = self.determine_section()
-        super(Note, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('view_note', args=[str(self.id)])
