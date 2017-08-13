@@ -6,7 +6,7 @@ from books.utils import roman_to_int
 
 class SectionChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return '{title} ({page})'.format(
+        return u'{title} ({page})'.format(
             title=obj.title,
             page=obj.page_number,
         )
