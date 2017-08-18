@@ -60,6 +60,7 @@
                     </div>
                 </div>
             </div>
+            {% if book.sections.count %}
             <div class="sixteen wide column">
                 {% with error=note_form.section.errors %}
                 <div class="{% if error %}error{% endif %} field"
@@ -69,6 +70,7 @@
                 </div>
                 {% endwith %}
             </div>
+            {% endif %}
         </div>
         <div class="ui basic center aligned segment">
             <button type="submit" name="submit"
