@@ -4,6 +4,7 @@ MarkdownSuperscript==2.0.0
 django-config-models==0.1.5
 django-debug-toolbar==1.8
 django-language-field==0.0.3
+psycopg2==2.7.3
 -e git+https://github.com/dellsystem/goodreads#egg=goodreads
 -e git+https://github.com/dellsystem/merriam-webster-api#egg=merriam_webster
 -e git+https://github.com/dellsystem/translate-term.git#egg=translate-term
