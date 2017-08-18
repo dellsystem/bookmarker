@@ -109,7 +109,7 @@
 <div class="ui divider"></div>
 <div class="ui grid">
     {% for artefact in section.get_artefacts %}
-    {% include artefact.display_template with x=artefact hide_section=True %}
+    {% include artefact.display_template with x=artefact show_page=True hide_section=True %}
     {% endfor %}
 </div>
 {% endblock %}
