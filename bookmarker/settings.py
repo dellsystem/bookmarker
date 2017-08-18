@@ -32,6 +32,10 @@ ALLOWED_HOSTS = [
     'bookmarker.dellsystem.me',
 ]
 
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
 
 # Application definition
 
@@ -48,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'config_models',
+    'debug_toolbar',
     'bookmarker',
     'languages',
     'vocab',
@@ -62,6 +67,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'bookmarker.urls'
