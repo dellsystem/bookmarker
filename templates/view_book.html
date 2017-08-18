@@ -74,13 +74,6 @@
             <div class="ui icon label" title="Sections">
                 <i class="angle right icon"></i> {{ book.sections.count }}
             </div>
-            {% with summary_pc=book.get_summary_percent %}
-            <a class="ui {% if summary_pc < 100 %}red{% endif %} label"
-               href="">
-                <i title="Summaries: % completed" class="browser icon"></i>
-                {{ summary_pc }}%
-            </a>
-            {% endwith %}
         </div>
         <br />
         {% if book.comments %}
@@ -165,7 +158,7 @@
         </div>
         {% endif %}
         {% if book.sections.count %}
-        {% include 'section_list.html' with sections=book.sections.all hide_book=True only %}
+        {% include 'section_list.html' with sections=sections hide_book=True only %}
         {% endif %}
     </div>
 </div>

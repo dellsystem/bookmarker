@@ -26,17 +26,13 @@ class Author(models.Model):
         return reverse('view_author', args=[str(self.id)])
 
     def get_associated_books(self):
-        """Get books the author is associated with, by section, by note, by
-        term, or as a direct author."""
+        """Get books the author is associated with, by section or directly."""
         books = set()
         for book in self.books.all():
-            books.add(book)
+            books.add(book.pk)
         for section in self.sections.all():
-            books.add(section.book)
-        for note in self.notes.all():
-            books.add(note.book)
-        for term in self.terms.all():
-            books.add(term.book)
+            books.add(section.book_id)
+
         return books
 
 
@@ -58,7 +54,7 @@ class Book(models.Model):
                                              related_name='default_books')
     language = LanguageField(default='en')
     objects = BookManager()
-    is_processed = models.BooleanField(default=False)  # terms, notes, sections
+    is_processed = models.BooleanField(default=False, db_index=True)  # terms, notes, sections
     completed_sections = models.BooleanField(default=False)  # KEEP
     completed_read = models.BooleanField(default=True)
     summary = models.TextField(blank=True)
@@ -71,17 +67,6 @@ class Book(models.Model):
 
     def get_absolute_url(self):
         return reverse('view_book', args=[str(self.id)])
-
-    def get_summary_percent(self):
-        num_sections = self.sections.count()
-        if num_sections:
-            return self.sections.exclude(summary='').count() * 100 / num_sections
-        else:
-            # 100% if the book summary is filled in. 0% otherwise.
-            if self.summary:
-                return 100
-            else:
-                return 0
 
 
 class PageNumberField(models.PositiveSmallIntegerField):
@@ -179,12 +164,19 @@ class Section(PageArtefact):
     def get_artefacts(self):
         """Returns a generator mixing notes and termoccurrences, ordered by
         page (only because PageArtefact defines a custom __cmp__ method)."""
-        return merge(self.notes.all(), self.terms.all())
+        return merge(
+            self.notes.all().prefetch_related(
+                'tags', 'authors', 'section__authors'
+            ),
+            self.terms.all().prefetch_related(
+                'category', 'authors', 'term', 'section__authors',
+            ),
+        )
 
     def has_default_authors(self):
         return (
-            set(self.authors.values_list('pk')) ==
-            set(self.book.default_authors.values_list('pk'))
+            set(a.pk for a in self.authors.all()) ==
+            set(a.pk for a in self.book.default_authors.all())
         )
 
     def get_next(self):
@@ -226,13 +218,13 @@ class SectionArtefact(PageArtefact):
     def has_default_authors(self):
         if self.section:
             return (
-                set(self.authors.values_list('pk')) ==
-                set(self.section.authors.values_list('pk'))
+                set(a.pk for a in self.authors.all()) ==
+                set(a.pk for a in self.section.authors.all())
             )
         else:
             return (
-                set(self.authors.values_list('pk')) ==
-                set(self.book.default_authors.values_list('pk'))
+                set(a.pk for a in self.authors.all()) ==
+                set(a.pk for a in self.book.default_authors.all())
             )
 
     def set_default_authors(self):

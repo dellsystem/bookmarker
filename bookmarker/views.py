@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
@@ -21,15 +21,16 @@ from vocab.models import Term, TermOccurrence
 def home(request):
     books = Book.objects.filter(is_processed=False).order_by(
         'is_processed', 'completed_sections', '-pk'
-    )
+    ).annotate(
+        num_terms=Count('terms', distinct=True),
+        num_notes=Count('notes', distinct=True),
+    ).prefetch_related('default_authors')
 
     context = {
         'started_books': books.filter(
-            is_processed=False,
             completed_sections=True
         ),
         'new_books': books.filter(
-            is_processed=False,
             completed_sections=False,
             completed_read=True,
         ),
@@ -40,7 +41,11 @@ def home(request):
 
 
 def view_complete(request):
-    books = Book.objects.filter(is_processed=True).order_by('-id')
+    books = Book.objects.filter(is_processed=True).annotate(
+        num_notes=Count('notes', distinct=True),
+        num_terms=Count('terms', distinct=True),
+    ).prefetch_related('default_authors').order_by('-pk')
+
     context = {
         'books': books,
     }
@@ -50,17 +55,33 @@ def view_complete(request):
 def view_book(request, book_id):
     book = Book.objects.get(pk=book_id)
 
+    recent_terms = book.terms.order_by('-added')[:5].prefetch_related(
+        'term', 'category', 'section'
+    )
+    recent_notes = book.notes.order_by('-added')[:5]
+
+    sections = book.sections.all().prefetch_related(
+        'authors', 'book__default_authors'
+    ).annotate(
+        num_terms=Count('terms', distinct=True),
+        num_notes=Count('notes', distinct=True),
+    )
+
     context = {
         'book': book,
-        'recent_terms': book.terms.order_by('-added')[:5],
-        'recent_notes': book.notes.order_by('-added')[:5],
+        'recent_terms': recent_terms,
+        'recent_notes': recent_notes,
+        'sections': sections,
     }
     return render(request, 'view_book.html', context)
 
 
 def view_terms(request, book_id):
     book = Book.objects.get(pk=book_id)
-    terms = book.terms.all()
+    terms = book.terms.all().prefetch_related(
+        'category', 'term', 'authors', 'section', 'section__authors', 'book',
+        'book__authors',
+    )
 
     author_pk = request.GET.get('author')
     try:
@@ -414,10 +435,16 @@ def add_note(request, book_id):
 
 
 def view_all_authors(request):
-    authors = Author.objects.all()
+    books_by_pk = {book.pk: book for book in Book.objects.all()}
+    authors = Author.objects.all().prefetch_related('books', 'sections')
+
+    authors_and_books = []
+    for author in authors:
+        author_books = [books_by_pk[b] for b in author.get_associated_books()]
+        authors_and_books.append((author, author_books))
 
     context = {
-        'authors': authors,
+        'authors_and_books': authors_and_books,
     }
 
     return render(request, 'view_all_authors.html', context)
@@ -463,7 +490,8 @@ def view_all_notes(request):
 
 def view_notes(request, book_id):
     book = Book.objects.get(pk=book_id)
-    notes = book.notes.all()
+    notes = book.notes.all().prefetch_related('tags', 'authors', 'section',
+    'section__authors', 'book')
 
     author_pk = request.GET.get('author')
     try:
@@ -536,58 +564,59 @@ def view_term(request, term_id):
 
 def view_author(request, author_id):
     author = Author.objects.get(pk=author_id)
-    books_by_pk = {book.pk: book for book in author.books.all()}
-    author_section_pks = set()
+    author_section_ids = set()
+    book_ids = set()
 
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)
-    for section in author.sections.all():
-        book = section.book
-        if book.pk not in books_by_pk:
-            books_by_pk[book.pk] = book
+    for section in author.sections.all().prefetch_related('authors', 'book__default_authors'):
+        book_id = section.book_id
+        book_ids.add(book_id)
 
-        sections_by_book[book.pk].append(section)
-        author_section_pks.add(section.pk)
+        sections_by_book[book_id].append(section)
+        author_section_ids.add(section.pk)
 
     # Find books for which the author is not listed as an author but has
     # associated terms or notes.
     notes_by_book = collections.defaultdict(list)
     for note in author.notes.all():
-        book = note.book
+        book_id = note.book_id
 
-        section = note.section
-        if section:
-            if section.pk in author_section_pks:
+        section_id = note.section_id
+        if section_id:
+            if section_id in author_section_ids:
                 continue
 
-        if book.pk not in books_by_pk:
-            books_by_pk[book.pk] = book
+        book_ids.add(book_id)
 
-        notes_by_book[book.pk].append(note)
+        notes_by_book[book_id].append(note)
 
     terms_by_book = collections.defaultdict(list)
-    for term in author.terms.all():
-        book = term.book
+    for term in author.terms.all().prefetch_related('category', 'term'):
+        book_id = term.book_id
 
-        section = term.section
-        if section:
-            if section.pk in author_section_pks:
+        section_id = term.section_id
+        if section_id:
+            if section_id in author_section_ids:
                 continue
 
-        if book.pk not in books_by_pk:
-            books_by_pk[book.pk] = book
+        book_ids.add(book_id)
 
-        terms_by_book[book.pk].append(term)
+        terms_by_book[book_id].append(term)
+
+    books_query = Book.objects.filter(pk__in=book_ids).prefetch_related(
+        'default_authors'
+    )
 
     books = []
-    for pk in books_by_pk:
+    for book in books_query:
         # Only show notes if there are no sections.
-        book_sections = sections_by_book[pk]
-        book_notes = notes_by_book[pk]
-        book_terms = terms_by_book[pk]
+        book_sections = sections_by_book[book.id]
+        book_notes = notes_by_book[book.id]
+        book_terms = terms_by_book[book.id]
 
         books.append({
-            'book': books_by_pk[pk],
+            'book': book,
             'sections': book_sections,
             'notes': book_notes[:5],
             'terms': book_terms[:5],
@@ -606,7 +635,10 @@ def view_author(request, author_id):
 
 
 def view_all_terms(request):
-    occurrences = TermOccurrence.objects.order_by('term')
+    occurrences = TermOccurrence.objects.order_by('term').prefetch_related(
+        'term', 'book', 'book__default_authors', 'authors', 'section',
+        'section__authors', 'category'
+    ) # could still be optimised further
 
     author_pk = request.GET.get('author')
     try:
@@ -733,35 +765,37 @@ def search(request):
     # Split out the meta options. TODO
     term = query
 
-    results = collections.defaultdict(list)
-    for note in Note.objects.filter(
-        Q(subject__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(comment__icontains=term)
-    ).order_by('book'):
-        results['notes'].append(note)
-
-    for term_occurrence in TermOccurrence.objects.filter(
-        Q(term__text__icontains=term) |
-        Q(term__definition__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(quote__icontains=term)
-    ).order_by('term'):
-        results['terms'].append(term_occurrence)
-
-    for section in Section.objects.filter(
-        Q(title__icontains=term) |
-        Q(subtitle__icontains=term) |
-        Q(summary__icontains=term)
-    ).order_by('book'):
-        results['sections'].append(section)
-
-    for book in Book.objects.filter(
-        Q(title__icontains=term) |
-        Q(summary__icontains=term) |
-        Q(authors__name__icontains=term)
-    ):
-        results['books'].append(book)
+    results = {
+        'notes': Note.objects.filter(
+            Q(subject__icontains=term) |
+            Q(quote__icontains=term) |
+            Q(comment__icontains=term)
+        ).order_by('book').select_related('book').prefetch_related(
+            'section__authors', 'book__default_authors', 'authors', 'tags',
+        ),
+        'terms': TermOccurrence.objects.filter(
+            Q(term__text__icontains=term) |
+            Q(term__definition__icontains=term) |
+            Q(quote__icontains=term) |
+            Q(quote__icontains=term)
+        ).select_related(
+            'term', 'book', 'category', 'section'
+        ).prefetch_related(
+            'section__authors', 'book__default_authors', 'authors'
+        ).order_by('term'),
+        'sections': Section.objects.filter(
+            Q(title__icontains=term) |
+            Q(subtitle__icontains=term) |
+            Q(summary__icontains=term)
+        ).order_by('book').select_related('book').prefetch_related(
+            'authors', 'book__default_authors',
+        ),
+        'books': Book.objects.filter(
+            Q(title__icontains=term) |
+            Q(summary__icontains=term) |
+            Q(authors__name__icontains=term)
+        ).prefetch_related('authors'),
+    }
 
     context = {
         'results': results,
@@ -833,7 +867,10 @@ def edit_note(request, note_id):
 def view_tag(request, slug):
     tag = NoteTag.objects.get(slug=slug)
 
-    paginator = Paginator(tag.notes.order_by('book'), 10)
+    notes = tag.notes.order_by('book').prefetch_related(
+        'authors', 'section__authors', 'tags', 'book',
+    )
+    paginator = Paginator(notes, 10)
     page = request.GET.get('page')
     try:
         notes = paginator.page(page)

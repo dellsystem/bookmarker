@@ -10,7 +10,7 @@
 <div class="ui divider"></div>
 
 <div class="ui three column stackable grid">
-    {% for author in authors %}
+    {% for author, books in authors_and_books %}
     <div class="column">
         <div class="ui segment">
             <h3 class="ui header">
@@ -18,13 +18,17 @@
                     {{ author.name }}
                 </a>
             </h3>
-            {% for book in author.get_associated_books %}
-            <a href="{{ book.get_absolute_url }}">
-                <img class="ui mini spaced image"
-                     title="{{ book.title }}"
-                     src="{{ book.image_url }}" />
-            </a>
-            {% endfor %}
+            {% if books %}
+            <div class="ui list">
+                {% for book in books %}
+                <div class="item">
+                <a href="{{ book.get_absolute_url }}">
+                    {{ book.title }}
+                </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endfor %}
