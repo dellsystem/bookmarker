@@ -69,7 +69,13 @@ class Book(models.Model):
         return reverse('view_book', args=[str(self.id)])
 
 
-class PageNumberField(models.PositiveSmallIntegerField):
+class PageNumberField(models.CharField):
+    """In the database, it's a PositiveSmallIntegerField but I'm setting as a
+    CharField for now to prevent the stupid validator from running too early"""
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 5
+        super(models.CharField, self).__init__(*args, **kwargs)
+
     def validate(self, value, model_instance):
         if not value.isdigit() and not roman_to_int(value):
             raise forms.ValidationError("Invalid page")
