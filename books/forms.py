@@ -112,7 +112,7 @@ class NoteForm(forms.ModelForm, SectionChoiceForm):
 
 class SectionForm(forms.ModelForm):
     related_to = forms.ModelChoiceField(
-        queryset=Section.objects.all().order_by('book__title', 'title'),
+        queryset=Section.objects.all().select_related('book').order_by('book__title', 'title'),
         required=False,
     )
 

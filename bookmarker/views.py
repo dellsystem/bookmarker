@@ -80,7 +80,7 @@ def view_terms(request, book_id):
     book = Book.objects.get(pk=book_id)
     terms = book.terms.all().prefetch_related(
         'category', 'term', 'authors', 'section', 'section__authors', 'book',
-        'book__authors',
+        'book__default_authors',
     )
 
     author_pk = request.GET.get('author')
@@ -451,7 +451,9 @@ def view_all_authors(request):
 
 
 def view_all_notes(request):
-    notes = Note.objects.order_by('book')
+    notes = Note.objects.order_by('book').select_related('book').prefetch_related(
+        'authors', 'tags', 'section', 'section__authors', 'book__default_authors'
+    )
 
     commented = request.GET.get('commented')
     if commented:
@@ -469,7 +471,7 @@ def view_all_notes(request):
     if author:
         notes = notes.filter(authors=author)
 
-    paginator = Paginator(notes, 5)
+    paginator = Paginator(notes, 10)
     page = request.GET.get('page')
     try:
         notes = paginator.page(page)
@@ -490,8 +492,10 @@ def view_all_notes(request):
 
 def view_notes(request, book_id):
     book = Book.objects.get(pk=book_id)
-    notes = book.notes.all().prefetch_related('tags', 'authors', 'section',
-    'section__authors', 'book')
+    notes = book.notes.all().prefetch_related(
+        'tags', 'authors', 'section', 'section__authors', 'book',
+        'book__default_authors',
+    )
 
     author_pk = request.GET.get('author')
     try:
@@ -502,7 +506,7 @@ def view_notes(request, book_id):
     if author:
         notes = notes.filter(authors=author)
 
-    paginator = Paginator(notes, 5)
+    paginator = Paginator(notes, 10)
     page = request.GET.get('page')
     try:
         notes = paginator.page(page)
@@ -552,10 +556,13 @@ def view_occurrence(request, occurrence_id):
 def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
     query = request.GET.get('q')
-
+    occurrences = term.occurrences.order_by('book__title').prefetch_related(
+        'book', 'authors', 'book__default_authors', 'category', 'section',
+        'section__authors',
+    )
     context = {
         'term': term,
-        'occurrences': term.occurrences.order_by('book__title'),
+        'occurrences': occurrences,
         'query': query,
     }
 
@@ -868,7 +875,7 @@ def view_tag(request, slug):
     tag = NoteTag.objects.get(slug=slug)
 
     notes = tag.notes.order_by('book').prefetch_related(
-        'authors', 'section__authors', 'tags', 'book',
+        'authors', 'section__authors', 'tags', 'book', 'book__default_authors',
     )
     paginator = Paginator(notes, 10)
     page = request.GET.get('page')
