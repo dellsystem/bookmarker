@@ -5,15 +5,28 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui two column grid">
-    <div class="column">
+<div class="ui grid">
+    <div class="four wide column">
         <h1>Search</h1>
     </div>
-    <div class="column">
+    <div class="six wide column">
         <div class="ui message">
             <code>{{ query }}</code>
         </div>
     </div>
+    {% if sort_options %}
+    <div class="six wide right aligned column">
+        <div class="ui compact menu">
+            <div class="header item">Sort by</div>
+            {% for sort_option in sort_options %}
+            <a href="{{ qs }}&mode={{ mode }}&sort={{ sort_option }}"
+               class="{% if sort_option == sort %}active {% endif %}item">
+                {{ sort_option }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <div class="ui divider"></div>

@@ -769,43 +769,81 @@ def search(request):
     if mode not in MODES:
         mode = None
 
+    ordering = {
+        'notes': 'subject',
+        'terms': 'term',
+        'sections': 'title',
+        'books': 'title',
+    }
+
+    # If we're sorting by a custom field, and we're in the right mode.
+    SORTS = {
+        'notes': ('added', 'subject', 'book', 'section'),
+        'terms': ('added', 'term', 'book'),
+        'sections': ('title', 'book'),
+        'books': ('title', 'pk'),
+    }
+    sort = request.GET.get('sort')
+    if mode and sort in SORTS[mode]:
+        ordering[mode] = sort
+
     # Split out the meta options. TODO
     term = query
 
-    results = {
-        'notes': Note.objects.filter(
-            Q(subject__icontains=term) |
-            Q(quote__icontains=term) |
-            Q(comment__icontains=term)
-        ).order_by('book').select_related('book').prefetch_related(
+    notes = Note.objects.filter(
+        Q(subject__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(comment__icontains=term)
+    ).order_by(ordering['notes'])
+    if mode == 'notes':
+        notes = notes.select_related(
+            'book'
+        ).prefetch_related(
             'section__authors', 'book__default_authors', 'authors', 'tags',
-        ),
-        'terms': TermOccurrence.objects.filter(
-            Q(term__text__icontains=term) |
-            Q(term__definition__icontains=term) |
-            Q(quote__icontains=term) |
-            Q(quote__icontains=term)
-        ).select_related(
+        )
+
+    terms = TermOccurrence.objects.filter(
+        Q(term__text__icontains=term) |
+        Q(term__definition__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(quote__icontains=term)
+    ).order_by(ordering['terms'])
+    if mode == 'terms':
+        terms = terms.select_related(
             'term', 'book', 'category', 'section'
         ).prefetch_related(
             'section__authors', 'book__default_authors', 'authors'
-        ).order_by('term'),
-        'sections': Section.objects.filter(
-            Q(title__icontains=term) |
-            Q(subtitle__icontains=term) |
-            Q(summary__icontains=term)
-        ).order_by('book').select_related('book').prefetch_related(
+        )
+
+    sections = Section.objects.filter(
+        Q(title__icontains=term) |
+        Q(subtitle__icontains=term) |
+        Q(summary__icontains=term)
+    ).order_by(ordering['sections'])
+    if mode == 'sections':
+        sections = sections.select_related(
+            'book'
+        ).prefetch_related(
             'authors', 'book__default_authors',
-        ),
-        'books': Book.objects.filter(
-            Q(title__icontains=term) |
-            Q(summary__icontains=term) |
-            Q(authors__name__icontains=term)
-        ).prefetch_related('authors'),
-    }
+        )
+
+    books = Book.objects.filter(
+        Q(title__icontains=term) |
+        Q(summary__icontains=term) |
+        Q(authors__name__icontains=term)
+    ).order_by(ordering['books']).distinct()
+    if mode == 'books':
+        books = books.prefetch_related('authors')
 
     context = {
-        'results': results,
+        'sort': ordering.get(mode),  # use the implied sort, not the input
+        'sort_options': SORTS.get(mode),
+        'results': {
+            'notes': notes,
+            'terms': terms,
+            'sections': sections,
+            'books': books,
+        },
         'query': query,
         'mode': mode,
         'modes': MODES,
