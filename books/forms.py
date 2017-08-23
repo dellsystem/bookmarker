@@ -1,6 +1,6 @@
 from django import forms
 
-from books.models import Author, Note, Section
+from books.models import Author, Note, Section, Book
 from books.utils import roman_to_int
 
 
@@ -185,3 +185,19 @@ class ArtefactAuthorForm(forms.Form):
                 'multiple': '',
         })
     )
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        exclude = ['goodreads_id', 'title', 'link', 'authors', 'language']
+        widgets = {
+            'summary': forms.Textarea(attrs={'rows': 3}),
+            'comments': forms.Textarea(attrs={'rows': 3}),
+            'default_authors': forms.widgets.SelectMultiple(
+                attrs={
+                    'class': 'ui fluid search dropdown',
+                    'multiple': '',
+                }
+            )
+        }

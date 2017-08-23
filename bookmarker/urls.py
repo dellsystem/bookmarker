@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^notes$', bookmarker.views.view_all_notes, name='view_all_notes'),
     url(r'^book/(?P<book_id>\d+)$', bookmarker.views.view_book,
         name='view_book'),
+    url(r'^book/(?P<book_id>\d+)/edit$', bookmarker.views.edit_book,
+        name='edit_book'),
     url(r'^book/(?P<book_id>\d+)/addterm$', bookmarker.views.add_term,
         name='add_term'),
     url(r'^book/(?P<book_id>\d+)/viewterms$', bookmarker.views.view_terms,

@@ -9,7 +9,7 @@
     <div class="thirteen wide column">
         <h2 class="ui header">
             {{ book.title }}
-            <a href="{% url 'admin:books_book_change' book.pk %}">
+            <a href="{% url 'edit_book' book.pk %}">
                 <i class="edit icon"></i>
             </a>
             <div class="sub header">

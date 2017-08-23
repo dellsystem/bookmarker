@@ -11,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from books.api import CLIENT
-from books.forms import NoteForm, SectionForm, ArtefactAuthorForm
+from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm
 from books.models import Book, Author, Note, NoteTag, Section
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
@@ -75,6 +75,28 @@ def view_book(request, book_id):
         'sections': sections,
     }
     return render(request, 'view_book.html', context)
+
+
+def edit_book(request, book_id):
+    book = Book.objects.get(pk=book_id)
+
+    if request.method == 'POST':
+        form = BookForm(request.POST, instance=book)
+        if form.is_valid():
+            form.save()
+            messages.success(request, u'Edited book: {}'.format(book.title))
+            return redirect(book)
+        else:
+            messages.error(request, 'Failed to edit book')
+    else:
+        form = BookForm(instance=book)
+
+    context = {
+        'book': book,
+        'form': form,
+    }
+
+    return render(request, 'edit_book.html', context)
 
 
 def view_terms(request, book_id):

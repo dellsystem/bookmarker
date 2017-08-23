@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<i class="right angle icon divider"></i>
+<div class="active section">Edit book</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="thirteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="three wide center aligned column">
+        <a href="{% url 'admin:books_book_change' book.pk %}"
+           class="ui fluid blue icon button">
+           <i class="edit icon"></i>
+           Edit in admin
+        </a>
+    </div>
+</div>
+
+<div class="ui divider"></div>
+
+<div class="ui segment">
+    <form class="ui form" method="post">
+        {% csrf_token %}
+        {% with error=form.image_url.errors %}
+        <div class="{% if error %}error{% endif %} field">
+            <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
+            {{ form.image_url }}
+        </div>
+        {% endwith %}
+        {% with error=form.default_authors.errors %}
+        <div class="{% if error %}error{% endif %} field">
+            <label>Default author(s){% if error %} (REQUIRED){% endif %}</label>
+            {{ form.default_authors }}
+        </div>
+        {% endwith %}
+        <div class="ui three fields">
+            <div class="field">
+                <label>Processed</label>
+                    {{ form.is_processed }}
+                </label>
+            </div>
+            <div class="field">
+                <label>Completed sections</label>
+                    {{ form.completed_sections }}
+                </label>
+            </div>
+            <div class="field">
+                <label>Completed read</label>
+                    {{ form.completed_read }}
+                </label>
+            </div>
+        </div>
+        <div class="ui two fields">
+            <div class="field">
+                <label>Summary</label>
+                {{ form.summary }}
+            </div>
+            <div class="field">
+                <label>Comments</label>
+                {{ form.comments }}
+            </div>
+        </div>
+        <div class="field">
+            <label>Source URL</label>
+            {{ form.source_url }}
+        </div>
+        <div class="ui basic center aligned segment">
+            <button type="submit" name="submit"
+                    class="ui blue button">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
