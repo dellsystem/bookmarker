@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 
+{% load markdown_filter %}
+
 {% block breadcrumbs %}
 <div class="active section">Search</div>
 {% endblock %}
 
 {% block content %}
 <div class="ui grid">
-    <div class="four wide column">
+    <div class="three wide column">
         <h1>Search</h1>
     </div>
-    <div class="six wide column">
-        <div class="ui message">
-            <code>{{ query }}</code>
-        </div>
-    </div>
-    {% if sort_options %}
-    <div class="six wide right aligned column">
+    <div class="thirteen wide right aligned column">
+        {% if sort_options %}
         <div class="ui compact menu">
             <div class="header item">Sort by</div>
             {% for sort_option in sort_options %}
@@ -24,7 +21,71 @@
                 {{ sort_option }}
             </a>
             {% endfor %}
-        </div>
+            </div>
+        {% endif %}
+    </div>
+    {% if mode %}
+    <div class="sixteen wide column">
+        <form class="ui form">
+            <input type="hidden" name="q" value="{{ query }}" />
+            <input type="hidden" name="mode" value="{{ mode }}" />
+            <input type="hidden" name="sort" value="{{ sort }}" />
+            <div class="fields">
+                {% if mode == 'books' %}
+                <div class="sixteen wide field">
+                    <label>Author</label>
+                    {{ filter_form.author }}
+                </div>
+                {% elif mode == 'notes' %}
+                <div class="four wide field">
+                    <label>Author</label>
+                    {{ filter_form.author }}
+                </div>
+                <div class="six wide field">
+                    <label>Book</label>
+                    {{ filter_form.book }}
+                </div>
+                <div class="six wide field">
+                    <label>Section</label>
+                    {{ filter_form.section }}
+                </div>
+                {% elif mode == 'terms' %}
+                <div class="four wide field">
+                    <label>Author</label>
+                    {{ filter_form.author }}
+                </div>
+                <div class="five wide field">
+                    <label>Book</label>
+                    {{ filter_form.book }}
+                </div>
+                <div class="five wide field">
+                    <label>Section</label>
+                    {{ filter_form.section }}
+                </div>
+                <div class="two wide field">
+                    <label>Category</label>
+                    {{ filter_form.category }}
+                </div>
+                {% elif mode == 'sections' %}
+                <div class="two wide field">
+                    <label>Minimum rating</label>
+                    {{ filter_form.min_rating }}
+                </div>
+                <div class="two wide field">
+                    <label>Maximum rating</label>
+                    {{ filter_form.max_rating }}
+                </div>
+                <div class="six wide field">
+                    <label>Author</label>
+                    {{ filter_form.author }}
+                </div>
+                <div class="six wide field">
+                    <label>Book</label>
+                    {{ filter_form.book }}
+                </div>
+                {% endif %}
+            </div>
+        </form>
     </div>
     {% endif %}
 </div>
@@ -89,7 +150,7 @@
                     {% for section in results.sections %}
                     <div class="item">
                         <a href="{{ section.get_absolute_url }}{{ qs }}">
-                            <strong>{{ section.title }}</strong>
+                            <strong>{{ section.title|markdownify_title }}</strong>
                         </a> from
                         <a href="{{ section.book.get_absolute_url }}">
                             {{ section.book.title }}

@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm
 from books.models import Book, Author, Note, NoteTag, Section
+from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
 from vocab.models import Term, TermOccurrence
@@ -794,60 +795,124 @@ def search(request):
         Q(subject__icontains=term) |
         Q(quote__icontains=term) |
         Q(comment__icontains=term)
-    ).order_by(ordering['notes'])
-    if mode == 'notes':
-        notes = notes.select_related(
-            'book'
-        ).prefetch_related(
-            'section__authors', 'book__default_authors', 'authors', 'tags',
-        )
-
+    )
     terms = TermOccurrence.objects.filter(
         Q(term__text__icontains=term) |
         Q(term__definition__icontains=term) |
         Q(quote__icontains=term) |
         Q(quote__icontains=term)
-    ).order_by(ordering['terms'])
-    if mode == 'terms':
-        terms = terms.select_related(
-            'term', 'book', 'category', 'section'
-        ).prefetch_related(
-            'section__authors', 'book__default_authors', 'authors'
-        )
-
+    )
     sections = Section.objects.filter(
         Q(title__icontains=term) |
         Q(subtitle__icontains=term) |
         Q(summary__icontains=term)
-    ).order_by(ordering['sections'])
-    if mode == 'sections':
-        sections = sections.select_related(
-            'book'
-        ).prefetch_related(
-            'authors', 'book__default_authors',
-        )
-
+    )
     books = Book.objects.filter(
         Q(title__icontains=term) |
         Q(summary__icontains=term) |
         Q(authors__name__icontains=term)
-    ).order_by(ordering['books']).distinct()
-    if mode == 'books':
-        books = books.prefetch_related('authors')
+    )
+
+    results = {
+        'notes': notes,
+        'terms': terms,
+        'sections': sections,
+        'books': books,
+    }
+
+    filter_form = SearchFilterForm(request.GET)
+    mode_filters = {
+        'books': ('author',),
+        'notes': ('author', 'book' ,'section'),
+        'terms': ('author', 'book', 'section', 'category'),
+        'sections': ('author', 'book', 'min_rating', 'max_rating'),
+    }
+    filter_fields = {
+        'author': 'authors',
+        'book': 'book',
+        'section': 'section',
+        'category': 'category',
+        'min_rating': 'rating__gte',
+        'max_rating': 'rating__lte',
+    }
+
+    if mode:
+        # Now do the prefetching (only for expansion mode).
+        to_prefetch = {
+            'notes': [
+                'book', 'section',
+                'section__authors', 'book__default_authors', 'authors', 'tags',
+            ],
+            'terms': [
+                'book', 'term', 'category', 'section',
+                'section__authors', 'book__default_authors', 'authors',
+            ],
+            'sections': [
+                'book',
+                'authors', 'book__default_authors',
+            ],
+            'books': [
+                'default_authors',
+            ],
+        }
+
+        results[mode] = results[mode].prefetch_related(*to_prefetch[mode])
+
+        author_pks = [
+            i for l in results[mode].values_list('authors') for i in l if i
+        ]
+
+        filter_form.fields['author'].queryset = Author.objects.filter(
+            pk__in=author_pks
+        )
+
+        # Only show the books dropdown if the mode is not books.
+        if mode != 'books':
+            book_pks = [i['book_id'] for i in results[mode].values('book_id')]
+            filter_form.fields['book'].queryset = Book.objects.filter(
+                pk__in=book_pks
+            )
+
+        # Only show section if the mode is not books or sections.
+        if mode not in ('books', 'sections'):
+            section_pks = [i['section_id'] for i in results[mode].values('section_id')]
+
+            filter_form.fields['section'].queryset = Section.objects.filter(
+                pk__in=section_pks
+            ).select_related('book')
+
+        # Apply the filters.
+        if filter_form.is_valid():
+            filters = {}
+            for filter_key in mode_filters[mode]:
+                if filter_form.cleaned_data[filter_key]:
+                    filter_field = filter_fields[filter_key]
+                    filters[filter_field] = filter_form.cleaned_data[filter_key]
+
+            if filters:
+                # Make sure to prefetch again for the filtered queryset.
+                results[mode] = results[mode].filter(
+                    **filters
+                ).prefetch_related(
+                    *to_prefetch[mode]
+                )
+    else:
+        results['terms'] = results['terms'].select_related('book', 'term')
+        results['notes'] = results['notes'].select_related('book')
+        results['sections'] = results['sections'].select_related('book')
+
+    for key in results:
+        results[key] = results[key].order_by(ordering[key]).distinct()
 
     context = {
         'sort': ordering.get(mode),  # use the implied sort, not the input
         'sort_options': SORTS.get(mode),
-        'results': {
-            'notes': notes,
-            'terms': terms,
-            'sections': sections,
-            'books': books,
-        },
+        'results': results,
         'query': query,
         'mode': mode,
         'modes': MODES,
         'qs': '?q=' + query,
+        'filter_form': filter_form,
     }
 
     return render(request, 'search.html', context)
