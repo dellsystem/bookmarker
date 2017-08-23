@@ -8,8 +8,8 @@
         <div class="ui stackable grid">
             <div class="row">
                 <div class="{% if book.has_pages %}eight{% else %}nine{% endif %} wide column">
-                    <div class="{% if error %}error{% endif %} field">
                     {% with error=note_form.subject.errors %}
+                    <div class="{% if error %}error{% endif %} field">
                         <label>Subject{% if error %} (REQUIRED){% endif %}</label>
                         {{ note_form.subject }}
                     </div>
