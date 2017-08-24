@@ -852,7 +852,7 @@ def search(request):
 
     filter_form = SearchFilterForm(request.GET)
     mode_filters = {
-        'books': ('author',),
+        'books': ('author', 'min_rating', 'max_rating'),
         'notes': ('author', 'book' ,'section'),
         'terms': ('author', 'book', 'section', 'category'),
         'sections': ('author', 'book', 'min_rating', 'max_rating'),

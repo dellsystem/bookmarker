@@ -11,6 +11,9 @@
         </a>
         <div class="sub header">
             {% include 'author_list.html' with authors=book.default_authors only %}
+            <div class="ui rating display-rating"
+                 data-rating="{{ book.rating }}">
+            </div>
         </div>
     </div>
 </h2>

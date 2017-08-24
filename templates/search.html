@@ -32,7 +32,15 @@
             <input type="hidden" name="sort" value="{{ sort }}" />
             <div class="fields">
                 {% if mode == 'books' %}
-                <div class="sixteen wide field">
+                <div class="two wide field">
+                    <label>Minimum rating</label>
+                    {{ filter_form.min_rating }}
+                </div>
+                <div class="two wide field">
+                    <label>Maximum rating</label>
+                    {{ filter_form.max_rating }}
+                </div>
+                <div class="twelve wide field">
                     <label>Author</label>
                     {{ filter_form.author }}
                 </div>
