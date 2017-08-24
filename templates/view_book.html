@@ -65,6 +65,35 @@
         </a>
         <br />
         <div style="text-align: center">
+            <p>
+                {% if book.isbn %}
+                <code>{{ book.isbn }}</code>
+                {% else %}
+                <span class="ui red label">ISBN?</span>
+                {% endif %}
+            </p>
+            <p>
+                {% if book.publisher %}
+                {{ book.publisher }},
+                {% else %}
+                <span class="ui red label">Publisher?</span>,
+                {% endif %}
+                {% if book.year %}
+                {{ book.year }}.
+                {% else %}
+                <span class="ui red label">Year?</span>.
+                {% endif %}
+                {% if book.num_pages %}
+                {{ book.num_pages }} pages.
+                {% else %}
+                <span class="ui red label">Pages?</span>.
+                {% endif %}
+                {% if book.verified %}
+                <i class="checkmark icon"></i>
+                {% else %}
+                <span class="ui red label">Unverified</span>
+                {% endif %}
+            </p>
             <a class="ui icon label" title="Terms" href="#terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>

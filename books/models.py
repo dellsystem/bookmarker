@@ -41,8 +41,20 @@ class BookManager(models.Manager):
         pass
 
 
+class RatingField(models.IntegerField):
+    def __init__(self, min_value=0, max_value=5, **kwargs):
+        self.min_value, self.max_value = min_value, max_value
+        models.IntegerField.__init__(self, **kwargs)
+
+    def formfield(self, **kwargs):
+        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
+        defaults.update(kwargs)
+        return super(RatingField, self).formfield(**defaults)
+
+
 class Book(models.Model):
-    goodreads_id = models.CharField(max_length=20, unique=True)
+    goodreads_id = models.CharField(max_length=20, blank=True, null=True,
+                                    db_index=True)
     title = models.CharField(max_length=255)
     image_url = models.URLField()
     link = models.URLField()
@@ -61,6 +73,14 @@ class Book(models.Model):
     comments = models.TextField(blank=True)  # temporary private notes
     source_url = models.URLField(blank=True)
     has_pages = models.BooleanField(default=True)
+    year = models.PositiveSmallIntegerField(blank=True, null=True)
+    isbn = models.CharField(max_length=13, blank=True, null=True)
+    publisher = models.CharField(max_length=50, blank=True, null=True)
+    num_pages = models.PositiveSmallIntegerField(blank=True, null=True)
+    verified = models.BooleanField(default=False)  # the ISBN and related details
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    rating = RatingField(default=0, blank=True)
 
     def __unicode__(self):
         return self.title
@@ -132,17 +152,6 @@ class PageArtefact(models.Model):
             return int_to_roman(self.page_number)
         else:
             return self.page_number
-
-
-class RatingField(models.IntegerField):
-    def __init__(self, min_value=0, max_value=5, **kwargs):
-        self.min_value, self.max_value = min_value, max_value
-        models.IntegerField.__init__(self, **kwargs)
-
-    def formfield(self, **kwargs):
-        defaults = {'min_value': self.min_value, 'max_value':self.max_value}
-        defaults.update(kwargs)
-        return super(RatingField, self).formfield(**defaults)
 
 
 class Section(PageArtefact):

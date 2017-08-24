@@ -8,13 +8,40 @@
             </a>
             <h3 class="ui header">
                 <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
-                <a href="{% url 'admin:books_book_change' book.pk %}">
+                <a href="{% url 'edit_book' book.pk %}">
                     <i class="edit icon"></i>
                 </a>
                 <div class="sub header">
                     {% include "author_list.html" with authors=book.default_authors %}
                 </div>
             </h3>
+            <p>
+                {% if book.isbn %}
+                <code>{{ book.isbn }}</code>
+                {% else %}
+                <span class="ui red label">ISBN?</span>
+                {% endif %}
+                {% if book.publisher %}
+                {{ book.publisher }},
+                {% else %}
+                <span class="ui red label">Publisher?</span>,
+                {% endif %}
+                {% if book.year %}
+                {{ book.year }}.
+                {% else %}
+                <span class="ui red label">Year?</span>.
+                {% endif %}
+                {% if book.num_pages %}
+                {{ book.num_pages }} pages.
+                {% else %}
+                <span class="ui red label">Pages?</span>.
+                {% endif %}
+                {% if book.verified %}
+                <i class="checkmark icon"></i>
+                {% else %}
+                <span class="ui red label">Unverified</span>
+                {% endif %}
+            </p>
             {% if book.comments %}
             <code>{{ book.comments }}</code>
             <br />
@@ -27,6 +54,14 @@
                 <a class="ui label" href="{% url 'view_notes' book.pk %}">
                     <i class="sticky note icon"></i> {{ book.num_notes }}
                 </a>
+                <div class="ui label">
+                    <div class="ui heart rating display-rating"
+                         data-rating="{{ book.rating }}">
+                    </div>
+                </div>
+                <div class="ui label">
+                    {{ book.end_date }}
+                </div>
             </div>
         </div>
     </div>

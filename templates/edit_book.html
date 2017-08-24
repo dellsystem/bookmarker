@@ -25,6 +25,16 @@
 <div class="ui segment">
     <form class="ui form" method="post">
         {% csrf_token %}
+        <div class="ui fields">
+            <div class="two wide field">
+                <label>Goodreads ID</label>
+                {{ form.goodreads_id }}
+            </div>
+            <div class="fourteen wide field">
+                <label>Goodreads link</label>
+                {{ form.link }}
+            </div>
+        </div>
         {% with error=form.image_url.errors %}
         <div class="{% if error %}error{% endif %} field">
             <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
@@ -37,20 +47,45 @@
             {{ form.default_authors }}
         </div>
         {% endwith %}
-        <div class="ui three fields">
-            <div class="field">
+        <div class="ui fields">
+            <div class="one wide field">
                 <label>Processed</label>
                     {{ form.is_processed }}
                 </label>
             </div>
-            <div class="field">
+            <div class="two wide field">
                 <label>Completed sections</label>
                     {{ form.completed_sections }}
                 </label>
             </div>
-            <div class="field">
+            <div class="two wide field">
                 <label>Completed read</label>
                     {{ form.completed_read }}
+                </label>
+            </div>
+            <div class="three wide field">
+                <label>ISBN</label>
+                    {{ form.isbn }}
+                </label>
+            </div>
+            <div class="three wide field">
+                <label>Publisher</label>
+                    {{ form.publisher }}
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Year</label>
+                    {{ form.year }}
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Pages</label>
+                    {{ form.num_pages }}
+                </label>
+            </div>
+            <div class="one wide field">
+                <label>Verified</label>
+                    {{ form.verified }}
                 </label>
             </div>
         </div>
@@ -64,9 +99,29 @@
                 {{ form.comments }}
             </div>
         </div>
-        <div class="field">
-            <label>Source URL</label>
-            {{ form.source_url }}
+        <div class="ui fields">
+            <div class="eight wide field">
+                <label>Source URL</label>
+                {{ form.source_url }}
+            </div>
+            <div class="two wide field">
+                <label>Rating</label>
+                {% if book.goodreads_id %}
+                <div class="ui heart rating display-rating" data-rating="{{ book.rating }}">
+                </div>
+                <input type="hidden" name="rating" value="{{ book.rating }}" />
+                {% else %}
+                TODO
+                {% endif %}
+            </div>
+            <div class="three wide field">
+                <label>Start date</label>
+                {{ form.start_date }}
+            </div>
+            <div class="three wide field">
+                <label>End date</label>
+                {{ form.end_date }}
+            </div>
         </div>
         <div class="ui basic center aligned segment">
             <button type="submit" name="submit"

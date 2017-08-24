@@ -82,6 +82,7 @@ def edit_book(request, book_id):
 
     if request.method == 'POST':
         form = BookForm(request.POST, instance=book)
+
         if form.is_valid():
             form.save()
             messages.success(request, u'Edited book: {}'.format(book.title))
@@ -90,6 +91,9 @@ def edit_book(request, book_id):
             messages.error(request, 'Failed to edit book')
     else:
         form = BookForm(instance=book)
+        if book.goodreads_id:
+            form.fields['start_date'].widget.attrs['readonly'] = True
+            form.fields['end_date'].widget.attrs['readonly'] = True
 
     context = {
         'book': book,
@@ -333,7 +337,11 @@ def add_book(request):
             goodreads_id=goodreads_id,
             title=gr_book.title,
             image_url=gr_book.image_url,
-            link=gr_book.link
+            link=gr_book.link,
+            year=gr_book.publication_date[2],
+            isbn=gr_book.isbn13,
+            publisher=gr_book.publisher,
+            num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
         )
         messages.success(
             request,

@@ -190,7 +190,7 @@ class ArtefactAuthorForm(forms.Form):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        exclude = ['goodreads_id', 'title', 'link', 'authors', 'language']
+        exclude = ['title', 'authors', 'language']
         widgets = {
             'summary': forms.Textarea(attrs={'rows': 3}),
             'comments': forms.Textarea(attrs={'rows': 3}),
