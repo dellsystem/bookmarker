@@ -14,7 +14,7 @@ def markdownify(text):
             ['superscript'],
             safe_mode='escape',
             smart_emphasis=False
-        )
+        ).replace('    ', '&ensp;')
     )
 
 
