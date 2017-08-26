@@ -32,7 +32,21 @@ class SectionChoiceForm:
                     self.add_error('section', 'Page number too large for section')
 
 
-class NoteForm(forms.ModelForm, SectionChoiceForm):
+class PageNumberForm:
+    """Inherit from this to ensure that the page number entered is no greater
+    than the number of pages that the book supposedly has. Requires that
+    self.book has been set (ideally in __init__)."""
+    def clean_page_number(self):
+        page_number = self.cleaned_data['page_number']
+        if page_number.isdigit() and int(page_number) > self.book.num_pages:
+            raise forms.ValidationError(
+                'This book has %d pages' % self.book.num_pages
+            )
+
+        return page_number
+
+
+class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
     # This has to be here and not in SectionChoiceForm, otherwise the label
     # won't show up correctly (it'll default to __unicode__)
     section = SectionChoiceField(
@@ -40,17 +54,11 @@ class NoteForm(forms.ModelForm, SectionChoiceForm):
         required=False,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, book, *args, **kwargs):
         # Store the book so we can use it for populating the sections and also
         # for updating the Note in save() (but only if there isn't already a
         # book).
-        if kwargs.get('instance'):
-            book = kwargs['instance'].book
-            self.book = None
-        else:
-            book = kwargs.pop('book')
-            self.book = book
-
+        self.book = book
         super(NoteForm, self).__init__(*args, **kwargs)
         self.fields['section'].queryset = book.sections.all()
 
@@ -72,11 +80,11 @@ class NoteForm(forms.ModelForm, SectionChoiceForm):
         accordingly)."""
         # This will blank out the authors. We need to add them back later.
         note = super(NoteForm, self).save(commit=False)
-        if self.book:
-            note.book = self.book
-        else:
+        if note.book_id:
             # Clear the authors in case they've changed.
             note.authors.clear()
+        else:
+            note.book = self.book
 
         page = note.page_number
         try:
@@ -110,7 +118,7 @@ class NoteForm(forms.ModelForm, SectionChoiceForm):
         return note
 
 
-class SectionForm(forms.ModelForm):
+class SectionForm(forms.ModelForm, PageNumberForm):
     related_to = forms.ModelChoiceField(
         queryset=Section.objects.all().select_related('book').order_by('book__title', 'title'),
         required=False,
@@ -123,17 +131,21 @@ class SectionForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'autofocus': 'autofocus'}),
         }
 
-    def save(self, author_form, book=None):
+    def __init__(self, book, *args, **kwargs):
+        self.book = book
+        super(SectionForm, self).__init__(*args, **kwargs)
+
+    def save(self, author_form):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
         section = super(SectionForm, self).save(commit=False)
 
-        if book:
-            # We're creating the section for the first time.
-            section.book = book
-        else:
+        if section.book_id:
             # Clear the authors just in case they've changed.
             section.authors.clear()
+        else:
+            # We're creating the section for the first time.
+            section.book = self.book
 
         page = section.page_number
         try:

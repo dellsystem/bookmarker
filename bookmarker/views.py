@@ -147,18 +147,18 @@ def add_section(request, book_id):
 
     new_form = True
     if request.method == 'POST':
-        section_form = SectionForm(request.POST, prefix='section')
+        section_form = SectionForm(book, request.POST, prefix='section')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if section_form.is_valid() and author_form.is_valid():
-            section = section_form.save(author_form, book=book)
+            section = section_form.save(author_form)
             messages.success(request, u'Added section: {}'.format(section.title))
         else:
             new_form = False
             messages.error(request, 'Failed to add section')
 
     if new_form:
-        section_form = SectionForm(prefix='section')
+        section_form = SectionForm(book, prefix='section')
         author_form = ArtefactAuthorForm(prefix='author')
 
     context = {
@@ -185,6 +185,7 @@ def edit_occurrence(request, occurrence_id):
             prefix='author',
         )
         occurrence_form = TermOccurrenceForm(
+            occurrence.book,
             request.POST,
             instance=occurrence,
             prefix='occurrence',
@@ -212,6 +213,7 @@ def edit_occurrence(request, occurrence_id):
             initial=occurrence.get_author_data(),
         )
         occurrence_form = TermOccurrenceForm(
+            occurrence.book,
             instance=occurrence,
             prefix='occurrence',
             initial={
@@ -242,7 +244,7 @@ def add_term(request, book_id):
     new_forms = True
     if request.method == 'POST':
         term_form = TermForm(request.POST, prefix='term')
-        occurrence_form = TermOccurrenceForm(request.POST, book=book, prefix='occurrence')
+        occurrence_form = TermOccurrenceForm(book, request.POST, prefix='occurrence')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if (
@@ -284,8 +286,8 @@ def add_term(request, book_id):
             prefix='term',
         )
         occurrence_form = TermOccurrenceForm(
+            book,
             prefix='occurrence',
-            book=book,
         )
         author_form = ArtefactAuthorForm(
             prefix='author',
@@ -430,7 +432,7 @@ def add_note(request, book_id):
 
     new_form = True
     if request.method == 'POST':
-        note_form = NoteForm(request.POST, prefix='note', book=book)
+        note_form = NoteForm(book, request.POST, prefix='note')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
 
         if note_form.is_valid() and author_form.is_valid():
@@ -450,7 +452,7 @@ def add_note(request, book_id):
             messages.error(request, 'Failed to add note')
 
     if new_form:
-        note_form = NoteForm(prefix='note', book=book)
+        note_form = NoteForm(book, prefix='note')
         author_form = ArtefactAuthorForm(prefix='author')
 
     recent_notes = book.notes.order_by('-added')
@@ -738,7 +740,7 @@ def edit_section(request, section_id):
 
     if request.method == 'POST':
         section_form = SectionForm(
-            request.POST, instance=section, prefix='section'
+            section.book, request.POST, instance=section, prefix='section'
         )
         author_form = ArtefactAuthorForm(
             request.POST, prefix='author',
@@ -754,6 +756,7 @@ def edit_section(request, section_id):
             messages.error(request, 'Failed to save section')
     else:
         section_form = SectionForm(
+            section.book,
             instance=section,
             prefix='section',
             initial={
@@ -970,7 +973,7 @@ def edit_note(request, note_id):
     note = Note.objects.get(pk=note_id)
 
     if request.method == 'POST':
-        note_form = NoteForm(request.POST, instance=note, prefix='note')
+        note_form = NoteForm(note.book, request.POST, instance=note, prefix='note')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
         if note_form.is_valid() and author_form.is_valid():
             note = note_form.save(author_form)
@@ -982,6 +985,7 @@ def edit_note(request, note_id):
             messages.error(request, 'Failed to save note')
     else:
         note_form = NoteForm(
+            note.book,
             instance=note,
             prefix='note',
             initial={

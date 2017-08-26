@@ -1,6 +1,6 @@
 from django import forms
 
-from books.forms import SectionChoiceForm, SectionChoiceField
+from books.forms import SectionChoiceForm, SectionChoiceField, PageNumberForm
 from books.models import Section
 from books.utils import roman_to_int
 from .models import Term, TermOccurrence
@@ -45,7 +45,7 @@ class TermForm(forms.ModelForm):
                 self.add_error('definition', 'Required')
 
 
-class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm):
+class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
     # This has to be here and not in SectionChoiceForm, otherwise the label
     # won't show up correctly (it'll default to __unicode__)
     section = SectionChoiceField(
@@ -61,16 +61,11 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm):
             'comments': forms.Textarea(attrs={'rows': 3}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, book, *args, **kwargs):
         # Store the book so we can use it for populating the sections and also
         # for updating the Note in save() (but only if there isn't already a
         # book).
-        if kwargs.get('instance'):
-            book = kwargs['instance'].book
-            self.book = None
-        else:
-            book = kwargs.pop('book')
-            self.book = book
+        self.book = book
 
         super(TermOccurrenceForm, self).__init__(*args, **kwargs)
         self.fields['section'].queryset = book.sections.all()
@@ -80,11 +75,11 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm):
         accordingly)."""
         occurrence = super(TermOccurrenceForm, self).save(commit=False)
 
-        if self.book and term:
+        if occurrence.book_id:
+            occurrence.authors.clear()
+        else:
             occurrence.book = self.book
             occurrence.term = term
-        else:
-            occurrence.authors.clear()
 
         page = occurrence.page_number
         try:
@@ -98,6 +93,8 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm):
             page_number = roman_to_int(page)
             if page_number:
                 in_preface = True
+        occurrence.page_number = page_number
+        occurrence.in_preface = in_preface
 
         section = self.cleaned_data.get('section')
         if section:
@@ -105,8 +102,6 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm):
         else:
             occurrence.section = occurrence.determine_section()
 
-        occurrence.page_number = page_number
-        occurrence.in_preface = in_preface
         occurrence.save()
         self.save_m2m()
 
