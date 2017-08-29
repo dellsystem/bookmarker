@@ -12,9 +12,14 @@
             <a href="{% url 'edit_book' book.pk %}">
                 <i class="edit icon"></i>
             </a>
+            {% if book.details %}
             <div class="sub header">
-                {% include 'author_list.html' with authors=book.default_authors only %}
+                {% include 'author_list.html' with authors=book.details.default_authors only %}
+                <div class="ui rating display-rating"
+                     data-rating="{{ book.details.rating }}">
+                </div>
             </div>
+            {% endif %}
         </h2>
     </div>
     <div class="three wide center aligned column">
@@ -26,11 +31,13 @@
                 <a class="ui blue icon button" href="{% url 'add_section' book.pk %}">
                     <i class="plus icon"></i> Add section
                 </a>
+                {% if book.details %}
                 <button class="ui green icon button"
                         name="mode"
                         value="sections">
                     <i class="check icon"></i> Done
                 </button>
+                {% endif %}
             </div>
         {% else %}
             <button class="ui fluid black icon button"
@@ -65,35 +72,37 @@
         </a>
         <br />
         <div style="text-align: center">
+            {% if details %}
             <p>
-                {% if book.isbn %}
-                <code>{{ book.isbn }}</code>
+                {% if details.isbn %}
+                <code>{{ details.isbn }}</code>
                 {% else %}
                 <span class="ui red label">ISBN?</span>
                 {% endif %}
             </p>
             <p>
-                {% if book.publisher %}
-                {{ book.publisher }},
+                {% if details.publisher %}
+                {{ details.publisher }},
                 {% else %}
                 <span class="ui red label">Publisher?</span>,
                 {% endif %}
-                {% if book.year %}
-                {{ book.year }}.
+                {% if details.year %}
+                {{ details.year }}.
                 {% else %}
                 <span class="ui red label">Year?</span>.
                 {% endif %}
-                {% if book.num_pages %}
-                {{ book.num_pages }} pages.
+                {% if details.num_pages %}
+                {{ details.num_pages }} pages.
                 {% else %}
                 <span class="ui red label">Pages?</span>.
                 {% endif %}
-                {% if book.verified %}
+                {% if details.verified %}
                 <i class="checkmark icon"></i>
                 {% else %}
                 <span class="ui red label">Unverified</span>
                 {% endif %}
             </p>
+            {% endif %}
             <a class="ui icon label" title="Terms" href="#terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>
@@ -120,7 +129,7 @@
         {% endif %}
     </div>
     <div class="twelve wide column">
-        {% if book.completed_sections %}
+        {% if book.completed_sections or not book.details %}
         <div class="ui celled two column stackable grid">
             <div class="column" id="terms">
                 {% with num_terms=book.terms.count %}

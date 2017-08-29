@@ -1,6 +1,6 @@
 from django import forms
 
-from books.models import Author, Note, Section, Book
+from books.models import Author, Note, Section, Book, BookDetails
 from books.utils import roman_to_int
 
 
@@ -38,9 +38,9 @@ class PageNumberForm:
     self.book has been set (ideally in __init__)."""
     def clean_page_number(self):
         page_number = self.cleaned_data['page_number']
-        if page_number.isdigit() and int(page_number) > self.book.num_pages:
+        if self.book.details and page_number.isdigit() and int(page_number) > self.book.details.num_pages:
             raise forms.ValidationError(
-                'This book has %d pages' % self.book.num_pages
+                'This book has %d pages' % self.book.details.num_pages
             )
 
         return page_number
@@ -61,6 +61,8 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         self.book = book
         super(NoteForm, self).__init__(*args, **kwargs)
         self.fields['section'].queryset = book.sections.all()
+        if not book.has_pages():
+            self.fields['section'].required = True
 
     class Meta:
         model = Note
@@ -110,7 +112,7 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         note.save()
         self.save_m2m()
 
-        if author_form.cleaned_data['mode'] == 'default':
+        if author_form.cleaned_data['mode'] == 'default' and note.book.details:
             note.set_default_authors()
         elif author_form.cleaned_data['mode'] == 'custom':
             note.authors.add(*author_form.cleaned_data['authors'])
@@ -134,6 +136,8 @@ class SectionForm(forms.ModelForm, PageNumberForm):
     def __init__(self, book, *args, **kwargs):
         self.book = book
         super(SectionForm, self).__init__(*args, **kwargs)
+        if book.details is None:
+            self.fields.pop('page_number')
 
     def save(self, author_form):
         """Convert the string 'page' input into an integer (and set in_preface
@@ -171,8 +175,8 @@ class SectionForm(forms.ModelForm, PageNumberForm):
         # Set the authors according to author_form. If the mode is 'none', we
         # don't need to do anything since the section has no authors by
         # default.
-        if author_form.cleaned_data['mode'] == 'default':
-            section.authors.add(*section.book.default_authors.all())
+        if author_form.cleaned_data['mode'] == 'default' and section.book.details:
+            section.authors.add(*section.book.details.default_authors.all())
         elif author_form.cleaned_data['mode'] == 'custom':
                 section.authors.add(*author_form.cleaned_data['authors'])
 
@@ -199,17 +203,32 @@ class ArtefactAuthorForm(forms.Form):
     )
 
 
-class BookForm(forms.ModelForm):
+class BookDetailsForm(forms.ModelForm):
     class Meta:
-        model = Book
-        exclude = ['title', 'authors', 'language']
+        model = BookDetails
+        exclude = ['book', 'authors']
         widgets = {
-            'summary': forms.Textarea(attrs={'rows': 3}),
-            'comments': forms.Textarea(attrs={'rows': 3}),
             'default_authors': forms.widgets.SelectMultiple(
                 attrs={
                     'class': 'ui fluid search dropdown',
                     'multiple': '',
                 }
             )
+        }
+
+    def save(self):
+        details = super(BookDetailsForm, self).save(commit=False)
+        if details.rating is None:
+            details.rating = 0
+            details.save()
+        self.save_m2m()
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        exclude = ['details']
+        widgets = {
+            'summary': forms.Textarea(attrs={'rows': 3}),
+            'comments': forms.Textarea(attrs={'rows': 3}),
         }

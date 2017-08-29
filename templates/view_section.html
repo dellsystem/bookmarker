@@ -15,12 +15,16 @@
 
 <div class="ui stackable grid">
     <div class="row">
+        {% if book.has_pages %}
         <div class="one wide center aligned column">
             <div class="big ui circular label">
                 {{ section.get_page_display }}
             </div>
         </div>
         <div class="ten wide column">
+        {% else %}
+        <div class="eleven wide column">
+        {% endif %}
             <h3 class="ui header">
                 {{ section.title|markdownify_title }}
                 {% if section.rating %}
@@ -67,7 +71,7 @@
                     </div>
                     <div class="label">
                         notes
-                        <a href="{% url 'add_note' book.pk %}">
+                        <a href="{% url 'add_note' book.pk %}?section={{ section.pk }}">
                             <i class="plus icon"></i>
                         </a>
                     </div>

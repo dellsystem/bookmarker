@@ -28,8 +28,9 @@ class Author(models.Model):
     def get_associated_books(self):
         """Get books the author is associated with, by section or directly."""
         books = set()
-        for book in self.books.all():
-            books.add(book.pk)
+        # This needs to be optimised
+        for details in self.books.all():
+            books.add(details.book.pk)
         for section in self.sections.all():
             books.add(section.book_id)
 
@@ -52,26 +53,11 @@ class RatingField(models.IntegerField):
         return super(RatingField, self).formfield(**defaults)
 
 
-class Book(models.Model):
+class BookDetails(models.Model):
+    """Mostly from Goodreads, though the book doesn't have to be on GR."""
     goodreads_id = models.CharField(max_length=20, blank=True, null=True,
                                     db_index=True)
-    title = models.CharField(max_length=255)
-    image_url = models.URLField()
     link = models.URLField()
-    authors = models.ManyToManyField(Author, blank=True, related_name='books')
-    # The default authors set on a Section/Term/Note if they aren't specified.
-    # If empty, then it's assumed that most sections are by different authors.
-    default_authors = models.ManyToManyField(Author,
-                                             blank=True,
-                                             related_name='default_books')
-    language = LanguageField(default='en')
-    objects = BookManager()
-    is_processed = models.BooleanField(default=False, db_index=True)  # terms, notes, sections
-    completed_sections = models.BooleanField(default=False)  # KEEP
-    completed_read = models.BooleanField(default=True)
-    summary = models.TextField(blank=True)
-    comments = models.TextField(blank=True)  # temporary private notes
-    source_url = models.URLField(blank=True)
     has_pages = models.BooleanField(default=True)
     year = models.PositiveSmallIntegerField(blank=True, null=True)
     isbn = models.CharField(max_length=13, blank=True, null=True)
@@ -81,12 +67,41 @@ class Book(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     rating = RatingField(default=0, blank=True)
+    # 'authors' is taken directly from GoodReads. Currently not used anywhere.
+    authors = models.ManyToManyField(Author, blank=True, related_name='books')
+    # The default authors set on a Section/Term/Note if they aren't specified.
+    # If empty, then it's assumed that most sections are by different authors.
+    default_authors = models.ManyToManyField(Author,
+                                             blank=True,
+                                             related_name='default_books')
+
+    def __unicode__(self):
+        return "Details for %s" % self.book.title
+
+
+class Book(models.Model):
+    """If details are None, then it's a publication, not a book."""
+    objects = BookManager()
+    details = models.OneToOneField(BookDetails, on_delete=models.CASCADE,
+                                   blank=True, null=True)
+    title = models.CharField(max_length=255)
+    language = LanguageField(default='en')
+    image_url = models.URLField()
+    is_processed = models.BooleanField(default=False, db_index=True)  # terms, notes, sections
+    completed_sections = models.BooleanField(default=False)  # KEEP
+    completed_read = models.BooleanField(default=True)
+    summary = models.TextField(blank=True)
+    comments = models.TextField(blank=True)  # temporary private notes
+    source_url = models.URLField(blank=True)
 
     def __unicode__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('view_book', args=[str(self.id)])
+
+    def has_pages(self):
+        return self.details.has_pages if self.details else False
 
 
 class PageNumberField(models.CharField):
@@ -110,7 +125,7 @@ class PageNumberField(models.CharField):
 class PageArtefact(models.Model):
     """Inherited by Note, TermOccurrence, and Section."""
     in_preface = models.BooleanField()
-    page_number = PageNumberField()
+    page_number = PageNumberField(default=1)
 
     class Meta:
         abstract = True
@@ -189,10 +204,14 @@ class Section(PageArtefact):
         )
 
     def has_default_authors(self):
-        return (
-            set(a.pk for a in self.authors.all()) ==
-            set(a.pk for a in self.book.default_authors.all())
-        )
+        details = self.book.details
+        if details:
+            return (
+                set(a.pk for a in self.authors.all()) ==
+                set(a.pk for a in details.default_authors.all())
+            )
+        else:
+            return True
 
     def get_next(self):
         """Probably inefficient but the alternative is fairly complex so"""
@@ -237,16 +256,20 @@ class SectionArtefact(PageArtefact):
                 set(a.pk for a in self.section.authors.all())
             )
         else:
-            return (
-                set(a.pk for a in self.authors.all()) ==
-                set(a.pk for a in self.book.default_authors.all())
-            )
+            details = self.book.details
+            if details:
+                return (
+                    set(a.pk for a in details.authors.all()) ==
+                    set(a.pk for a in details.default_authors.all())
+                )
+            else:
+                return True
 
     def set_default_authors(self):
         if self.section:
             default_authors = self.section.authors.all()
         else:
-            default_authors = self.book.default_authors.all()
+            default_authors = self.book.details.default_authors.all()
 
         self.authors.add(*default_authors)
 

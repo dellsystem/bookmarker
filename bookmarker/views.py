@@ -11,8 +11,9 @@ from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
 from books.api import CLIENT
-from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm
-from books.models import Book, Author, Note, NoteTag, Section
+from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
+                        BookDetailsForm
+from books.models import Book, Author, Note, NoteTag, Section, BookDetails
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
@@ -25,7 +26,7 @@ def home(request):
     ).annotate(
         num_terms=Count('terms', distinct=True),
         num_notes=Count('notes', distinct=True),
-    ).prefetch_related('default_authors')
+    ).prefetch_related('details__default_authors')
 
     context = {
         'started_books': books.filter(
@@ -45,7 +46,7 @@ def view_complete(request):
     books = Book.objects.filter(is_processed=True).annotate(
         num_notes=Count('notes', distinct=True),
         num_terms=Count('terms', distinct=True),
-    ).prefetch_related('default_authors').order_by('-pk')
+    ).prefetch_related('details__default_authors').order_by('-pk')
 
     context = {
         'books': books,
@@ -62,7 +63,7 @@ def view_book(request, book_id):
     recent_notes = book.notes.order_by('-added')[:5]
 
     sections = book.sections.all().prefetch_related(
-        'authors', 'book__default_authors'
+        'authors', 'book__details__default_authors'
     ).annotate(
         num_terms=Count('terms', distinct=True),
         num_notes=Count('notes', distinct=True),
@@ -70,6 +71,7 @@ def view_book(request, book_id):
 
     context = {
         'book': book,
+        'details': book.details,
         'recent_terms': recent_terms,
         'recent_notes': recent_notes,
         'sections': sections,
@@ -81,23 +83,39 @@ def edit_book(request, book_id):
     book = Book.objects.get(pk=book_id)
 
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        book_form = BookForm(request.POST, instance=book)
 
-        if form.is_valid():
-            form.save()
+        if book.details:
+            details_form = BookDetailsForm(request.POST, instance=book.details)
+        else:
+            details_form = None
+
+        if book_form.is_valid() and (details_form is None or details_form.is_valid()):
+            book_form.save()
+            if details_form:
+                details_form.save()
+
             messages.success(request, u'Edited book: {}'.format(book.title))
             return redirect(book)
         else:
             messages.error(request, 'Failed to edit book')
     else:
-        form = BookForm(instance=book)
-        if book.goodreads_id:
+        book_form = BookForm(instance=book)
+        if book.details:
+            details_form = BookDetailsForm(instance=book.details)
+        else:
+            details_form = None
+
+        """
+        if book.details and book.details.goodreads_id:
             form.fields['start_date'].widget.attrs['readonly'] = True
             form.fields['end_date'].widget.attrs['readonly'] = True
+        """
 
     context = {
         'book': book,
-        'form': form,
+        'book_form': book_form,
+        'details_form': details_form,
     }
 
     return render(request, 'edit_book.html', context)
@@ -107,7 +125,7 @@ def view_terms(request, book_id):
     book = Book.objects.get(pk=book_id)
     terms = book.terms.all().prefetch_related(
         'category', 'term', 'authors', 'section', 'section__authors', 'book',
-        'book__default_authors',
+        'book__details__default_authors',
     )
 
     author_pk = request.GET.get('author')
@@ -237,7 +255,7 @@ def edit_occurrence(request, occurrence_id):
 def add_term(request, book_id):
     book = Book.objects.get(pk=book_id)
 
-    if not book.completed_sections:
+    if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')
         return redirect(book)
 
@@ -330,47 +348,90 @@ def add_author(request):
 @staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
-    gr_book = CLIENT.book(goodreads_id)
+    if goodreads_id:
+        gr_book = CLIENT.book(goodreads_id)
 
-    try:
-        book = Book.objects.get(goodreads_id=goodreads_id)
-    except Book.DoesNotExist:
-        book = Book.objects.create(
-            goodreads_id=goodreads_id,
-            title=gr_book.title,
-            image_url=gr_book.image_url,
-            link=gr_book.link,
-            year=gr_book.publication_date[2],
-            isbn=gr_book.isbn13,
-            publisher=gr_book.publisher,
-            num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
-        )
-        messages.success(
-            request,
-            u'Added book: {}'.format(book.title),
-        )
+        try:
+            book = Book.objects.get(details__goodreads_id=goodreads_id)
+        except Book.DoesNotExist:
+            details = BookDetails.objects.create(
+                goodreads_id=goodreads_id,
+                link=gr_book.link,
+                year=gr_book.publication_date[2],
+                isbn=gr_book.isbn13,
+                publisher=gr_book.publisher,
+                num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
+            )
 
-        for gr_author in gr_book.authors:
-            try:
-                author = Author.objects.get(goodreads_id=gr_author.gid)
-            except Author.DoesNotExist:
-                author = None
+            book = Book.objects.create(
+                details=details,
+                title=gr_book.title,
+                image_url=gr_book.image_url,
+            )
 
-            if author is None:
-                author = Author.objects.create(
-                    goodreads_id=gr_author.gid,
-                    name=gr_author.name,
-                    link=gr_author.link,
-                )
-                messages.success(
+            messages.success(
+                request,
+                u'Added book: {}'.format(book.title),
+            )
+
+            for gr_author in gr_book.authors:
+                try:
+                    author = Author.objects.get(goodreads_id=gr_author.gid)
+                except Author.DoesNotExist:
+                    author = None
+
+                if author is None:
+                    author = Author.objects.create(
+                        goodreads_id=gr_author.gid,
+                        name=gr_author.name,
+                        link=gr_author.link,
+                    )
+                    messages.success(
+                        request,
+                        u'Added author: {}'.format(author.name),
+                    )
+
+                details.authors.add(author)
+                details.default_authors.add(author)
+
+        return redirect(book)
+    else:
+        if request.POST.get('submit'):
+            book_form = BookForm(request.POST)
+
+            if request.POST['submit'] == 'details':
+                details_form = BookDetailsForm(request.POST)
+            else:
+                details_form = None
+
+            if book_form.is_valid():
+                book = book_form.save()
+
+                if details_form and details_form.is_valid():
+                    details = details_form.save()
+                    details.book = book
+                    details.save()
+                    messages.success(request, 'Added book with details')
+                    return redirect(book)
+                else:
+                    messages.success(request, 'Added book')
+                    return redirect(book)
+            else:
+                messages.error(
                     request,
-                    u'Added author: {}'.format(author.name),
+                    'Error'
                 )
+        else:
+            book_form = BookForm()
+            details_form = BookDetailsForm()
+            details_form.fields['goodreads_id'] = None
 
-            book.authors.add(author)
-            book.default_authors.add(author)
+        context = {
+            'book_form': book_form,
+            'details_form': details_form,
+        }
 
-    return redirect(book)
+        return render(request, 'add_book.html', context)
 
 
 def suggest_terms(request):
@@ -424,9 +485,11 @@ def get_definition(request):
 
 @staff_member_required
 def add_note(request, book_id):
+    section_id = request.GET.get('section')
+
     book = Book.objects.get(pk=book_id)
 
-    if not book.completed_sections:
+    if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')
         return redirect(book)
 
@@ -452,7 +515,11 @@ def add_note(request, book_id):
             messages.error(request, 'Failed to add note')
 
     if new_form:
-        note_form = NoteForm(book, prefix='note')
+        initial = {}
+        if section_id:
+            initial['section'] = section_id
+
+        note_form = NoteForm(book, prefix='note', initial=initial)
         author_form = ArtefactAuthorForm(prefix='author')
 
     recent_notes = book.notes.order_by('-added')
@@ -485,7 +552,7 @@ def view_all_authors(request):
 
 def view_all_notes(request):
     notes = Note.objects.order_by('book').select_related('book').prefetch_related(
-        'authors', 'tags', 'section', 'section__authors', 'book__default_authors'
+        'authors', 'tags', 'section', 'section__authors', 'book__details__default_authors'
     )
 
     commented = request.GET.get('commented')
@@ -527,7 +594,7 @@ def view_notes(request, book_id):
     book = Book.objects.get(pk=book_id)
     notes = book.notes.all().prefetch_related(
         'tags', 'authors', 'section', 'section__authors', 'book',
-        'book__default_authors',
+        'book__details__default_authors',
     )
 
     author_pk = request.GET.get('author')
@@ -590,7 +657,7 @@ def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
     query = request.GET.get('q')
     occurrences = term.occurrences.order_by('book__title').prefetch_related(
-        'book', 'authors', 'book__default_authors', 'category', 'section',
+        'book', 'authors', 'book__details__default_authors', 'category', 'section',
         'section__authors',
     )
     context = {
@@ -609,7 +676,7 @@ def view_author(request, author_id):
 
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)
-    for section in author.sections.all().prefetch_related('authors', 'book__default_authors'):
+    for section in author.sections.all().prefetch_related('authors', 'book__details__default_authors'):
         book_id = section.book_id
         book_ids.add(book_id)
 
@@ -645,7 +712,7 @@ def view_author(request, author_id):
         terms_by_book[book_id].append(term)
 
     books_query = Book.objects.filter(pk__in=book_ids).prefetch_related(
-        'default_authors'
+        'details__default_authors'
     )
 
     books = []
@@ -676,7 +743,7 @@ def view_author(request, author_id):
 
 def view_all_terms(request):
     occurrences = TermOccurrence.objects.order_by('term').prefetch_related(
-        'term', 'book', 'book__default_authors', 'authors', 'section',
+        'term', 'book', 'book__details__default_authors', 'authors', 'section',
         'section__authors', 'category'
     ) # could still be optimised further
 
@@ -843,7 +910,7 @@ def search(request):
     books = Book.objects.filter(
         Q(title__icontains=term) |
         Q(summary__icontains=term) |
-        Q(authors__name__icontains=term)
+        Q(details__authors__name__icontains=term)
     )
 
     results = {
@@ -874,18 +941,18 @@ def search(request):
         to_prefetch = {
             'notes': [
                 'book', 'section',
-                'section__authors', 'book__default_authors', 'authors', 'tags',
+                'section__authors', 'book__details__default_authors', 'authors', 'tags',
             ],
             'terms': [
                 'book', 'term', 'category', 'section',
-                'section__authors', 'book__default_authors', 'authors',
+                'section__authors', 'book__details__default_authors', 'authors',
             ],
             'sections': [
                 'book',
-                'authors', 'book__default_authors',
+                'authors', 'book__details__default_authors',
             ],
             'books': [
-                'default_authors',
+                'details__default_authors',
             ],
         }
 
@@ -998,9 +1065,11 @@ def edit_note(request, note_id):
             initial=note.get_author_data(),
         )
 
+    book = note.book
+
     context = {
         'note': note,
-        'book': note.book,
+        'book': book,
         'note_form': note_form,
         'author_form': author_form,
     }

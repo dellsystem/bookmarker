@@ -1,0 +1,156 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+    {{ details_form.errors }}
+
+    {% if details_form %}
+    <div class="ui segment">
+        <div class="ui fields">
+            {% if details_form.goodreads_id %}
+            <div class="two wide field">
+                <label>Goodreads ID</label>
+                {{ details_form.goodreads_id }}
+            </div>
+            <div class="fourteen wide field">
+            {% else %}
+            <div class="sixteen wide field">
+            {% endif %}
+                <label>Link</label>
+                {{ details_form.link }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="four wide field">
+                <label>ISBN</label>
+                    {{ details_form.isbn }}
+                </label>
+            </div>
+            <div class="six wide field">
+                <label>Publisher</label>
+                    {{ details_form.publisher }}
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Year</label>
+                    {{ details_form.year }}
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Pages</label>
+                    <div class="ui toggle checkbox">
+                        {{ details_form.has_pages }}
+                    </div>
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Number of pages</label>
+                    {{ details_form.num_pages }}
+                </label>
+            </div>
+        </div>
+        <div class="ui fields">
+            {% with error=details_form.default_authors.errors %}
+            <div class="{% if error %}error{% endif %} seven wide field">
+                <label>Default author(s){% if error %} (REQUIRED){% endif %}</label>
+                {{ details_form.default_authors }}
+            </div>
+            {% endwith %}
+            <div class="one wide field">
+                <label>Verified</label>
+                    <div class="ui toggle checkbox">
+                        {{ details_form.verified }}
+                    </div>
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Rating</label>
+                {% if book.goodreads_id %}
+                <div class="ui heart rating display-rating" data-rating="{{ book.rating }}">
+                </div>
+                <input type="hidden" name="rating" value="{{ book.rating }}" />
+                {% else %}
+                <div class="ui heart rating editable-rating" data-rating="{{ details_form.rating.value }}">
+                </div>
+                <input type="hidden" name="book-rating" id="book_rating" value="0" />
+                {% endif %}
+            </div>
+            <div class="three wide field">
+                <label>Start date</label>
+                {{ details_form.start_date }}
+            </div>
+            <div class="three wide field">
+                <label>End date</label>
+                {{ details_form.end_date }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="ui segment">
+        <div class="ui fields">
+            {% with error=book_form.title.errors %}
+            <div class="{% if error %}error{% endif %} eight wide field">
+                <label>Title{% if error %} (REQUIRED){% endif %}</label>
+                {{ book_form.title }}
+            </div>
+            {% endwith %}
+            {% with error=book_form.image_url.errors %}
+            <div class="{% if error %}error{% endif %} eight wide field">
+                <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
+                {{ book_form.image_url }}
+            </div>
+            {% endwith %}
+        </div>
+        <div class="ui two fields">
+            <div class="field">
+                <label>Summary</label>
+                {{ book_form.summary }}
+            </div>
+            <div class="field">
+                <label>Comments</label>
+                {{ book_form.comments }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="ten wide field">
+                <label>Source URL</label>
+                {{ book_form.source_url }}
+            </div>
+            <div class="two wide field">
+                <label>Language</label>
+                {{ book_form.language }}
+            </div>
+            <div class="one wide field">
+                <label>Processed</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.is_processed }}
+                    </div>
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Completed sections</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.completed_sections }}
+                    </div>
+                </label>
+            </div>
+            <div class="one wide field">
+                <label>Read</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.completed_read }}
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui center aligned segment">
+        <button type="submit" name="submit" value="create"
+                class="ui blue button">
+            Submit without details
+        </button>
+        <button type="submit" name="submit" value="details"
+                class="ui blue button">
+            Submit
+        </button>
+    </div>
+</form>

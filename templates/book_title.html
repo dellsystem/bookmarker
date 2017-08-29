@@ -9,11 +9,13 @@
             {{ book.title }}
             {% endif %}
         </a>
+        {% if book.details %}
         <div class="sub header">
-            {% include 'author_list.html' with authors=book.default_authors only %}
+            {% include 'author_list.html' with authors=book.details.default_authors only %}
             <div class="ui rating display-rating"
-                 data-rating="{{ book.rating }}">
+                 data-rating="{{ book.details.rating }}">
             </div>
         </div>
+        {% endif %}
     </div>
 </h2>

@@ -2,7 +2,7 @@
     <form class="ui form" method="post">
         {% csrf_token %}
         <div class="ui stackable grid">
-            <div class="five wide column">
+            <div class="{% if section_form.page_number %}five{% else %}six{% endif %} wide column">
                 {% with error=section_form.title.errors %}
                 <div class="{% if error %}error{% endif %} field">
                     <label>Title{% if error %} (REQUIRED){% endif %}</label>
@@ -10,6 +10,7 @@
                 </div>
                 {% endwith %}
             </div>
+            {% if section_form.page_number %}
             <div class="one wide collapsed column">
                 {% with error=section_form.page_number.errors %}
                 <div class="{% if error %}error{% endif %} field"
@@ -19,6 +20,7 @@
                 </div>
                 {% endwith %}
             </div>
+            {% endif %}
             <div class="four wide column">
                 <div class="field">
                     <label>Subtitle</label>

@@ -65,7 +65,7 @@
                 {% with error=note_form.section.errors %}
                 <div class="{% if error %}error{% endif %} field"
                      {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                    <label>Section (only set this if there is ambiguity)</label>
+                    <label>Section{% if book.has_pages %} (only set this if there is ambiguity){% endif %}</label>
                     {{ note_form.section }}
                 </div>
                 {% endwith %}
