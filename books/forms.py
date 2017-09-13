@@ -222,6 +222,7 @@ class BookDetailsForm(forms.ModelForm):
             details.rating = 0
             details.save()
         self.save_m2m()
+        return details
 
 
 class BookForm(forms.ModelForm):
