@@ -32,7 +32,7 @@
 <h3>
     Existing sections ({{ count }} total)
 </h3>
-{% include 'section_list.html' with sections=book.sections.all only %}
+{% include 'section_list.html' with sections=sections only %}
 {% else %}
 <div class="ui warning message">
     <div class="header">

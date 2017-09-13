@@ -179,8 +179,16 @@ def add_section(request, book_id):
         section_form = SectionForm(book, prefix='section')
         author_form = ArtefactAuthorForm(prefix='author')
 
+    sections = book.sections.prefetch_related(
+        'authors', 'book__details__default_authors',
+    ).annotate(
+        num_terms=Count('terms', distinct=True),
+        num_notes=Count('notes', distinct=True),
+    )
+
     context = {
         'book': book,
+        'sections': sections,
         'section_form': section_form,
         'author_form': author_form,
     }
