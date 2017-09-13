@@ -13,7 +13,7 @@
         {% include 'book_header.html' with book=book only %}
     </div>
     <div class="two wide column">
-        <a class="ui fluid green icon button" href="{% url 'add_note' book.pk %}">
+        <a class="ui fluid green icon button" href="{% url 'add_note' book.slug %}">
             <i class="plus icon"></i>
             Add note
         </a>

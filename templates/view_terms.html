@@ -12,7 +12,7 @@
         {% include 'book_header.html' with book=book only %}
     </div>
     <div class="two wide column">
-        <a class="ui green icon button" href="{% url 'add_term' book.pk %}">
+        <a class="ui green icon button" href="{% url 'add_term' book.slug %}">
             <i class="plus icon"></i>
             Add term
         </a>

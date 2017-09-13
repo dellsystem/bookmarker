@@ -54,8 +54,8 @@ def view_complete(request):
     return render(request, 'view_complete.html', context)
 
 
-def view_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def view_book(request, slug):
+    book = Book.objects.get(slug=slug)
 
     recent_terms = book.terms.order_by('-added')[:5].prefetch_related(
         'term', 'category', 'section'
@@ -79,8 +79,8 @@ def view_book(request, book_id):
     return render(request, 'view_book.html', context)
 
 
-def edit_book(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def edit_book(request, slug):
+    book = Book.objects.get(slug=slug)
 
     if request.method == 'POST':
         book_form = BookForm(request.POST, instance=book)
@@ -121,8 +121,8 @@ def edit_book(request, book_id):
     return render(request, 'edit_book.html', context)
 
 
-def view_terms(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def view_terms(request, slug):
+    book = Book.objects.get(slug=slug)
     terms = book.terms.all().prefetch_related(
         'category', 'term', 'authors', 'section', 'section__authors', 'book',
         'book__details__default_authors',
@@ -157,8 +157,8 @@ def view_terms(request, book_id):
 
 
 @staff_member_required
-def add_section(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def add_section(request, slug):
+    book = Book.objects.get(slug=slug)
     if book.completed_sections:
         messages.error(request, 'Sections are already completed!')
         return redirect(book)
@@ -260,8 +260,8 @@ def edit_occurrence(request, occurrence_id):
 
 
 @staff_member_required
-def add_term(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def add_term(request, slug):
+    book = Book.objects.get(slug=slug)
 
     if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')
@@ -492,10 +492,10 @@ def get_definition(request):
 
 
 @staff_member_required
-def add_note(request, book_id):
+def add_note(request, slug):
     section_id = request.GET.get('section')
 
-    book = Book.objects.get(pk=book_id)
+    book = Book.objects.get(slug=slug)
 
     if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')
@@ -598,8 +598,8 @@ def view_all_notes(request):
     return render(request, 'view_all_notes.html', context)
 
 
-def view_notes(request, book_id):
-    book = Book.objects.get(pk=book_id)
+def view_notes(request, slug):
+    book = Book.objects.get(slug=slug)
     notes = book.notes.all().prefetch_related(
         'tags', 'authors', 'section', 'section__authors', 'book',
         'book__details__default_authors',
@@ -677,8 +677,14 @@ def view_term(request, term_id):
     return render(request, 'view_term.html', context)
 
 
-def view_author(request, author_id):
-    author = Author.objects.get(pk=author_id)
+def section_redirect(request, slug):
+    section = Section.objects.get(slug=slug)
+
+    return redirect(section)
+
+
+def view_author(request, slug):
+    author = Author.objects.get(slug=slug)
     author_section_ids = set()
     book_ids = set()
 

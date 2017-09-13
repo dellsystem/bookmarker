@@ -8,7 +8,7 @@
             </a>
             <h3 class="ui header">
                 <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
-                <a href="{% url 'edit_book' book.pk %}">
+                <a href="{% url 'edit_book' book.slug %}">
                     <i class="edit icon"></i>
                 </a>
                 <div class="sub header">
@@ -53,10 +53,10 @@
             <br />
             {% endif %}
             <div class="ui labels">
-                <a class="ui label" href="{% url 'view_terms' book.pk %}">
+                <a class="ui label" href="{% url 'view_terms' book.slug %}">
                     <i class="flag icon"></i> {{ book.num_terms }}
                 </a>
-                <a class="ui label" href="{% url 'view_notes' book.pk %}">
+                <a class="ui label" href="{% url 'view_notes' book.slug %}">
                     <i class="sticky note icon"></i> {{ book.num_notes }}
                 </a>
                 {% if book.details %}

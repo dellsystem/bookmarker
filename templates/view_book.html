@@ -9,7 +9,7 @@
     <div class="thirteen wide column">
         <h2 class="ui header">
             {{ book.title }}
-            <a href="{% url 'edit_book' book.pk %}">
+            <a href="{% url 'edit_book' book.slug %}">
                 <i class="edit icon"></i>
             </a>
             {% if book.details %}
@@ -28,7 +28,7 @@
         {% csrf_token %}
         {% if not book.completed_sections %}
             <div class="ui fluid buttons">
-                <a class="ui blue icon button" href="{% url 'add_section' book.pk %}">
+                <a class="ui blue icon button" href="{% url 'add_section' book.slug %}">
                     <i class="plus icon"></i> Add section
                 </a>
                 {% if book.details %}
@@ -136,14 +136,14 @@
                 {% if num_terms or not book.is_processed %}
                 <div class="ui fluid buttons">
                     {% if num_terms %}
-                    <a href="{% url 'view_terms' book.pk %}"
+                    <a href="{% url 'view_terms' book.slug %}"
                        class="ui basic blue icon button">
                         <i class="list icon"></i>
                         View terms ({{ num_terms }})
                     </a>
                     {% endif %}
                     {% if not book.is_processed %}
-                    <a href="{% url 'add_term' book.pk %}" class="ui blue icon button">
+                    <a href="{% url 'add_term' book.slug %}" class="ui blue icon button">
                         <i class="plus icon"></i> Add term
                     </a>
                     {% endif %}
@@ -165,14 +165,14 @@
                 {% if num_notes or not book.is_processed %}
                 <div class="ui fluid buttons">
                     {% if num_notes %}
-                    <a href="{% url 'view_notes' book.pk %}"
+                    <a href="{% url 'view_notes' book.slug %}"
                        class="ui basic blue icon button">
                         <i class="list icon"></i>
                         View all {{ num_notes }} notes
                     </a>
                     {% endif %}
                     {% if not book.is_processed %}
-                    <a href="{% url 'add_note' book.pk %}" class="ui blue icon button">
+                    <a href="{% url 'add_note' book.slug %}" class="ui blue icon button">
                         <i class="plus icon"></i> Add note
                     </a>
                     {% endif %}

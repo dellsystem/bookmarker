@@ -86,20 +86,12 @@
     {% endif %}
 
     <div class="ui segment">
-        <div class="ui fields">
-            {% with error=book_form.title.errors %}
-            <div class="{% if error %}error{% endif %} eight wide field">
-                <label>Title{% if error %} (REQUIRED){% endif %}</label>
-                {{ book_form.title }}
-            </div>
-            {% endwith %}
-            {% with error=book_form.image_url.errors %}
-            <div class="{% if error %}error{% endif %} eight wide field">
-                <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
-                {{ book_form.image_url }}
-            </div>
-            {% endwith %}
+        {% with error=book_form.title.errors %}
+        <div class="{% if error %}error{% endif %} ui field">
+            <label>Title{% if error %} (REQUIRED){% endif %}</label>
+            {{ book_form.title }}
         </div>
+        {% endwith %}
         <div class="ui two fields">
             <div class="field">
                 <label>Summary</label>
@@ -111,9 +103,21 @@
             </div>
         </div>
         <div class="ui fields">
-            <div class="ten wide field">
+            {% with error=book_form.image_url.errors %}
+            <div class="{% if error %}error{% endif %} eight wide field">
+                <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
+                {{ book_form.image_url }}
+            </div>
+            {% endwith %}
+            <div class="eight wide field">
                 <label>Source URL</label>
                 {{ book_form.source_url }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="ten wide field">
+                <label>Slug</label>
+                {{ book_form.slug }}
             </div>
             <div class="two wide field">
                 <label>Language</label>

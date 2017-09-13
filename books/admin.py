@@ -16,7 +16,7 @@ class SectionAdmin(admin.ModelAdmin):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['title', 'slug']
 
 
 @admin.register(Note)

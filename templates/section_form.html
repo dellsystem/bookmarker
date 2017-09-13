@@ -2,7 +2,7 @@
     <form class="ui form" method="post">
         {% csrf_token %}
         <div class="ui stackable grid">
-            <div class="{% if section_form.page_number %}five{% else %}six{% endif %} wide column">
+            <div class="{% if section_form.page_number %}eight{% else %}nine{% endif %} wide column">
                 {% with error=section_form.title.errors %}
                 <div class="{% if error %}error{% endif %} field">
                     <label>Title{% if error %} (REQUIRED){% endif %}</label>
@@ -21,25 +21,10 @@
                 {% endwith %}
             </div>
             {% endif %}
-            <div class="four wide column">
+            <div class="seven wide column">
                 <div class="field">
                     <label>Subtitle</label>
                     {{ section_form.subtitle }}
-                </div>
-            </div>
-            <div class="two wide column">
-                {% with error=author_form.mode.errors %}
-                <div class="{% if error %}error{% endif %} field"
-                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                    <label>Author mode</label>
-                    {{ author_form.mode }}
-                </div>
-                {% endwith %}
-            </div>
-            <div class="four wide collapsed column">
-                <div class="field">
-                    <label>Author(s)</label>
-                    {{ author_form.authors }}
                 </div>
             </div>
         </div>
@@ -48,14 +33,33 @@
             <label>Summary</label>
             {{ section_form.summary }}
         </div>
-        <div class="two fields">
-            <div class="field">
-                <label>Source URL</label>
-                {{ section_form.source_url }}
+        <div class="fields">
+            {% with error=author_form.mode.errors %}
+            <div class="two wide {% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Author mode</label>
+                {{ author_form.mode }}
             </div>
-            <div class="field">
+            {% endwith %}
+            <div class="five wide field">
+                <div class="field">
+                    <label>Author(s)</label>
+                    {{ author_form.authors }}
+                </div>
+            </div>
+            <div class="nine wide field">
                 <label>Related section</label>
                 {{ section_form.related_to }}
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="ui field">
+                <label>Slug</label>
+                {{ section_form.slug }}
+            </div>
+            <div class="ui field">
+                <label>Source URL</label>
+                {{ section_form.source_url }}
             </div>
         </div>
         <div class="ui basic center aligned segment">

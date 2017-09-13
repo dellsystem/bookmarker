@@ -15,6 +15,7 @@ class Author(models.Model):
     goodreads_id = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=100)
     link = models.URLField()
+    slug = models.SlugField(null=True)
 
     class Meta:
         ordering = ['name']
@@ -23,7 +24,7 @@ class Author(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('view_author', args=[str(self.id)])
+        return reverse('view_author', args=[self.slug])
 
     def get_associated_books(self):
         """Get books the author is associated with, by section or directly."""
@@ -93,12 +94,13 @@ class Book(models.Model):
     summary = models.TextField(blank=True)
     comments = models.TextField(blank=True)  # temporary private notes
     source_url = models.URLField(blank=True)
+    slug = models.SlugField(unique=True)
 
     def __unicode__(self):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('view_book', args=[str(self.id)])
+        return reverse('view_book', args=[self.slug])
 
     def has_pages(self):
         return self.details.has_pages if self.details else False
@@ -178,6 +180,7 @@ class Section(PageArtefact):
     rating = RatingField(default=0, blank=True)
     source_url = models.URLField(blank=True)
     related_to = models.ForeignKey('self', blank=True, null=True)
+    slug = models.SlugField(blank=True)  # only for link-worthy sections
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

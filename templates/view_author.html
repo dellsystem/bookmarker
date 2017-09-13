@@ -89,7 +89,7 @@
             <div class="ui celled two column grid">
                 <div class="column">
                     {% if row.num_terms %}
-                    <a href="{% url 'view_terms' row.book.pk %}?author={{ author.pk }}"
+                    <a href="{% url 'view_terms' row.book.slug %}?author={{ author.pk }}"
                        class="ui fluid basic blue icon button">
                         <i class="list icon"></i>
                         View terms by {{ author }} ({{ row.num_terms }})
@@ -101,7 +101,7 @@
                 </div>
                 <div class="column">
                     {% if row.num_notes %}
-                    <a href="{% url 'view_notes' row.book.pk %}?author={{ author.pk }}"
+                    <a href="{% url 'view_notes' row.book.slug %}?author={{ author.pk }}"
                        class="ui fluid basic blue icon button">
                         <i class="list icon"></i>
                         View notes by {{ author }} ({{ row.num_notes }})

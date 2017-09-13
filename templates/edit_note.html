@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block breadcrumbs %}
-<a class="section" href="{% url 'view_book' book.pk %}">View book</a>
+<a class="section" href="{% url 'view_book' book.slug %}">View book</a>
 <i class="right angle icon divider"></i>
 <a class="section" href="{{ note.get_absolute_url }}">View note</a>
 <i class="right angle icon divider"></i>

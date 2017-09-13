@@ -51,6 +51,11 @@
                     {% endif %}
                 </div>
             </h3>
+            {% if section.slug %}
+            <a href="{% url 'section_redirect' section.slug %}">
+                {{ request.get_host }}{% url 'section_redirect' section.slug %}
+            </a>
+            {% endif %}
         </div>
         <div class="three wide column">
             <div class="ui two mini statistics">
@@ -60,7 +65,7 @@
                     </div>
                     <div class="label">
                         terms
-                        <a href="{% url 'add_term' book.pk %}">
+                        <a href="{% url 'add_term' book.slug %}">
                             <i class="plus icon"></i>
                         </a>
                     </div>
@@ -71,7 +76,7 @@
                     </div>
                     <div class="label">
                         notes
-                        <a href="{% url 'add_note' book.pk %}?section={{ section.pk }}">
+                        <a href="{% url 'add_note' book.slug %}?section={{ section.pk }}">
                             <i class="plus icon"></i>
                         </a>
                     </div>
