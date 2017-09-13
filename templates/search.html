@@ -183,7 +183,7 @@
                         <a href="{{ book.get_absolute_url }}">
                             <strong>{{ book.title }}</strong>
                         </a>
-                        {% include 'author_list.html' with authors=book.default_authors only %}
+                        {% include 'author_list.html' with authors=book.details.default_authors only %}
                     </div>
                     {% endfor %}
                 </div>
