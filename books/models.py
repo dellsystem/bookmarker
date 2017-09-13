@@ -76,9 +76,6 @@ class BookDetails(models.Model):
                                              blank=True,
                                              related_name='default_books')
 
-    def __unicode__(self):
-        return "Details for %s" % self.book.title
-
 
 class Book(models.Model):
     """If details are None, then it's a publication, not a book."""
