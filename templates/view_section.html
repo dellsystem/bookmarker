@@ -36,7 +36,7 @@
                     <i class="edit icon"></i>
                 </a>
                 <div class="sub header">
-                    {{ section.subtitle }}
+                    {{ section.subtitle|markdownify }}
                     {% if section.authors.count %}
                         {% if not section.has_default_authors %}
                         {% include 'author_list.html' with authors=section.authors %}
