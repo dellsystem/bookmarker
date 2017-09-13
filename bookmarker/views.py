@@ -559,9 +559,9 @@ def view_all_authors(request):
 
 
 def view_all_notes(request):
-    notes = Note.objects.order_by('book').select_related('book').prefetch_related(
+    notes = Note.objects.select_related('book').prefetch_related(
         'authors', 'tags', 'section', 'section__authors', 'book__details__default_authors'
-    )
+    ).order_by('book', 'added')
 
     commented = request.GET.get('commented')
     if commented:
@@ -1094,9 +1094,9 @@ def edit_note(request, note_id):
 def view_tag(request, slug):
     tag = NoteTag.objects.get(slug=slug)
 
-    notes = tag.notes.order_by('book').prefetch_related(
-        'authors', 'section__authors', 'tags', 'book', 'book__default_authors',
-    )
+    notes = tag.notes.prefetch_related(
+        'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
+    ).order_by('book', 'page_number')
     paginator = Paginator(notes, 10)
     page = request.GET.get('page')
     try:
