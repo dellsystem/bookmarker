@@ -759,33 +759,37 @@ def view_author(request, slug):
 
 
 def view_all_terms(request):
-    occurrences = TermOccurrence.objects.order_by('term').prefetch_related(
-        'term', 'book', 'book__details__default_authors', 'authors', 'section',
-        'section__authors', 'category'
-    ) # could still be optimised further
+    terms = Term.objects.order_by('text')
 
     author_pk = request.GET.get('author')
-    try:
-        author = Author.objects.get(pk=author_pk)
-    except Author.DoesNotExist:
-        author = None
+    author = None
+    if author_pk:
+        try:
+            author = Author.objects.get(pk=author_pk)
+        except Author.DoesNotExist:
+            pass
 
-    if author:
-        occurrences = occurrences.filter(authors=author)
+        if author:
+            terms = terms.filter.filter(occurrence__authors=author)
 
-    paginator = Paginator(occurrences, 10)
+    flagged = request.GET.get('flagged')
+    if flagged:
+        terms = terms.filter(flagged=True)
+
+    paginator = Paginator(terms, 25)
     page = request.GET.get('page')
     try:
-        occurrences = paginator.page(page)
+        terms = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        occurrences = paginator.page(1)
+        terms = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        occurrences = paginator.page(paginator.num_pages)
+        terms = paginator.page(paginator.num_pages)
 
     context = {
-        'occurrences': occurrences,
+        'flagged': flagged,
+        'terms': terms,
         'author': author,
     }
 

@@ -5,19 +5,33 @@
 {% endblock %}
 
 {% block content %}
-<h2>View all terms</h2>
+<div class="ui grid">
+    <div class="thirteen wide column">
+        <h2>View all terms</h2>
+    </div>
+    <div class="three wide column">
+        {% if flagged %}
+        <a href="{% if author %}?author={{ author }}{{% else %}?flagged{% endif %}"
+           class="ui fluid basic blue button">
+            Show all
+        </a>
+        {% else %}
+        <a href="?flagged=1{% if author %}&author={{ author }}{% endif %}"
+           class="ui fluid blue button">
+            Show flagged
+        </a>
+        {% endif %}
+    </div>
+</div>
 
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=occurrences author=author only %}
+{% include "pagination.html" with items=terms author=author flagged=flagged only %}
 
-{% regroup occurrences by term as term_list %}
-
-{% for term in term_list %}
-    {% include 'term_header.html' with term=term.grouper only %}
-    {% include 'term_list_with_books.html' with occurrences=term.list only %}
+{% for term in terms %}
+    {% include 'term_header.html' with term=term %}
 {% endfor %}
 
-{% include "pagination.html" with items=occurrences author=author only %}
+{% include "pagination.html" with items=terms author=author flagged=flagged only %}
 
 {% endblock %}

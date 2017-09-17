@@ -2,7 +2,8 @@
 {% load highlight_filter %}
 
 <h2 class="ui header">
-    <i class="blue flag icon"></i>
+    <i title="{% if term.flagged %}Flagged{% endif %}"
+       class="{% if not term.flagged %}disabled {% endif %}blue flag icon"></i>
     <div class="content">
         <a href="{{ term.get_absolute_url }}">
             {{ term.text }}

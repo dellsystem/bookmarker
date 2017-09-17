@@ -11,11 +11,21 @@ class TermOccurrenceInline(admin.StackedInline):
     extra = 0
 
 
+def flag_terms(modeladmin, request, queryset):
+    queryset.update(flagged=True)
+    modeladmin.message_user(
+        request,
+        'Flagged {n} terms'.format(n=queryset.count()),
+        messages.SUCCESS
+    )
+
+
 @admin.register(Term)
 class TermAdmin(admin.ModelAdmin):
-    list_display = ('text', 'definition', 'language')
+    list_display = ('text', 'definition', 'language', 'flagged')
     inlines = [TermOccurrenceInline]
     search_fields = ['text', 'definition']
+    actions = [flag_terms]
 
 
 @admin.register(TermOccurrence)

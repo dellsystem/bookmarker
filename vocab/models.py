@@ -27,7 +27,8 @@ class Term(models.Model):
     text = models.CharField(max_length=100)
     definition = models.TextField()  # taken directly from an API
     language = LanguageField(default='en')
-    highlights = models.TextField()  # words to highlight, separated by /
+    highlights = models.TextField()  # words to highlight, separated by \n
+    flagged = models.BooleanField(default=False)  # pretty words
 
     class Meta:
         ordering = ['text']
