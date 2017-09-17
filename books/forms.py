@@ -38,10 +38,11 @@ class PageNumberForm:
     self.book has been set (ideally in __init__)."""
     def clean_page_number(self):
         page_number = self.cleaned_data['page_number']
-        if self.book.details and page_number.isdigit() and int(page_number) > self.book.details.num_pages:
-            raise forms.ValidationError(
-                'This book has %d pages' % self.book.details.num_pages
-            )
+        if self.book.details and self.book.details.num_pages:
+            if self.book.details and page_number.isdigit() and int(page_number) > self.book.details.num_pages:
+                raise forms.ValidationError(
+                    'This book has %d pages' % self.book.details.num_pages
+                )
 
         return page_number
 
