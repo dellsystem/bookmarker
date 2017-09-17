@@ -6,11 +6,6 @@ from books.models import Author
 from .models import TermCategory, Term, TermOccurrence
 
 
-class TermOccurrenceInline(admin.StackedInline):
-    model = TermOccurrence
-    extra = 0
-
-
 def flag_terms(modeladmin, request, queryset):
     queryset.update(flagged=True)
     modeladmin.message_user(
@@ -23,7 +18,6 @@ def flag_terms(modeladmin, request, queryset):
 @admin.register(Term)
 class TermAdmin(admin.ModelAdmin):
     list_display = ('text', 'definition', 'language', 'flagged')
-    inlines = [TermOccurrenceInline]
     search_fields = ['text', 'definition']
     actions = [flag_terms]
 
