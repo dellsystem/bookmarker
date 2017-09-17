@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from books.api import CLIENT
@@ -344,6 +345,7 @@ def add_author(request):
             goodreads_id=goodreads_id,
             name=gr_author.name,
             link=gr_author.link,
+            slug=slugify(gr_author.name)[:50],
         )
         messages.success(
             request,
@@ -375,6 +377,7 @@ def add_book(request):
                 details=details,
                 title=gr_book.title,
                 image_url=gr_book.image_url,
+                slug=slugify(gr_book.title)[:50],
             )
 
             messages.success(
