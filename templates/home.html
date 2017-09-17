@@ -8,7 +8,7 @@
     <div class="eight wide column">
 {% endif %}
         <div class="ui segment">
-            <div class="ui four small statistics">
+            <div class="ui five mini statistics">
                 <div class="statistic">
                     <div class="value">
                         {{ started_books.count }}
@@ -31,6 +31,14 @@
                     </div>
                     <div class="label">
                         <a href="#unread_books">Unread</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ publications.count }}
+                    </div>
+                    <div class="label">
+                        <a href="#publications">Publications</a>
                     </div>
                 </div>
                 <div class="statistic">
@@ -80,6 +88,9 @@
 <br />
 <h2 id="started_books">In progress</h2>
 {% include 'book_list.html' with books=started_books only %}
+
+<h2 id="publications">Publications</h2>
+{% include 'book_list.html' with books=publications only %}
 
 <h2 id="new_books">New</h2>
 {% include 'book_list.html' with books=new_books only %}

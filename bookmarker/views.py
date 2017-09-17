@@ -36,6 +36,10 @@ def home(request):
         'new_books': books.filter(
             completed_sections=False,
             completed_read=True,
+            details__isnull=False,
+        ),
+        'publications': books.filter(
+            details__isnull=True
         ),
         'unread_books': books.filter(completed_read=False),
         'complete_books': Book.objects.filter(is_processed=True),
