@@ -1,3 +1,5 @@
+import re
+
 from django import template
 from django.utils.safestring import mark_safe
 import markdown
@@ -18,9 +20,13 @@ def markdownify(text):
     )
 
 
+OL_REGEX = re.compile('([0-9]+)\. ')
 @register.filter
 def markdownify_title(text):
-    """Same as markdownify but removes the paragraph tags."""
+    """Same as markdownify but removes the paragraph and header tags, and
+    prevents ordered lists from being created."""
+    if OL_REGEX.match(text):
+        text = OL_REGEX.sub(r'\1\\. ', text)
     output = markdown.markdown(text, safe_mode='escape', smart_emphasis=False)
     if output.startswith('<p>') and output.endswith('</p>'):
         output = output[3:-4]
