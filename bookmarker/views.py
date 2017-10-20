@@ -400,6 +400,7 @@ def add_book(request):
                         goodreads_id=gr_author.gid,
                         name=gr_author.name,
                         link=gr_author.link,
+                        slug=slugify(gr_author.name)[:50],
                     )
                     messages.success(
                         request,
