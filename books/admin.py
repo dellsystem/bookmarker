@@ -6,6 +6,7 @@ from .models import Author, Book, Note, NoteTag, Section
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ['name', 'goodreads_id']
+    prepopulated_fields = {'slug': ('name',), }
 
 
 @admin.register(Section)
