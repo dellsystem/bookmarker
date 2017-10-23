@@ -84,6 +84,7 @@ def view_book(request, slug):
     return render(request, 'view_book.html', context)
 
 
+@staff_member_required
 def edit_book(request, slug):
     book = Book.objects.get(slug=slug)
 
