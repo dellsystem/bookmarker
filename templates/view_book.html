@@ -18,6 +18,9 @@
                 <div class="ui rating display-rating"
                      data-rating="{{ book.details.rating }}">
                 </div>
+                {% if book.details.start_date and book.details.end_date %}
+                {{ book.details.start_date }} - {{ book.details.end_date }}
+                {% endif %}
             </div>
             {% endif %}
         </h2>
