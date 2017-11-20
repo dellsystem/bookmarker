@@ -22,29 +22,32 @@ from vocab.models import Term, TermOccurrence
 
 
 def home(request):
-    books = Book.objects.filter(is_processed=False).order_by(
-        'is_processed', 'completed_sections', '-pk'
-    ).annotate(
-        num_terms=Count('terms', distinct=True),
-        num_notes=Count('notes', distinct=True),
-    ).prefetch_related('details__default_authors')
+    if request.user.is_staff:
+        books = Book.objects.filter(is_processed=False).order_by(
+            'is_processed', 'completed_sections', '-pk'
+        ).annotate(
+            num_terms=Count('terms', distinct=True),
+            num_notes=Count('notes', distinct=True),
+        ).prefetch_related('details__default_authors')
 
-    context = {
-        'started_books': books.filter(
-            completed_sections=True
-        ),
-        'new_books': books.filter(
-            completed_sections=False,
-            completed_read=True,
-            details__isnull=False,
-        ),
-        'publications': books.filter(
-            details__isnull=True
-        ),
-        'unread_books': books.filter(completed_read=False),
-        'complete_books': Book.objects.filter(is_processed=True),
-    }
-    return render(request, 'home.html', context)
+        context = {
+            'started_books': books.filter(
+                completed_sections=True
+            ),
+            'new_books': books.filter(
+                completed_sections=False,
+                completed_read=True,
+                details__isnull=False,
+            ),
+            'publications': books.filter(
+                details__isnull=True
+            ),
+            'unread_books': books.filter(completed_read=False),
+            'complete_books': Book.objects.filter(is_processed=True),
+        }
+        return render(request, 'home.html', context)
+    else:
+        return view_complete(request)
 
 
 def view_complete(request):

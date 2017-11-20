@@ -87,14 +87,14 @@
 {% endif %}
 <br />
 <h2 id="started_books">In progress</h2>
-{% include 'book_list.html' with books=started_books only %}
+{% include 'book_list.html' with books=started_books %}
 
 <h2 id="publications">Publications</h2>
-{% include 'book_list.html' with books=publications only %}
+{% include 'book_list.html' with books=publications %}
 
 <h2 id="new_books">New</h2>
-{% include 'book_list.html' with books=new_books only %}
+{% include 'book_list.html' with books=new_books %}
 
 <h2 id="unread_books">Unread</h2>
-{% include 'book_list.html' with books=unread_books only %}
+{% include 'book_list.html' with books=unread_books %}
 {% endblock %}

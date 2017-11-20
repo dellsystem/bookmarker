@@ -20,33 +20,39 @@
                 </div>
             </h3>
             {% if book.details %}
+            {% with admin=request.user.is_staff %}
             <p>
-                {% if book.details.isbn %}
-                <code>{{ book.details.isbn }}</code>
-                {% else %}
-                <span class="ui red label">ISBN?</span>
+                {% if admin %}
+                    {% if book.details.isbn %}
+                    <code>{{ book.details.isbn }}</code>
+                    {% else %}
+                    <span class="ui red label">ISBN?</span>
+                    {% endif %}
                 {% endif %}
                 {% if book.details.publisher %}
                 {{ book.details.publisher }},
-                {% else %}
+                {% elif admin %}
                 <span class="ui red label">Publisher?</span>,
                 {% endif %}
                 {% if book.details.year %}
                 {{ book.details.year }}.
-                {% else %}
+                {% elif admin %}
                 <span class="ui red label">Year?</span>.
                 {% endif %}
                 {% if book.details.num_pages %}
                 {{ book.details.num_pages }} pages.
-                {% else %}
+                {% elif admin %}
                 <span class="ui red label">Pages?</span>.
                 {% endif %}
-                {% if book.details.verified %}
-                <i class="checkmark icon"></i>
-                {% else %}
-                <span class="ui red label">Unverified</span>
+                {% if admin %}
+                    {% if book.details.verified %}
+                    <i class="checkmark icon" title="Publication details verified"></i>
+                    {% else %}
+                    <span class="ui red label">Unverified</span>
+                    {% endif %}
                 {% endif %}
             </p>
+            {% endwith %}
             {% endif %}
             {% if book.comments %}
             <code>{{ book.comments }}</code>
@@ -66,9 +72,11 @@
                          data-rating="{{ book.details.rating }}">
                     </div>
                 </div>
-                <div class="ui label">
-                    {{ book.details.end_date }}
-                </div>
+                    {% if book.details.start_date and book.details.end_date %}
+                    <div class="ui label">
+                        {{ book.details.start_date }} - {{ book.details.end_date }}
+                    </div>
+                    {% endif %}
                 {% endif %}
             </div>
         </div>
