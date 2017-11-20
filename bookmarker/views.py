@@ -779,7 +779,7 @@ def view_all_terms(request):
             pass
 
         if author:
-            terms = terms.filter(occurrence__authors=author)
+            terms = terms.filter(occurrences__authors=author)
 
     flagged = request.GET.get('flagged')
     if flagged:
