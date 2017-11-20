@@ -63,14 +63,13 @@
             </div>
             <div class="two wide field">
                 <label>Rating</label>
-                {% if book.goodreads_id %}
-                <div class="ui heart rating display-rating" data-rating="{{ book.rating }}">
-                </div>
-                <input type="hidden" name="rating" value="{{ book.rating }}" />
-                {% else %}
+                {% if book.details and book.details.goodreads_id %}
                 <div class="ui heart rating editable-rating" data-rating="{{ details_form.rating.value }}">
                 </div>
-                <input type="hidden" name="book-rating" id="book_rating" value="0" />
+                {% else %}
+                <div class="ui heart rating display-rating" data-rating="{{ book.details.rating }}">
+                </div>
+                <input type="hidden" name="rating" value="{{ book.details.rating }}" />
                 {% endif %}
             </div>
             <div class="three wide field">
