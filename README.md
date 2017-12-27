@@ -8,7 +8,7 @@ multiple users eventually.
 Demo
 ----
 
-You can view a read-only active demo at <http://dellsystem.bookmarker.me>. This
+You can view a read-only active demo at <http://bookmarker.dellsystem.me>. This
 is also a great way to creep on what books I'm reading.
 
 License
