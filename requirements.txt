@@ -1,10 +1,34 @@
+asn1crypto==0.24.0
+bcrypt==3.1.4
+beautifulsoup4==4.6.0
+certifi==2017.11.5
+cffi==1.11.2
+chardet==3.0.4
+cryptography==2.1.4
 Django==1.9.13
-Markdown==2.6.6
-MarkdownSuperscript==2.0.0
 django-config-models==0.1.5
 django-debug-toolbar==1.8
 django-language-field==0.0.3
+djangorestframework==3.7.7
+enum34==1.1.6
+Fabric==1.14.0
+-e git+https://github.com/dellsystem/goodreads@5f6dad481dc0601413581acb6b4b8a00e94dd7b3#egg=goodreads
+idna==2.6
+ipaddress==1.0.19
+Markdown==2.6.6
+MarkdownSuperscript==2.0.0
+-e git+https://github.com/dellsystem/merriam-webster-api@5dfc857fa0879c27cc567dacf8d5764fee2604ac#egg=Merriam_Webster_API
+nose==1.3.7
+paramiko==2.4.0
 psycopg2==2.7.3
--e git+https://github.com/dellsystem/goodreads#egg=goodreads
--e git+https://github.com/dellsystem/merriam-webster-api#egg=merriam_webster
--e git+https://github.com/dellsystem/translate-term.git#egg=translate-term
+pyasn1==0.4.2
+pycparser==2.18
+PyNaCl==1.2.1
+rauth==0.7.3
+requests==2.18.4
+six==1.11.0
+sqlparse==0.2.4
+terminaltables==3.1.0
+-e git+https://github.com/dellsystem/translate-term.git@e1a585826d64cb16c83d783a16b0e84d848bfc44#egg=translate_term
+urllib3==1.22
+xmltodict==0.11.0
