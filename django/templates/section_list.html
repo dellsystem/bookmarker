@@ -13,7 +13,10 @@
     {% endif %}
     <div class="computer only row">
         <div class="one wide column">
-            <div class="ui large circular label">{{ section.get_page_display }}</div>
+            <div class="ui large circular label {% if section.skipped %}black{% endif %}"
+                 {% if section.skipped %}title="Not read yet"{% endif %}>
+                {{ section.get_page_display }}
+            </div>
         </div>
         <div class="eleven wide column">
             <h4 class="ui {% if related %}disabled{% endif %} header">

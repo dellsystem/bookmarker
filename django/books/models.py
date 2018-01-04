@@ -178,6 +178,7 @@ class Section(PageArtefact):
     source_url = models.URLField(blank=True)
     related_to = models.ForeignKey('self', blank=True, null=True)
     slug = models.SlugField(blank=True)  # only for link-worthy sections
+    skipped = models.BooleanField(default=False, help_text='Not yet read')
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

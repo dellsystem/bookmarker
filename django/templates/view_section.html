@@ -17,7 +17,8 @@
     <div class="row">
         {% if book.has_pages %}
         <div class="one wide center aligned column">
-            <div class="big ui circular label">
+            <div class="big ui circular {% if section.skipped %}black{% endif %} label"
+                 {% if section.skipped %}title="Not read yet"{% endif %}>
                 {{ section.get_page_display }}
             </div>
         </div>

@@ -52,12 +52,18 @@
                 {{ section_form.related_to }}
             </div>
         </div>
-        <div class="two fields">
-            <div class="ui field">
+        <div class="ui fields">
+            <div class="one wide field">
+                <label>Skipped?</label>
+                <div class="ui toggle checkbox">
+                    {{ section_form.skipped }}
+                </div>
+            </div>
+            <div class="seven wide field">
                 <label>Slug</label>
                 {{ section_form.slug }}
             </div>
-            <div class="ui field">
+            <div class="eight wide field">
                 <label>Source URL</label>
                 {{ section_form.source_url }}
             </div>
