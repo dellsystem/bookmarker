@@ -163,6 +163,7 @@
                         <a href="{{ section.book.get_absolute_url }}">
                             {{ section.book.title }}
                         </a>
+                        {% include 'author_list.html' with authors=section.authors only %}
                     </div>
                     {% endfor %}
                 </div>
