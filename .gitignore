@@ -1,8 +1,6 @@
-db.sqlite3
 *.json
 *.pyc
 *.swp
-*/migrations/*
 .log
 backups/*
-src
+env
