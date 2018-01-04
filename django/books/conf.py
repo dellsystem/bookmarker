@@ -1,2 +1,0 @@
-GOODREADS_KEY = 'ILCdjXwqbRNItgCTZyfn5w'
-GOODREADS_SECRET = 's8xjQclDgihLqtfSmgQ2gwhFQ0KXqsYANlDc9fr9E'
