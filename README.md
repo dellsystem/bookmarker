@@ -11,6 +11,16 @@ Demo
 You can view a read-only active demo at <http://bookmarker.dellsystem.me>. This
 is also a great way to creep on what books I'm reading.
 
+Setup
+-----
+
+Django 1.10. Run `python django/manage.py runserver`.
+
+(Optional) set the following environment variables (ideally using virtualenv)
+
+* `DJANGO_SECRET_KEY`
+* `POSTGRES_PASSWORD`
+
 License
 -------
 
