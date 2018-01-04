@@ -943,6 +943,15 @@ def search(request):
         Q(details__authors__name__icontains=term)
     )
 
+    # Add the sections where the author name matches BUT the associated books
+    # not already in the books queryset above.
+    book_pks = books.values_list('pk', flat=True)
+    authors = Author.objects.filter(name__icontains=term)
+    for author in authors:
+        author_sections = author.sections.exclude(book_id__in=book_pks)
+        if author_sections.exists():
+            sections |= author_sections
+
     results = {
         'notes': notes,
         'terms': terms,
