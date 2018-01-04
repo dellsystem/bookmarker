@@ -21,6 +21,10 @@ Django 1.10. Run `python django/manage.py runserver`.
 * `DJANGO_SECRET_KEY`
 * `POSTGRES_PASSWORD`
 
+CAVEATS: The `page_number` field on Section, Note, TermOccurrence needs to be
+converted into an int on the database level.  See [this commit](/dellsystem/bookmarker/commit/9838ef6a391b50f8e4fd7cdfd8914437d25bc652)
+for details.
+
 License
 -------
 
