@@ -10,6 +10,9 @@ env.host_string = 'stratus'
 def up():
     local('django/manage.py runserver')
 
+def static():
+    local('django/manage.py collectstatic --noinput')
+
 
 def get_backup_filename(hostname):
     return 'backups/{}_{}.json'.format(
