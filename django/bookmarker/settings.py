@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     # For local development only
     SECRET_KEY = '5&_lct-1f$r5yw=d^xurif@x6#^&r@adysue_r1l_jzro=bfpd'
@@ -30,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'bookmarker.dellsystem.me',
+    'localhost',
 ]
 
 INTERNAL_IPS = [
@@ -96,15 +97,25 @@ WSGI_APPLICATION = 'bookmarker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+DATABASES = {}
+postgres_password = os.environ.get('POSTGRES_PASSWORD')
+if postgres_password:
+    db = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'bookmarker',
         'USER': 'bookmarker',
-        'PASSWORD': os.environ.get('BOOKMARKER_PASSWORD'),
+        'PASSWORD': postgres_password,
         'HOST': 'localhost',
         'PORT': '',
     }
+else:
+    db = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+
+DATABASES = {
+    'default': db,
 }
 
 
