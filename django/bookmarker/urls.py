@@ -66,6 +66,8 @@ urlpatterns = [
         name='view_author'),
     url(r'^tag/(?P<slug>[^/]+)$', bookmarker.views.view_tag,
         name='view_tag'),
+    url(r'^tag/(?P<slug>[^/]+)/cite$', bookmarker.views.cite_tag,
+        name='cite_tag'),
     url(r'^tags$', bookmarker.views.view_all_tags, name='view_all_tags'),
     url(r'^stats$', bookmarker.views.view_stats, name='view_stats'),
     url(r'^api/suggest.json$', bookmarker.views.suggest_terms),

@@ -19,12 +19,12 @@
             </div>
         </div>
         <div class="ui fields">
-            <div class="four wide field">
+            <div class="three wide field">
                 <label>ISBN</label>
                     {{ details_form.isbn }}
                 </label>
             </div>
-            <div class="six wide field">
+            <div class="four wide field">
                 <label>Publisher</label>
                     {{ details_form.publisher }}
                 </label>
@@ -34,7 +34,7 @@
                     {{ details_form.year }}
                 </label>
             </div>
-            <div class="two wide field">
+            <div class="one wide field">
                 <label>Pages</label>
                     <div class="ui toggle checkbox">
                         {{ details_form.has_pages }}
@@ -46,14 +46,18 @@
                     {{ details_form.num_pages }}
                 </label>
             </div>
-        </div>
-        <div class="ui fields">
-            {% with error=details_form.default_authors.errors %}
-            <div class="{% if error %}error{% endif %} seven wide field">
-                <label>Default author(s){% if error %} (REQUIRED){% endif %}</label>
-                {{ details_form.default_authors }}
+            <div class="two wide field">
+                <label>Issue #</label>
+                    {{ details_form.issue_number }}
+                </label>
             </div>
-            {% endwith %}
+            <div class="one wide field">
+                <label>Edited?</label>
+                    <div class="ui toggle checkbox">
+                    {{ details_form.is_edited }}
+                    </div>
+                </label>
+            </div>
             <div class="one wide field">
                 <label>Verified</label>
                     <div class="ui toggle checkbox">
@@ -61,6 +65,14 @@
                     </div>
                 </label>
             </div>
+        </div>
+        <div class="ui fields">
+            {% with error=details_form.default_authors.errors %}
+            <div class="{% if error %}error{% endif %} ten wide field">
+                <label>Default author(s){% if error %} (REQUIRED){% endif %}</label>
+                {{ details_form.default_authors }}
+            </div>
+            {% endwith %}
             <div class="two wide field">
                 <label>Rating</label>
                 {% if book.details and book.details.goodreads_id %}
@@ -72,11 +84,11 @@
                 <input type="hidden" name="rating" value="{{ book.details.rating }}" />
                 {% endif %}
             </div>
-            <div class="three wide field">
+            <div class="two wide field">
                 <label>Start date</label>
                 {{ details_form.start_date }}
             </div>
-            <div class="three wide field">
+            <div class="two wide field">
                 <label>End date</label>
                 {{ details_form.end_date }}
             </div>

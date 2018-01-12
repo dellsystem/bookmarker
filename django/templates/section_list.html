@@ -20,6 +20,7 @@
         </div>
         <div class="eleven wide column">
             <h4 class="ui {% if related %}disabled{% endif %} header">
+                {% if section.number %}{{ section.number }}.{% endif %}
                 {% if related %}
                 <a href="{{ related.get_absolute_url }}">
                 {% else %}
