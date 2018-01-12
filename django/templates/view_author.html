@@ -85,7 +85,7 @@
         <div class="thirteen wide column">
             {% if row.sections %}
             {% include 'section_list.html' with sections=row.sections %}
-            {% else %}
+            {% elif row.num_terms or row.num_notes %}
             <div class="ui celled two column grid">
                 <div class="column">
                     {% if row.num_terms %}
@@ -112,6 +112,8 @@
                     {% endif %}
                 </div>
             </div>
+            {% else %}
+            <p>Nothing by this author</p>
             {% endif %}
         </div>
     </div>

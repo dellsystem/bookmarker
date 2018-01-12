@@ -700,6 +700,10 @@ def view_author(request, slug):
     author_section_ids = set()
     book_ids = set()
 
+    # Find the author's direct books.
+    for details in author.books.all():
+        book_ids.add(details.book.pk)
+
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)
     for section in author.sections.all().prefetch_related('authors', 'book__details__default_authors'):
