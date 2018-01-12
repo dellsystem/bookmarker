@@ -73,7 +73,7 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
             'comment': forms.Textarea(attrs={'rows': 5}),
             'tags': forms.SelectMultiple(
                 attrs={
-                    'class': 'ui fluid dropdown multi-select',
+                    'class': 'ui fluid search dropdown multi-select',
                 }
             ),
         }
