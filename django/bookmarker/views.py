@@ -185,8 +185,18 @@ def add_section(request, slug):
             messages.error(request, 'Failed to add section')
 
     if new_form:
-        section_form = SectionForm(book, prefix='section')
-        author_form = ArtefactAuthorForm(prefix='author')
+        section_initial = {
+            'number': book.sections.filter(number__isnull=False).count() + 1,
+        }
+        section_form = SectionForm(
+            book, prefix='section', initial=section_initial
+        )
+
+        # If the book is an edited collection, set the author mode to custom.
+        author_initial = {}
+        if book.details and book.details.is_edited:
+            author_initial['mode'] = 'custom'
+        author_form = ArtefactAuthorForm(prefix='author', initial=author_initial)
 
     sections = book.sections.prefetch_related(
         'authors', 'book__details__default_authors',
@@ -700,6 +710,10 @@ def view_author(request, slug):
     author_section_ids = set()
     book_ids = set()
 
+    # Find the author's direct books.
+    for details in author.books.all():
+        book_ids.add(details.book.pk)
+
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)
     for section in author.sections.all().prefetch_related('authors', 'book__details__default_authors'):
@@ -1114,6 +1128,21 @@ def edit_note(request, note_id):
     }
 
     return render(request, 'edit_note.html', context)
+
+
+def cite_tag(request, slug):
+    tag = NoteTag.objects.get(slug=slug)
+
+    notes = tag.notes.prefetch_related(
+        'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
+    ).order_by('book', 'page_number')
+
+    context = {
+        'tag': tag,
+        'notes': notes,
+    }
+
+    return render(request, 'cite_tag.html', context)
 
 
 def view_tag(request, slug):

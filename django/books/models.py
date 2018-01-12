@@ -62,12 +62,19 @@ class BookDetails(models.Model):
     has_pages = models.BooleanField(default=True)
     year = models.PositiveSmallIntegerField(blank=True, null=True)
     isbn = models.CharField(max_length=13, blank=True, null=True)
+    issue_number = models.PositiveSmallIntegerField(blank=True, null=True,
+        help_text='Only for periodicals (like NLR, Jacobin)'
+    )
     publisher = models.CharField(max_length=50, blank=True, null=True)
     num_pages = models.PositiveSmallIntegerField(blank=True, null=True)
     verified = models.BooleanField(default=False)  # the ISBN and related details
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     rating = RatingField(default=0, blank=True)
+    is_edited = models.BooleanField(
+        default=False,
+        help_text='If the authors are actually editors'
+    )
     # 'authors' is taken directly from GoodReads. Currently not used anywhere.
     authors = models.ManyToManyField(Author, blank=True, related_name='books')
     # The default authors set on a Section/Term/Note if they aren't specified.
@@ -95,6 +102,61 @@ class Book(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def get_citation_data(self):
+        details = self.details
+        if details is None:
+            return
+
+        if details.issue_number:
+            # It's a periodical. Set the title to the first author's name.
+            title = details.default_authors.first().name
+            authors = None
+            num_authors = 0
+        else:
+            title = self.title
+            author_names = []
+            for author in details.default_authors.all():
+                author_name = author.name.split(' ')
+                last_name = ' '.join(author_name[1:])
+                first_initial = author_name[0][0]
+                author_names.append(
+                    '{last}, {first}.'.format(last=last_name, first=first_initial)
+                )
+
+            # Join the names with commas and an "and" at the end.
+            authors = '?'
+            num_authors = len(author_names)
+            if num_authors == 1:
+                authors = author_names[0]
+            elif num_authors == 2:
+                authors = author_names[0] + ' and ' + author_names[1]
+            elif num_authors == 3:
+                authors = (
+                    author_names[0] + ', ' + author_names[1] + ' and ' + author_names[2]
+                )
+            elif num_authors > 3:
+                authors = author_names[0] + ' et al'
+
+        return {
+            'is_edited': details.is_edited,
+            'issue_number': details.issue_number,
+            'num_authors': num_authors,
+            'authors': authors,
+            'year': details.year,
+            'title': title,
+            'publisher': details.publisher,
+        }
+
+    def get_citation(self):
+        """Streeck, W. (2016). _How will capitalism end? Essays on a failing
+        system._ New York: Verso Books."""
+
+        citation_data = self.get_citation_data()
+        if citation_data:
+            return '{authors} ({year}). _{title}_. {publisher}.'.format(
+                **citation_data
+            )
 
     def get_absolute_url(self):
         return reverse('view_book', args=[self.slug])
@@ -169,7 +231,10 @@ class PageArtefact(models.Model):
 
 
 class Section(PageArtefact):
+    # TODO: unique together for book & number
     book = models.ForeignKey(Book, related_name='sections')
+    number = models.PositiveSmallIntegerField(blank=True, null=True,
+        help_text='Chapter number (if relevant')
     authors = models.ManyToManyField(Author, related_name='sections', blank=True)
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)
@@ -213,6 +278,66 @@ class Section(PageArtefact):
             )
         else:
             return True
+
+    def get_citation(self):
+        """Gandy, O. H. (2009). Rational discrimination. In _Coming to terms
+        with chance: Engaging rational discrimination and cumulative
+        disadvantage_. Farnham, VT: Ashgate, pp. 55-76."""
+        d = self.book.get_citation_data()
+        if not d:
+            return
+
+        author_names = []
+        for author in self.authors.all():
+            author_name = author.name.split(' ')
+            last_name = ' '.join(author_name[1:])
+            first_initial = author_name[0][0]
+            author_names.append(
+                '{last}, {first}.'.format(last=last_name, first=first_initial)
+            )
+
+        # Join the names with commas and an "and" at the end.
+        authors = '?'
+        if len(author_names) == 1:
+            authors = author_names[0]
+        elif len(author_names) == 2:
+            authors = author_names[0] + ' and ' + author_names[1]
+        elif len(author_names) == 3:
+            authors = (
+                author_names[0] + ', ' + author_names[1] + ' and ' + author_names[2]
+            )
+        elif len(author_names) > 3:
+            authors = author_names[0] + ' et al'
+
+        d['section_authors'] = authors
+        d['section_title'] = self.title
+        d['start'] = self.page_number
+        d['end'] = self.get_end_page()
+        if d['issue_number']:
+            d['in'] = ''
+            d['publication'] = d['issue_number']
+            d['book_authors'] = ''
+            d['book_title'] = d['title'] + ','
+        else:
+            d['in'] = 'In '
+            d['publication'] = d['publisher']
+            d['book_authors'] = d['authors']
+            if d['is_edited']:
+                d['book_authors'] += ' (ed{})'.format('s' if d['num_authors'] > 1 else '')
+            d['book_title'] = d['title'] + '.'
+
+        return (
+            '{section_authors} ({year}). {section_title}. '
+            '{in}{book_authors} _{book_title}_ {publication}, pp. {start}-{end}'
+        ).format(**d)
+
+    def get_end_page(self):
+        next_section = self.book.sections.filter(page_number__gt=self.page_number).order_by('page_number').first()
+        if next_section:
+            return next_section.page_number - 1
+        else:
+            if self.book.details and self.book.details.num_pages:
+                return self.book.details.num_pages - 1
 
     def get_next(self):
         """Probably inefficient but the alternative is fairly complex so"""
@@ -286,6 +411,40 @@ class NoteTag(models.Model):
     def get_absolute_url(self):
         return reverse('view_tag', args=[self.slug])
 
+    def get_bibliography(self):
+        book_ids = set()
+        section_ids = set()
+        for note in self.notes.all().prefetch_related('section', 'book'):
+            if note.section_id:
+                section_ids.add(note.section_id)
+            else:
+                book_ids.add(note.book_id)
+
+        # Only include the section if the author is different from the book's
+        sections = Section.objects.filter(pk__in=section_ids).prefetch_related(
+            'authors'
+        )
+        books = Book.objects.filter(pk__in=book_ids).prefetch_related(
+            'details__default_authors'
+        )
+        entries = set()
+        for book in books:
+            entries.add(book)
+
+        for section in sections:
+            if section.has_default_authors():
+                entries.add(section.book)
+            else:
+                entries.add(section)
+
+        bibliography = []
+        for entry in entries:
+            citation = entry.get_citation()
+            if citation:
+                bibliography.append((citation, entry.get_absolute_url()))
+
+        return sorted(bibliography, key=operator.itemgetter(0))
+
 
 class Note(SectionArtefact):
     book = models.ForeignKey(Book, related_name='notes')
@@ -309,6 +468,32 @@ class Note(SectionArtefact):
 
     def get_absolute_url(self):
         return reverse('view_note', args=[str(self.id)])
+
+    def get_citation(self):
+        author_names = []
+        for author in self.authors.all():
+            author_name = author.name.split(' ')
+            author_names.append(author_name[-1])  # last name only
+
+        # Join the names with commas and an "and" at the end.
+        authors = '?'
+        num_authors = len(author_names)
+        if num_authors == 1:
+            authors = author_names[0]
+        elif num_authors == 2:
+            authors = author_names[0] + ' and ' + author_names[1]
+        elif num_authors == 3:
+            authors = (
+                author_names[0] + ', ' + author_names[1] + ' and ' + author_names[2]
+            )
+        elif num_authors > 3:
+            authors = author_names[0] + ' et al'
+
+        return '({authors}, {year}, p.{page})'.format(
+            authors=authors,
+            year=self.book.details.year,
+            page=self.page_number
+        )
 
     def __unicode__(self):
         return "{subject} - {book}".format(

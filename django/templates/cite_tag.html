@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load markdown_filter %}
+
+{% block breadcrumbs %}
+<div class="active section">View tag</div>
+{% endblock %}
+
+{% block content %}
+<h1>
+    <span class="ui big {{ tag.colour }} label">
+        {{ tag.slug }}
+    </span>
+</h1>
+<p>
+    {{ tag.description }}
+    <a href="{% url 'admin:books_notetag_change' tag.pk %}">
+        <i class="edit icon"></i>
+    </a>
+</p>
+
+<div class="ui segment">
+    <div class="ui bulleted list">
+        {% for citation, entry_url in tag.get_bibliography %}
+        <div class="item">
+                {{ citation|markdownify }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% for note in notes %}
+<h3 class="ui header">
+    {{ note.get_citation }}
+    <div class="sub header">
+        {{ note.book.title }}
+    </div>
+</h3>
+<blockquote>
+    {{ note.quote|markdownify }}
+</blockquote>
+{% endfor %}
+
+{% endblock %}
+

@@ -116,6 +116,8 @@
 </div>
 {% endif %}
 
+<p>{{ section.get_citation|markdownify }}</p>
+
 <div class="ui divider"></div>
 <div class="ui grid">
     {% for artefact in section.get_artefacts %}

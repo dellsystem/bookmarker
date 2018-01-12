@@ -4,3 +4,6 @@ by
 {% empty %}
 multiple authors
 {% endfor %}
+{% if is_edited %}
+(editor{{ authors.count|pluralize }})
+{% endif %}
