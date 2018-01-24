@@ -185,9 +185,13 @@ def add_section(request, slug):
             messages.error(request, 'Failed to add section')
 
     if new_form:
-        section_initial = {
-            'number': book.sections.filter(number__isnull=False).count() + 1,
-        }
+        # If the book is a periodical, it won't have chapter numbers.
+        section_initial = {}
+        if not book.details or not book.details.issue_number:
+            section_initial['number'] = (
+                book.sections.filter(number__isnull=False).count() + 1
+            )
+
         section_form = SectionForm(
             book, prefix='section', initial=section_initial
         )
