@@ -68,9 +68,14 @@
         {{ book.summary|markdownify }}
     </div>
 {% endif %}
+{% with citation=book.get_citation %}
+{% if citation %}
 <p>
-    {{ book.get_citation|markdownify }}
+    {{ citation|markdownify }}
 </p>
+{% endif %}
+{% endwith %}
+
 <div class="ui stackable grid">
     <div class="four wide column">
         <a href="{% if details %}{{ book.details.link }}{% endif %}">
