@@ -65,10 +65,15 @@
                     {{ section_form.skipped }}
                 </div>
             </div>
-            <div class="seven wide field">
-                <label>Slug</label>
+            {% with error=section_form.slug.errors %}
+            <div class="seven wide {% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                <label>Slug
+                    (<a href="#" onclick="fillSlugFromTitle(); return false">fill from title</a>)
+                </label>
                 {{ section_form.slug }}
             </div>
+            {% endwith %}
             <div class="eight wide field">
                 <label>Source URL</label>
                 {{ section_form.source_url }}

@@ -68,9 +68,14 @@
         {{ book.summary|markdownify }}
     </div>
 {% endif %}
+{% with citation=book.get_citation %}
+{% if citation %}
 <p>
-    {{ book.get_citation|markdownify }}
+    {{ citation|markdownify }}
 </p>
+{% endif %}
+{% endwith %}
+
 <div class="ui stackable grid">
     <div class="four wide column">
         <a href="{% if details %}{{ book.details.link }}{% endif %}">
@@ -80,37 +85,7 @@
         </a>
         <br />
         <div style="text-align: center">
-            {% if details %}
-            <p>
-                {% if details.isbn %}
-                <code>{{ details.isbn }}</code>
-                {% else %}
-                <span class="ui red label">ISBN?</span>
-                {% endif %}
-            </p>
-            <p>
-                {% if details.publisher %}
-                {{ details.publisher }},
-                {% else %}
-                <span class="ui red label">Publisher?</span>,
-                {% endif %}
-                {% if details.year %}
-                {{ details.year }}.
-                {% else %}
-                <span class="ui red label">Year?</span>.
-                {% endif %}
-                {% if details.num_pages %}
-                {{ details.num_pages }} pages.
-                {% else %}
-                <span class="ui red label">Pages?</span>.
-                {% endif %}
-                {% if details.verified %}
-                <i class="checkmark icon"></i>
-                {% else %}
-                <span class="ui red label">Unverified</span>
-                {% endif %}
-            </p>
-            {% endif %}
+            {% include 'book_details.html' with details=details admin=request.user.is_staff only %}
             <a class="ui icon label" title="Terms" href="#terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>

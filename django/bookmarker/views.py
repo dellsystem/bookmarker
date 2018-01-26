@@ -103,6 +103,7 @@ def edit_book(request, slug):
             book_form.save()
             if details_form:
                 details_form.save()
+                book.details.save()
 
             messages.success(request, u'Edited book: {}'.format(book.title))
             return redirect(book)
@@ -185,9 +186,25 @@ def add_section(request, slug):
             messages.error(request, 'Failed to add section')
 
     if new_form:
-        section_initial = {
-            'number': book.sections.filter(number__isnull=False).count() + 1,
-        }
+        section_initial = {}
+
+        predict_number = True
+        # If the book is a periodical, it won't have chapter numbers.
+        if book.details and book.details.issue_number:
+            predict_number = False
+
+        # If at least 2 sections exist and none have numbers, give up.
+        if (
+                book.sections.count() >= 2 and
+                not book.sections.filter(number__isnull=True).exists()
+        ):
+            predict_number = False
+
+        if predict_number:
+            section_initial['number'] = (
+                book.sections.filter(number__isnull=False).count() + 1
+            )
+
         section_form = SectionForm(
             book, prefix='section', initial=section_initial
         )

@@ -1,3 +1,10 @@
+function fillSlugFromTitle() {
+    var title = document.getElementById('id_section-title').value;
+    // Replace spaces with - and remove non-word chars
+    var slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    document.getElementById('id_section-slug').value = slug;
+}
+
 function reformatQuote(elementId) {
     var field = document.getElementById(elementId);
     var lines = field.value.split(/\n/g);

@@ -5,15 +5,11 @@
     {% if details_form %}
     <div class="ui segment">
         <div class="ui fields">
-            {% if details_form.goodreads_id %}
             <div class="two wide field">
                 <label>Goodreads ID</label>
                 {{ details_form.goodreads_id }}
             </div>
             <div class="fourteen wide field">
-            {% else %}
-            <div class="sixteen wide field">
-            {% endif %}
                 <label>Link</label>
                 {{ details_form.link }}
             </div>

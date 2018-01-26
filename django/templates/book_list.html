@@ -20,39 +20,9 @@
                 </div>
             </h3>
             {% if book.details %}
-            {% with admin=request.user.is_staff %}
             <p>
-                {% if admin %}
-                    {% if book.details.isbn %}
-                    <code>{{ book.details.isbn }}</code>
-                    {% else %}
-                    <span class="ui red label">ISBN?</span>
-                    {% endif %}
-                {% endif %}
-                {% if book.details.publisher %}
-                {{ book.details.publisher }},
-                {% elif admin %}
-                <span class="ui red label">Publisher?</span>,
-                {% endif %}
-                {% if book.details.year %}
-                {{ book.details.year }}.
-                {% elif admin %}
-                <span class="ui red label">Year?</span>.
-                {% endif %}
-                {% if book.details.num_pages %}
-                {{ book.details.num_pages }} pages.
-                {% elif admin %}
-                <span class="ui red label">Pages?</span>.
-                {% endif %}
-                {% if admin %}
-                    {% if book.details.verified %}
-                    <i class="checkmark icon" title="Publication details verified"></i>
-                    {% else %}
-                    <span class="ui red label">Unverified</span>
-                    {% endif %}
-                {% endif %}
+            {% include 'book_details.html' with details=book.details admin=request.user.is_staff only %}
             </p>
-            {% endwith %}
             {% endif %}
             {% if book.comments %}
             <code>{{ book.comments }}</code>

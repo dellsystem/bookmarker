@@ -116,7 +116,11 @@
 </div>
 {% endif %}
 
-<p>{{ section.get_citation|markdownify }}</p>
+{% with citation=section.get_citation %}
+{% if citation %}
+<p>{{ citation|markdownify }}</p>
+{% endif %}
+{% endwith %}
 
 <div class="ui divider"></div>
 <div class="ui grid">
