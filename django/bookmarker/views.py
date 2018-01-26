@@ -103,6 +103,7 @@ def edit_book(request, slug):
             book_form.save()
             if details_form:
                 details_form.save()
+                book.details.save()
 
             messages.success(request, u'Edited book: {}'.format(book.title))
             return redirect(book)
