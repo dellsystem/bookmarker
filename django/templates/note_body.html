@@ -31,11 +31,11 @@
 {% endif %}
 {% if note.authors.count %}
     {% if note.has_default_authors %}
-    <span title="{{ note.authors.all|join:", " }}">
-        default author
-    </span>
-    {% else %}
     {% include 'author_list.html' with authors=note.authors %}
+    {% else %}
+    <strong>
+    {% include 'author_list.html' with authors=note.authors %}
+    </strong>
     {% endif %}
 {% else %}
 <span class="ui red label">missing author</span>

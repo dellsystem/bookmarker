@@ -61,7 +61,7 @@
             </a>
             {% endif %}
         </div>
-        <div class="three wide column">
+        <div class="{% if previous_section or next_section %}three{% else %}five{% endif %} wide column">
             <div class="ui two mini statistics">
                 <div class="statistic">
                     <div class="value">
@@ -87,6 +87,7 @@
                 </div>
             </div>
         </div>
+        {% if previous_section or next_section %}
         <div class="two wide column">
             <div class="ui fluid buttons">
                 {% if previous_section %}
@@ -105,6 +106,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 

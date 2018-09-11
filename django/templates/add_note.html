@@ -31,7 +31,7 @@
 {% with num_notes=book.notes.count %}
 {% if num_notes %}
 <h3>
-    Recent notes ({{ num_notes }} total)::
+    Recent notes ({{ num_notes }} total) ::
     <a href="{% url 'view_notes' book.slug %}">View all &raquo;</a>
 </h3>
 <div class="ui celled two column grid">
