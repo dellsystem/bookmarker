@@ -109,46 +109,56 @@ class Book(models.Model):
     def get_citation_data(self):
         details = self.details
         if details is None:
-            return
-
-        if details.issue_number:
-            # It's a periodical. Set the title to the first author's name.
-            title = details.default_authors.first().name
-            authors = None
+            is_edited = False
+            issue_number = None
+            year = None
+            publisher = ''
+            authors = ''
             num_authors = 0
-        else:
             title = self.title
-            author_names = []
-            for author in details.default_authors.all():
-                author_name = author.name.split(' ')
-                last_name = ' '.join(author_name[1:])
-                first_initial = author_name[0][0]
-                author_names.append(
-                    '{last}, {first}.'.format(last=last_name, first=first_initial)
-                )
+        else:
+            if details.issue_number:
+                # It's a periodical. Set the title to the first author's name.
+                title = details.default_authors.first().name
+                authors = ''
+                num_authors = 0
+            else:
+                title = self.title
+                author_names = []
+                for author in details.default_authors.all():
+                    author_name = author.name.split(' ')
+                    last_name = ' '.join(author_name[1:])
+                    first_initial = author_name[0][0]
+                    author_names.append(
+                        '{last}, {first}.'.format(last=last_name, first=first_initial)
+                    )
 
-            # Join the names with commas and an "and" at the end.
-            authors = '?'
-            num_authors = len(author_names)
-            if num_authors == 1:
-                authors = author_names[0]
-            elif num_authors == 2:
-                authors = author_names[0] + ' and ' + author_names[1]
-            elif num_authors == 3:
-                authors = (
-                    author_names[0] + ', ' + author_names[1] + ' and ' + author_names[2]
-                )
-            elif num_authors > 3:
-                authors = author_names[0] + ' et al'
+                # Join the names with commas and an "and" at the end.
+                authors = '?'
+                num_authors = len(author_names)
+                if num_authors == 1:
+                    authors = author_names[0]
+                elif num_authors == 2:
+                    authors = author_names[0] + ' and ' + author_names[1]
+                elif num_authors == 3:
+                    authors = (
+                        author_names[0] + ', ' + author_names[1] + ' and ' + author_names[2]
+                    )
+                elif num_authors > 3:
+                    authors = author_names[0] + ' et al'
+            is_edited = details.is_edited
+            issue_number = details.issue_number
+            year = details.year
+            publisher = details.publisher
 
         return {
-            'is_edited': details.is_edited,
-            'issue_number': details.issue_number,
+            'is_edited': is_edited,
+            'issue_number': issue_number,
             'num_authors': num_authors,
             'authors': authors,
-            'year': details.year,
+            'year': year,
             'title': title,
-            'publisher': details.publisher,
+            'publisher': publisher,
         }
 
     def get_citation(self):
@@ -318,24 +328,36 @@ class Section(PageArtefact):
 
         d['section_authors'] = authors
         d['section_title'] = self.title
-        d['start'] = self.page_number
-        d['end'] = self.get_end_page()
         if d['issue_number']:
             d['in'] = ''
             d['publication'] = d['issue_number']
             d['book_authors'] = ''
             d['book_title'] = d['title'] + ','
         else:
-            d['in'] = 'In '
+            if self.book.details:
+                d['in'] = 'In '
+            else:
+                d['in'] = ''
             d['publication'] = d['publisher']
             d['book_authors'] = d['authors']
             if d['is_edited']:
                 d['book_authors'] += ' (ed{})'.format('s' if d['num_authors'] > 1 else '')
             d['book_title'] = d['title'] + '.'
 
+        if self.book.details:
+            d['ending'] = ', pp. {start}-{end}'.format(
+                start=self.page_number,
+                end=self.get_end_page()
+            )
+        else:
+            d['ending'] = self.source_url
+
+        if self.date:
+            d['year'] = self.date.strftime('%Y, %B %d')
+
         return (
             '{section_authors} ({year}). {section_title}. '
-            '{in}{book_authors} _{book_title}_ {publication}, pp. {start}-{end}'
+            '{in}{book_authors} _{book_title}_ {publication}{ending}'
         ).format(**d)
 
     def get_end_page(self):
@@ -496,9 +518,16 @@ class Note(SectionArtefact):
         elif num_authors > 3:
             authors = author_names[0] + ' et al'
 
+        if self.book.details:
+            year = self.book.details.year
+        else:
+            if self.section.date:
+                year = self.section.date.year
+            else:
+                year = '????'
         return '({authors}, {year}, p.{page})'.format(
             authors=authors,
-            year=self.book.details.year,
+            year=year,
             page=self.page_number
         )
 

@@ -21,6 +21,7 @@
 </p>
 
 <div class="ui segment">
+    <h2>Bibliography ({{ tag.get_bibliography|length }})</h2>
     <div class="ui bulleted list">
         {% for citation, entry_url in tag.get_bibliography %}
         <div class="item">
