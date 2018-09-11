@@ -6,6 +6,12 @@ from books.utils import roman_to_int
 
 class SectionChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
+        if obj.is_article():
+            return u'{title} - {authors}'.format(
+                title=obj.title,
+                authors=', '.join(author.name for author in obj.authors.all())
+            )
+
         return u'{title} ({page})'.format(
             title=obj.title,
             page=obj.page_number,
@@ -113,7 +119,7 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         note.save()
         self.save_m2m()
 
-        if author_form.cleaned_data['mode'] == 'default' and note.book.details:
+        if author_form.cleaned_data['mode'] == 'default':
             note.set_default_authors()
         elif author_form.cleaned_data['mode'] == 'custom':
             note.authors.add(*author_form.cleaned_data['authors'])
@@ -139,6 +145,9 @@ class SectionForm(forms.ModelForm, PageNumberForm):
         super(SectionForm, self).__init__(*args, **kwargs)
         if book.details is None:
             self.fields.pop('page_number')
+            self.fields.pop('number')
+        else:
+            self.fields.pop('date')
 
     def save(self, author_form):
         """Convert the string 'page' input into an integer (and set in_preface

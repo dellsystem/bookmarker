@@ -2,7 +2,13 @@
 
 
 {% block breadcrumbs %}
-<a class="section" href="{{ book.get_absolute_url }}">View book</a>
+<a class="section" href="{{ book.get_absolute_url }}">View
+    {% if book.is_publication %}
+    publication
+    {% else %}
+    book
+    {% endif %}
+</a>
 <i class="right angle icon divider"></i>
 <div class="active section">View notes</div>
 {% endblock %}

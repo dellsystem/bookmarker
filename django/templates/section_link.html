@@ -4,5 +4,7 @@
     <strong title="{{ section.subtitle }}{% if section.authors.count %} by {{ section.authors.all|join:", " }}{% endif %}">
         {{ section.title|markdownify_title }}
     </strong>
+    {% if not section.is_article %}
     ({{ section.get_page_display }})
+    {% endif %}
 </a>

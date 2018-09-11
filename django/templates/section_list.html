@@ -12,6 +12,9 @@
     {% endifchanged %}
     {% endif %}
     <div class="computer only row">
+        {% if section.is_article %}
+        <div class="twelve wide column">
+        {% else  %}
         <div class="one wide column">
             <div class="ui large circular label {% if section.skipped %}black{% endif %}"
                  {% if section.skipped %}title="Not read yet"{% endif %}>
@@ -19,6 +22,7 @@
             </div>
         </div>
         <div class="eleven wide column">
+        {% endif %}
             <h4 class="ui {% if related %}disabled{% endif %} header">
                 {% if section.number %}{{ section.number }}.{% endif %}
                 {% if related %}
@@ -35,6 +39,9 @@
                 {% if not related %}
                 <div class="ui heart rating display-rating" data-rating="{{ section.rating }}">
                 </div>
+                {% endif %}
+                {% if section.date %}
+                {{ section.date }}
                 {% endif %}
                 {% if section.source_url %}
                 <a href="{{ section.source_url }}">

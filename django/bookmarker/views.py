@@ -181,6 +181,9 @@ def add_section(request, slug):
         if section_form.is_valid() and author_form.is_valid():
             section = section_form.save(author_form)
             messages.success(request, u'Added section: {}'.format(section.title))
+            # If it's a publication, go straight to that section's page.
+            if not book.details:
+                return redirect(section)
         else:
             new_form = False
             messages.error(request, 'Failed to add section')
@@ -211,7 +214,7 @@ def add_section(request, slug):
 
         # If the book is an edited collection, set the author mode to custom.
         author_initial = {}
-        if book.details and book.details.is_edited:
+        if book.details and book.details.is_edited or not book.details:
             author_initial['mode'] = 'custom'
         author_form = ArtefactAuthorForm(prefix='author', initial=author_initial)
 
@@ -535,6 +538,12 @@ def add_note(request, slug):
     section_id = request.GET.get('section')
 
     book = Book.objects.get(slug=slug)
+    # If the "book" is actually a publication, and there is no section passed
+    # as a GET param, just use the most recently-added article/section.
+    if not section_id and book.is_publication():
+        latest_article = book.sections.latest('pk')
+        if latest_article:
+            section_id = latest_article.pk
 
     if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')

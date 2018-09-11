@@ -3,7 +3,13 @@
 {% load markdown_filter %}
 
 {% block breadcrumbs %}
-<div class="active section">View book</div>
+<div class="active section">View
+    {% if book.is_publication %}
+    publication
+    {% else %}
+    book
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
@@ -35,7 +41,12 @@
         {% if not book.completed_sections %}
             <div class="ui fluid buttons">
                 <a class="ui blue icon button" href="{% url 'add_section' book.slug %}">
-                    <i class="plus icon"></i> Add section
+                    <i class="plus icon"></i> Add
+                    {% if book.is_publication %}
+                    article
+                    {% else %}
+                    chapter
+                    {% endif %}
                 </a>
                 {% if book.details %}
                 <button class="ui green icon button"

@@ -4,7 +4,7 @@
     </div>
 </div>
 <div class="computer only row">
-    {% if show_page %}
+    {% if not hide_page %}
     <div class="one wide column">
         <div class="ui big circular label">
             {{ x.get_page_display }}
@@ -14,11 +14,11 @@
     {% else %}
     <div class="sixteen wide column">
     {% endif %}
-        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section hide_page=True only %}
+        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section hide_page=hide_page only %}
     </div>
 </div>
 <div class="mobile tablet only row">
     <div class="sixteen wide column">
-        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section %}
+        {% include 'note_body.html' with note=x highlight=highlight hide_section=hide_section hide_page=hide_page %}
     </div>
 </div>

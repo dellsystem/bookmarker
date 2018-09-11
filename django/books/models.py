@@ -103,6 +103,9 @@ class Book(models.Model):
     def __unicode__(self):
         return self.title
 
+    def is_publication(self):
+        return self.details is None
+
     def get_citation_data(self):
         details = self.details
         if details is None:
@@ -244,6 +247,7 @@ class Section(PageArtefact):
     related_to = models.ForeignKey('self', blank=True, null=True)
     slug = models.SlugField(blank=True)  # only for link-worthy sections
     skipped = models.BooleanField(default=False, help_text='Not yet read')
+    date = models.DateField(blank=True, null=True)  # only publications
 
     class Meta:
         ordering = ['-in_preface', 'page_number']
@@ -253,6 +257,9 @@ class Section(PageArtefact):
             title=self.title,
             book=self.book.title
         )
+
+    def is_article(self):
+        return self.book.is_publication()
 
     def get_absolute_url(self):
         return reverse('view_section', args=[str(self.id)])
@@ -277,7 +284,7 @@ class Section(PageArtefact):
                 set(a.pk for a in details.default_authors.all())
             )
         else:
-            return True
+            return False
 
     def get_citation(self):
         """Gandy, O. H. (2009). Rational discrimination. In _Coming to terms

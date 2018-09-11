@@ -12,7 +12,7 @@
         {% include 'book_header.html' with book=book only %}
     </div>
     <div class="three wide center aligned column">
-        {% if not book.is_processed %}
+        {% if not book.is_processed and not book.is_publication %}
         <form method="post" action="{% url 'mark_complete' book.id %}">
             {% csrf_token %}
             <button class="ui fluid black icon button"

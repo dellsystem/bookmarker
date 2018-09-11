@@ -28,5 +28,5 @@
 <div class="ui divider"></div>
 
 {% include 'note_header.html' with note=note highlight=query only %}
-{% include 'note_body.html' with note=note highlight=query only %}
+{% include 'note_body.html' with note=note hide_page=note.section.is_article highlight=query only %}
 {% endblock %}

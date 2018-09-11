@@ -42,6 +42,9 @@
                         {% if not section.has_default_authors %}
                         {% include 'author_list.html' with authors=section.authors %}
                         {% endif %}
+                        {% if section.date %}
+                        / {{ section.date }}
+                        {% endif %}
                     {% else %}
                     (missing author)
                     {% endif %}
@@ -124,8 +127,10 @@
 
 <div class="ui divider"></div>
 <div class="ui grid">
+    {% with is_article=section.is_article %}
     {% for artefact in section.get_artefacts %}
-    {% include artefact.display_template with x=artefact show_page=True hide_section=True %}
+    {% include artefact.display_template with x=artefact hide_page=is_article hide_section=True %}
     {% endfor %}
+    {% endwith %}
 </div>
 {% endblock %}
