@@ -1,0 +1,25 @@
+{% with book=action.primary_instance %}
+<div class="extra text">
+    <div class="ui grid">
+        <div class="two wide column">
+            <a href="{{ book.get_absolute_url }}">
+                <img src="{{ book.image_url }}" class="ui fluid image" />
+            </a>
+        </div>
+        <div class="fourteen wide column">
+            <h3 class="ui header">
+                <a href="{{ book.get_absolute_url }}">
+                    {{ book.title }}
+                </a>
+                <div class="sub header">
+                {% if book.details and book.details.authors.count %}
+                    {% include 'author_list.html' with authors=book.details.authors %}
+                {% else %}
+                (missing author)
+                {% endif %}
+                </div>
+            </h3>
+        </div>
+    </div>
+</div>
+{% endwith %}

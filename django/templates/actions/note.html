@@ -1,0 +1,41 @@
+{% load markdown_filter %}
+
+{% with note=action.primary_instance %}
+<div class="extra text">
+    {% with book=action.secondary_instance %}
+    <div class="ui grid">
+        <div class="two wide column">
+            <a href="{{ book.get_absolute_url }}">
+                <img src="{{ book.image_url }}" class="ui fluid image" />
+            </a>
+        </div>
+        <div class="fourteen wide column">
+            {% if note %}
+            <h3 class="ui header">
+                <a href="{{ note.get_absolute_url }}">
+                    {{ note.subject|markdownify_title }}
+                </a>
+                {% for tag in note.tags.all %}
+                <a class="ui {{ tag.colour }} label" title="{{ tag.description }}"
+                   href="{{ tag.get_absolute_url }}">
+                    {{ tag.slug }}
+                </a>
+                {% endfor %}
+                <div class="sub header">
+                    <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                </div>
+            </h3>
+            {% include "note_body.html" with note=note truncate=1 only %}
+            {% else %}
+            <div class="ui error message">
+                <div class="header">
+                    {{ action.details }}
+                </div>
+                This note has since been deleted.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endwith %}
+</div>
+{% endwith %}

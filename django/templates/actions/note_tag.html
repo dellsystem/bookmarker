@@ -1,0 +1,14 @@
+{% with note=action.primary_instance %}
+    <div class="extra text">
+    <a href="{{ note.get_absolute_url }}">{{ note.subject }}</a>
+    <br />
+    from
+    <a href="{{ note.book.get_absolute_url }}">{{ note.book }}</a>
+    {% with tag=action.secondary_instance %}
+    <br />
+    <div class="ui {{ tag.colour }} label">
+        <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>
+    </div>
+    {% endwith %}
+    </div>
+{% endwith %}

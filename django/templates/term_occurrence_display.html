@@ -49,10 +49,12 @@
 <i class="quote left icon" title="Defined"></i>
 {% endif %}
 <div class="ui label {{ o.category }}-category">{{ o.category }}</div>
+{% if not hide_timestamp %}
 <i class="ellipsis vertical icon"></i>
 <a href="{{ o.get_absolute_url }}" title="{{ o.added }}">
     {{ o.added|timesince }} ago
 </a>
+{% endif %}
 <i class="ellipsis vertical icon"></i>
 <a href="{% url 'edit_occurrence' o.pk %}">
     <i class="edit icon"></i>

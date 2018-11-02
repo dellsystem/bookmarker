@@ -1,0 +1,7 @@
+{% with author=action.primary_instance %}
+<div class="extra text">
+    <h3 class="ui header">
+        <a href="{{ author.get_absolute_url }}">{{ author }}</a>
+    </h3>
+</div>
+{% endwith %}

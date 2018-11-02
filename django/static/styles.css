@@ -88,3 +88,7 @@ blockquote {
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
+
+.ui.feed>.event>.content .extra.text {
+    max-width: initial !important;
+}

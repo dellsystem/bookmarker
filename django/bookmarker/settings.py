@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'languages',
     'vocab',
     'books',
+    'activity',
 ]
 
 MIDDLEWARE_CLASSES = [

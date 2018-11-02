@@ -1,8 +1,3 @@
-{% extends "base.html" %}
-
-{% block nobreadcrumbs %}{% endblock %}
-
-{% block content %}
 {% if request.user.is_staff %}
 <div class="ui stackable grid">
     <div class="eight wide column">
@@ -11,42 +6,42 @@
             <div class="ui five mini statistics">
                 <div class="statistic">
                     <div class="value">
-                        {{ new_books.count }}
+                        {{ books.new.count }}
                     </div>
                     <div class="label">
-                        <a href="#new_books">New</a>
+                        <a href="{% url 'view_books' 'new' %}">New</a>
                     </div>
                 </div>
                 <div class="statistic">
                     <div class="value">
-                        {{ started_books.count }}
+                        {{ books.started.count }}
                     </div>
                     <div class="label">
-                        <a href="#started_books">In progress</a>
+                        <a href="{% url 'view_books' 'started' %}">Started</a>
                     </div>
                 </div>
                 <div class="statistic">
                     <div class="value">
-                        {{ unread_books.count }}
+                        {{ books.unread.count }}
                     </div>
                     <div class="label">
-                        <a href="#unread_books">Unread</a>
+                        <a href="{% url 'view_books' 'unread' %}">Unread</a>
                     </div>
                 </div>
                 <div class="statistic">
                     <div class="value">
-                        {{ publications.count }}
+                        {{ books.publications.count }}
                     </div>
                     <div class="label">
-                        <a href="#publications">Publications</a>
+                        <a href="{% url 'view_books' 'publications' %}">Publications</a>
                     </div>
                 </div>
                 <div class="statistic">
                     <div class="value">
-                        {{ complete_books.count }}
+                        {{ books.complete.count }}
                     </div>
                     <div class="label">
-                        <a href="{% url 'view_complete' %}">Complete</a>
+                        <a href="{% url 'view_books' 'complete' %}">Complete</a>
                     </div>
                 </div>
             </div>
@@ -85,17 +80,3 @@
     </div>
 </div>
 {% endif %}
-<br />
-
-<h2 id="new_books">New</h2>
-{% include 'book_list.html' with books=new_books %}
-
-<h2 id="started_books">In progress</h2>
-{% include 'book_list.html' with books=started_books %}
-
-<h2 id="publications">Publications</h2>
-{% include 'book_list.html' with books=publications %}
-
-<h2 id="unread_books">Unread</h2>
-{% include 'book_list.html' with books=unread_books %}
-{% endblock %}

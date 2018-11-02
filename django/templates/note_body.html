@@ -7,10 +7,14 @@
         {% if highlight %}
         {{ note.quote|markdownify|highlight_term:highlight }}
         {% else %}
+        {% if truncate %}
+        {{ note.quote|truncatechars:250|markdownify }}
+        {% else %}
         {{ note.quote|markdownify }}
         {% endif %}
+        {% endif %}
     </div>
-    {% if note.comment %}
+    {% if note.comment and not truncate %}
     <div class="ui secondary segment">
         {% if highlight %}
         {{ note.comment|markdownify|highlight_term:highlight }}
@@ -40,5 +44,7 @@
 {% else %}
 <span class="ui red label">missing author</span>
 {% endif %}
+{% if not truncate %}
 <i class="ellipsis vertical icon"></i>
 <span title="{{ note.added }}">{{ note.added|timesince }} ago</a>
+{% endif %}
