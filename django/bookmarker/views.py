@@ -11,10 +11,11 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
+from activity.models import Action
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm
-from books.models import Book, Author, Note, NoteTag, Section, BookDetails
+from books.models import Book, Author, Note, Tag, Section, BookDetails
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
@@ -22,44 +23,81 @@ from vocab.models import Term, TermOccurrence
 
 
 def home(request):
-    if request.user.is_staff:
-        books = Book.objects.filter(is_processed=False).order_by(
-            'is_processed', 'completed_sections', '-pk'
-        ).annotate(
-            num_terms=Count('terms', distinct=True),
-            num_notes=Count('notes', distinct=True),
-        ).prefetch_related('details__default_authors')
+    actions_list = Action.objects.all()
+    paginator = Paginator(actions_list, 25)
 
-        context = {
-            'started_books': books.filter(
-                completed_sections=True
-            ),
-            'new_books': books.filter(
-                completed_sections=False,
-                completed_read=True,
-                details__isnull=False,
-            ),
-            'publications': books.filter(
-                details__isnull=True
-            ),
-            'unread_books': books.filter(completed_read=False),
-            'complete_books': Book.objects.filter(is_processed=True),
-        }
-        return render(request, 'home.html', context)
-    else:
-        return view_complete(request)
+    page = request.GET.get('page')
+    try:
+        actions = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        actions = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        actions = paginator.page(paginator.num_pages)
 
-
-def view_complete(request):
-    books = Book.objects.filter(is_processed=True).annotate(
-        num_notes=Count('notes', distinct=True),
+    all_books = Book.objects.order_by(
+        'is_processed', 'completed_sections', '-pk'
+    ).annotate(
         num_terms=Count('terms', distinct=True),
-    ).prefetch_related('details__default_authors').order_by('-pk')
+        num_notes=Count('notes', distinct=True),
+    ).prefetch_related('details__default_authors')
+
+    books = {
+        'complete': all_books.filter(is_processed=True),
+        'new': all_books.filter(
+            is_processed=False,
+            completed_sections=False,
+            completed_read=True,
+            details__isnull=False,
+        ),
+        'unread': all_books.filter(completed_read=False),
+        'started': all_books.filter(
+            completed_sections=True
+        ),
+        'publications': all_books.filter(
+            details__isnull=True
+        ),
+    }
 
     context = {
         'books': books,
+        'actions': actions,
     }
-    return render(request, 'view_complete.html', context)
+    return render(request, 'activity.html', context)
+
+
+def view_books(request, book_type):
+    all_books = Book.objects.order_by(
+        'is_processed', 'completed_sections', '-pk'
+    ).annotate(
+        num_terms=Count('terms', distinct=True),
+        num_notes=Count('notes', distinct=True),
+    ).prefetch_related('details__default_authors')
+
+    books = {
+        'complete': all_books.filter(is_processed=True),
+        'new': all_books.filter(
+            is_processed=False,
+            completed_sections=False,
+            completed_read=True,
+            details__isnull=False,
+        ),
+        'unread': all_books.filter(completed_read=False),
+        'started': all_books.filter(
+            completed_sections=True
+        ),
+        'publications': all_books.filter(
+            details__isnull=True
+        ),
+    }
+
+    context = {
+        'books': books,
+        'book_type': book_type,
+        'displayed_books': books[book_type],
+    }
+    return render(request, 'view_books.html', context)
 
 
 def view_book(request, slug):
@@ -105,6 +143,12 @@ def edit_book(request, slug):
                 details_form.save()
                 book.details.save()
 
+            Action.objects.create(
+                category='book',
+                verb='edited',
+                details=book.title,
+                primary_id=book.pk,
+            )
             messages.success(request, u'Edited book: {}'.format(book.title))
             return redirect(book)
         else:
@@ -181,6 +225,15 @@ def add_section(request, slug):
         if section_form.is_valid() and author_form.is_valid():
             section = section_form.save(author_form)
             messages.success(request, u'Added section: {}'.format(section.title))
+
+            Action.objects.create(
+                primary_id=section.pk,
+                category='section',
+                verb='added',
+                details=section.title,
+                secondary_id=section.book.pk,
+            )
+
             # If it's a publication, go straight to that section's page.
             if not book.details:
                 return redirect(section)
@@ -340,6 +393,13 @@ def add_term(request, slug):
             else:
                 message = u'Added term: {}'.format(term.text)
 
+            Action.objects.create(
+                category='term',
+                verb='added',
+                primary_id=occurrence.pk,
+                secondary_id=occurrence.book.pk,
+                details=term.text,
+            )
             messages.success(request, message)
         else:
             new_forms = False
@@ -385,6 +445,12 @@ def add_author(request):
             link=gr_author.link,
             slug=slugify(gr_author.name)[:50],
         )
+        Action.objects.create(
+            category='author',
+            primary_id=author.pk,
+            verb='added',
+            details=author.name,
+        )
         messages.success(
             request,
             u'Added author: {}'.format(author.name),
@@ -418,6 +484,13 @@ def add_book(request):
                 slug=slugify(gr_book.title)[:50],
             )
 
+            Action.objects.create(
+                category='book',
+                primary_id=book.pk,
+                details=book.title,
+                verb='added',
+            )
+
             messages.success(
                 request,
                 u'Added book: {}'.format(book.title),
@@ -435,6 +508,12 @@ def add_book(request):
                         name=gr_author.name,
                         link=gr_author.link,
                         slug=slugify(gr_author.name)[:50],
+                    )
+                    Action.objects.create(
+                        category='author',
+                        primary_id=author.pk,
+                        details=author.name,
+                        verb='added',
                     )
                     messages.success(
                         request,
@@ -456,6 +535,13 @@ def add_book(request):
 
             if book_form.is_valid():
                 book = book_form.save()
+
+                Action.objects.create(
+                    category='book',
+                    primary_id=book.pk,
+                    details=book.title,
+                    verb='added',
+                )
 
                 if details_form and details_form.is_valid():
                     details = details_form.save()
@@ -556,6 +642,13 @@ def add_note(request, slug):
 
         if note_form.is_valid() and author_form.is_valid():
             note = note_form.save(author_form)
+            Action.objects.create(
+                primary_id=note.pk,
+                category='note',
+                verb='added',
+                details=note.subject,
+                secondary_id=note.book.pk,
+            )
 
             if note.section:
                 message = u'Added note {note} to section {section}'.format(
@@ -876,6 +969,19 @@ def edit_section(request, section_id):
     section = Section.objects.get(pk=section_id)
 
     if request.method == 'POST':
+        if request.POST.get('submit') == 'delete':
+            messages.success(
+                request, u'Deleted section: {}'.format(section.title)
+            )
+            Action.objects.create(
+                category='section',
+                verb='deleted',
+                details=section.title,
+                secondary_id=section.book.pk,
+            )
+            section.delete()
+            return redirect('home')
+
         section_form = SectionForm(
             section.book, request.POST, instance=section, prefix='section'
         )
@@ -888,6 +994,15 @@ def edit_section(request, section_id):
             messages.success(
                 request, u'Edited section: {}'.format(section.title)
             )
+
+            Action.objects.create(
+                primary_id=section.pk,
+                verb='edited',
+                category='section',
+                details=section.title,
+                secondary_id=section.book.pk,
+            )
+
             return redirect(section.book)
         else:
             messages.error(request, 'Failed to save section')
@@ -1119,10 +1234,30 @@ def edit_note(request, note_id):
     note = Note.objects.get(pk=note_id)
 
     if request.method == 'POST':
+        if request.POST.get('submit') == 'delete':
+            messages.success(
+                request, u'Deleted note: {}'.format(note.subject)
+            )
+            Action.objects.create(
+                category='note',
+                verb='deleted',
+                details=note.subject,
+                secondary_id=note.book.pk,
+            )
+            note.delete()
+            return redirect('home')
+
         note_form = NoteForm(note.book, request.POST, instance=note, prefix='note')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
         if note_form.is_valid() and author_form.is_valid():
             note = note_form.save(author_form)
+            Action.objects.create(
+                primary_id=note.pk,
+                verb='edited',
+                category='note',
+                details=note.subject,
+                secondary_id=note.book.pk,
+            )
             messages.success(
                 request, u'Edited note: {}'.format(note.subject)
             )
@@ -1157,7 +1292,7 @@ def edit_note(request, note_id):
 
 
 def cite_tag(request, slug):
-    tag = NoteTag.objects.get(slug=slug)
+    tag = Tag.objects.get(slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
@@ -1172,7 +1307,7 @@ def cite_tag(request, slug):
 
 
 def view_tag(request, slug):
-    tag = NoteTag.objects.get(slug=slug)
+    tag = Tag.objects.get(slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
@@ -1197,7 +1332,7 @@ def view_tag(request, slug):
 
 
 def view_all_tags(request):
-    tags = NoteTag.objects.all()
+    tags = Tag.objects.all()
 
     context = {
         'tags': tags,

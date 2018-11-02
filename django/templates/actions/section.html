@@ -1,0 +1,40 @@
+{% with section=action.primary_instance %}
+<div class="extra text">
+    {% with book=action.secondary_instance %}
+    <div class="ui grid">
+        <div class="two wide column">
+            <a href="{{ book.get_absolute_url }}">
+                <img src="{{ book.image_url }}" class="ui fluid image" />
+            </a>
+        </div>
+        <div class="fourteen wide column">
+            {% if section %}
+            <h3 class="ui header">
+                <a href="{{ section.get_absolute_url }}">
+                    {{ section.title }}
+                </a>
+                {% if section.authors.count %}
+                    {% include 'author_list.html' with authors=section.authors %}
+                    {% if section.date %}
+                    / {{ section.date }}
+                    {% endif %}
+                {% else %}
+                (missing author)
+                {% endif %}
+                <div class="sub header">
+                    <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                </div>
+            </h3>
+            {% else %}
+            <div class="ui error message">
+                <div class="header">
+                    {{ action.details }}
+                </div>
+                This section has since been deleted.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endwith %}
+</div>
+{% endwith %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Author, Book, Note, NoteTag, Section
+from .models import Author, Book, Note, Tag, Section
 
 
 @admin.register(Author)
@@ -26,6 +26,6 @@ class NoteAdmin(admin.ModelAdmin):
     search_fields = ['subject', 'quote', 'comment']
 
 
-@admin.register(NoteTag)
-class NoteTagAdmin(admin.ModelAdmin):
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     list_display = ['slug', 'description', 'colour']

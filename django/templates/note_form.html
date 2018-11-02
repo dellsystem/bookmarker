@@ -73,10 +73,17 @@
             {% endif %}
         </div>
         <div class="ui basic center aligned segment">
-            <button type="submit" name="submit"
+            <button type="submit" name="submit" value=""
                     class="ui blue button">
                 Submit
             </button>
+            {% if show_delete %}
+            <button type="submit" name="submit" value="delete"
+                    class="ui red icon button">
+                <i class="x icon"></i>
+                Delete
+            </button>
+            {% endif %}
         </div>
     </form>
 </div>

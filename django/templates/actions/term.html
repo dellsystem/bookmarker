@@ -1,0 +1,33 @@
+{% load markdown_filter %}
+
+{% with o=action.primary_instance %}
+<div class="extra text">
+    {% with book=action.secondary_instance %}
+    <div class="ui grid">
+        <div class="two wide column">
+            <a href="{{ book.get_absolute_url }}">
+                <img src="{{ book.image_url }}" class="ui fluid image" />
+            </a>
+        </div>
+        <div class="fourteen wide column">
+            {% if o %}
+            <h3 class="ui header">
+                <a href="{{ o.get_absolute_url }}">{{ o.term }}</a>
+                <div class="sub header">
+                    <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                </div>
+            </h3>
+            {% include 'term_occurrence_display.html' with o=o hide_timestamp=1 only %}
+            {% else %}
+            <div class="ui error message">
+                <div class="header">
+                    {{ action.details }}
+                </div>
+                This vocabulary term has since been deleted.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endwith %}
+</div>
+{% endwith %}

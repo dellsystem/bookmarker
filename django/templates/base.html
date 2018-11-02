@@ -7,7 +7,7 @@
     <title>Bookmarker</title>
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css" />
-    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/styles.css?1" />
     <link rel="apple-touch-icon-precomposed" href="/static/favicon-152.png">
     <link rel="icon" href="/static/favicon-32.png" sizes="32x32">
     <link rel="icon" href="/static/favicon-16.png" sizes="32x32">
@@ -21,13 +21,30 @@
                 </a>
             </div>
             <div class="ui dropdown item">
+                Books
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item" href="{% url 'view_books' 'new' %}">
+                        New
+                    </a>
+                    <a class="item" href="{% url 'view_books' 'started' %}">
+                        Started
+                    </a>
+                    <a class="item" href="{% url 'view_books' 'unread' %}">
+                        Unread
+                    </a>
+                    <a class="item" href="{% url 'view_books' 'publications' %}">
+                        Publications
+                    </a>
+                    <a class="item" href="{% url 'view_books' 'complete' %}">
+                        Complete
+                    </a>
+                </div>
+            </div>
+            <div class="ui dropdown item">
                 Browse
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item" href="{% url 'view_complete' %}">
-                        <i class="book icon"></i>
-                        Complete
-                    </a>
                     <a class="item" href="{% url 'view_all_authors' %}">
                         <i class="user icon"></i>
                         Authors
