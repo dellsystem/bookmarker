@@ -69,7 +69,7 @@ class Action(models.Model):
     secondary_id = models.IntegerField(blank=True, null=True)
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
     verb = models.CharField(max_length=10)
-    details = models.CharField(max_length=100, blank=True)
+    details = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ['-timestamp']
