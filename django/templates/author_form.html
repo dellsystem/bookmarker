@@ -1,0 +1,36 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+    {{ author_form.errors }}
+
+    <div class="ui segment">
+        <div class="ui fields">
+            <div class="two wide field">
+                <label>Goodreads ID</label>
+                {{ author_form.goodreads_id }}
+            </div>
+            <div class="fourteen wide field">
+                <label>Link</label>
+                {{ author_form.link }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="eight wide field">
+                <label>Name</label>
+                    {{ author_form.name }}
+                </label>
+            </div>
+            <div class="eight wide field">
+                <label>Slug</label>
+                    {{ author_form.slug }}
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui center aligned segment">
+        <button type="submit" name="submit" value="submit"
+                class="ui blue button">
+            Submit
+        </button>
+    </div>
+</form>
