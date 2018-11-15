@@ -243,3 +243,9 @@ class BookForm(forms.ModelForm):
             'summary': forms.Textarea(attrs={'rows': 3}),
             'comments': forms.Textarea(attrs={'rows': 3}),
         }
+
+
+class AuthorForm(forms.ModelForm):
+    class Meta:
+        model = Author
+        exclude = ['goodreads_id']

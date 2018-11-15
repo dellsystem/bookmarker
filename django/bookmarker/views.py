@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 from activity.models import Action
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
-                        BookDetailsForm
+                        BookDetailsForm, AuthorForm
 from books.models import Book, Author, Note, Tag, Section, BookDetails
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
@@ -434,29 +434,58 @@ def add_term(request, slug):
 @staff_member_required
 def add_author(request):
     goodreads_id = request.POST.get('goodreads_id')
-    gr_author = CLIENT.author(goodreads_id)
+    if goodreads_id:
+        gr_author = CLIENT.author(goodreads_id)
 
-    try:
-        author = Author.objects.get(goodreads_id=goodreads_id)
-    except Author.DoesNotExist:
-        author = Author.objects.create(
-            goodreads_id=goodreads_id,
-            name=gr_author.name,
-            link=gr_author.link,
-            slug=slugify(gr_author.name)[:50],
-        )
-        Action.objects.create(
-            category='author',
-            primary_id=author.pk,
-            verb='added',
-            details=author.name,
-        )
-        messages.success(
-            request,
-            u'Added author: {}'.format(author.name),
-        )
+        try:
+            author = Author.objects.get(goodreads_id=goodreads_id)
+        except Author.DoesNotExist:
+            author = Author.objects.create(
+                goodreads_id=goodreads_id,
+                name=gr_author.name,
+                link=gr_author.link,
+                slug=slugify(gr_author.name)[:50],
+            )
+            Action.objects.create(
+                category='author',
+                primary_id=author.pk,
+                verb='added',
+                details=author.name,
+            )
+            messages.success(
+                request,
+                u'Added author: {}'.format(author.name),
+            )
 
-    return redirect(author)
+        return redirect(author)
+    else:
+        if request.POST.get('submit'):
+            author_form = AuthorForm(request.POST)
+
+            if author_form.is_valid():
+                author = author_form.save()
+
+                Action.objects.create(
+                    category='author',
+                    primary_id=author.pk,
+                    details=author.name,
+                    verb='added',
+                )
+                messages.success(request, 'Added author: %s' % author.name)
+                return redirect(author)
+            else:
+                messages.error(
+                    request,
+                    'Error creating author'
+                )
+        else:
+            author_form = AuthorForm()
+
+        context = {
+            'author_form': author_form,
+        }
+
+        return render(request, 'add_author.html', context)
 
 
 @staff_member_required
