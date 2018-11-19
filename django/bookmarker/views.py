@@ -572,24 +572,31 @@ def add_book(request):
                     verb='added',
                 )
 
-                if details_form and details_form.is_valid():
-                    details = details_form.save()
-                    details.book = book
-                    details.save()
-                    messages.success(request, 'Added book with details')
-                    return redirect(book)
+                if details_form:
+                    messages.error(request, 'Has details form')
+                    if details_form.is_valid():
+                        details = details_form.save()
+                        book.details = details
+                        book.save()
+                        messages.success(request, 'Added book with details')
+                        return redirect(book)
+                    else:
+                        messages.error(
+                            request,
+                            'Error with details form'
+                        )
                 else:
+                    messages.error(request, 'Does not have details form')
                     messages.success(request, 'Added book')
                     return redirect(book)
             else:
                 messages.error(
                     request,
-                    'Error'
+                    'Error with book form'
                 )
         else:
             book_form = BookForm()
             details_form = BookDetailsForm()
-            details_form.fields['goodreads_id'] = None
 
         context = {
             'book_form': book_form,
