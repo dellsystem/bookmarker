@@ -14,7 +14,7 @@
 
 {% block content %}
 <div class="ui stackable grid">
-    <div class="thirteen wide column">
+    <div class="twelve wide column">
         <h2 class="ui header">
             {{ book.title }}
             <a href="{% url 'edit_book' book.slug %}">
@@ -34,7 +34,7 @@
             {% endif %}
         </h2>
     </div>
-    <div class="three wide center aligned column">
+    <div class="four wide center aligned column">
         {% if not book.is_processed %}
         <form method="post" action="{% url 'mark_complete' book.id %}">
         {% csrf_token %}
