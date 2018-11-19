@@ -27,6 +27,32 @@
 </div>
 <div class="ui divider"></div>
 
+<div class="ui center aligned basic segment">
+    <div class="ui right pagination menu">
+        {% if previous_note %}
+        <a class="item" href="{{ previous_note.get_absolute_url }}">
+           <i class="left angle icon"></i>
+           {{ previous_note.subject }}
+        </a>
+        {% else %}
+        <a class="disabled item">No previous note</a>
+        {% endif %}
+
+        <a class="active item">
+            {{ note_count }} notes in {{ note_container }}
+        </a>
+
+        {% if next_note %}
+        <a class="item" href="{{ next_note.get_absolute_url }}">
+           {{ next_note.subject }}
+           <i class="right angle icon"></i>
+        </a>
+        {% else %}
+        <a class="disabled item"><i class="right angle icon"></i></a>
+        {% endif %}
+    </div>
+</div>
+
 {% include 'note_header.html' with note=note highlight=query only %}
 {% include 'note_body.html' with note=note hide_page=note.section.is_article highlight=query only %}
 {% endblock %}

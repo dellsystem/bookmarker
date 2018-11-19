@@ -813,10 +813,37 @@ def view_notes(request, slug):
 
 def view_note(request, note_id):
     note = Note.objects.get(pk=note_id)
+    book = note.book
     query = request.GET.get('q')
 
+    # If it's a publication or edited book, limit to the section. Otherwise,
+    # use the whole book.
+    if book.details is None or book.details.is_edited:
+        note_container = 'section'
+        notes = Note.objects.filter(section=note.section)
+    else:
+        note_container = 'book'
+        notes = Note.objects.filter(book=note.book)
+
+    previous_note = None
+    next_note = None
+    found_note = False
+    for n in notes:
+        if found_note:
+            next_note = n
+            break
+        elif n.pk != note.pk:
+            previous_note = n
+
+        if n.pk == note.pk:
+            found_note = True
+
     context = {
-        'book': note.book,
+        'note_count': notes.count(),
+        'note_container': note_container,
+        'previous_note': previous_note,
+        'next_note': next_note,
+        'book': book,
         'note': note,
         'query': query,
     }
