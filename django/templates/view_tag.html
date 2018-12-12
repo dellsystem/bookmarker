@@ -3,6 +3,8 @@
 {% load humanize %}
 {% load markdown_filter %}
 
+{% block title %}{{ tag.slug }} [tag]{% endblock %}
+
 {% block breadcrumbs %}
 <div class="active section">View tag</div>
 {% endblock %}

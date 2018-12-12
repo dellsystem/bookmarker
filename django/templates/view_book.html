@@ -2,6 +2,8 @@
 
 {% load markdown_filter %}
 
+{% block title %}{{ book.title }}{% endblock %}
+
 {% block breadcrumbs %}
 <div class="active section">View
     {% if book.is_publication %}
