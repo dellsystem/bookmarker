@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 
+{% block title %}{{ book.title }} [notes]{% endblock %}
 
 {% block breadcrumbs %}
 <a class="section" href="{{ book.get_absolute_url }}">View

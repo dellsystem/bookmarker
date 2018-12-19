@@ -92,6 +92,8 @@
     </div>
     {% endif %}
 
+    {{ book_form.errors }}
+
     <div class="ui segment">
         {% with error=book_form.title.errors %}
         <div class="{% if error %}error{% endif %} ui field">
@@ -122,8 +124,8 @@
             </div>
         </div>
         <div class="ui fields">
-            <div class="ten wide field">
-                <label>Slug</label>
+            <div class="{% if error %}error{% endif %} ten wide field">
+                <label>Slug{% if error %} (REQUIRED){% endif %}</label>
                 {{ book_form.slug }}
             </div>
             <div class="two wide field">

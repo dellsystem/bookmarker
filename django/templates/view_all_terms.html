@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+{% block title %}
+    {% if author %}
+    {{ author.name }} [terms]
+    {% else %}
+    Terms
+    {% endif %}
+{% endblock %}
+
+
 {% block breadcrumbs %}
 <div class="active section">View all terms</div>
 {% endblock %}

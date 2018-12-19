@@ -2,6 +2,8 @@
 
 {% load markdown_filter %}
 
+{% block title %}Search: {{ query }} {% if mode %}[{{ mode }}]{% endif %}{% endblock %}
+
 {% block breadcrumbs %}
 <div class="active section">Search</div>
 {% endblock %}

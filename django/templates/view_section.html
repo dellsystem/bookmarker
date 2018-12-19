@@ -2,6 +2,14 @@
 
 {% load markdown_filter %}
 
+{% comment %}If the section title is long, omit the book title.{% endcomment %}
+{% block title %}
+    {{ section.title }}
+    {% if section.title|length < 20 %}
+    - {{ book.title }}
+    {% endif %}
+{% endblock %}
+
 {% block breadcrumbs %}
 <a class="section" href="{{ book.get_absolute_url }}">View book</a>
 <i class="right angle icon divider"></i>
