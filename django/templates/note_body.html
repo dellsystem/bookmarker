@@ -8,7 +8,7 @@
         {{ note.quote|markdownify|highlight_term:highlight }}
         {% else %}
         {% if truncate %}
-        {{ note.quote|truncatechars:250|markdownify }}
+        {{ note.quote|truncatechars:300|markdownify }}
         {% else %}
         {{ note.quote|markdownify }}
         {% endif %}
@@ -27,6 +27,13 @@
 
 {% if not hide_page %}
     &mdash;p.{{ note.get_page_display }}
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
+{% if show_book %}
+    <i class="book icon"></i>
+    <a href="{{ note.book.get_absolute_url }}">
+        {{ note.book.title }}
+    </a>
     <i class="ellipsis vertical icon"></i>
 {% endif %}
 {% if not hide_section and note.section %}

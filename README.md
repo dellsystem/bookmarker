@@ -1,4 +1,4 @@
-![Bookmarker](https://github.com/dellsystem/bookmarker/raw/master/static/bookmarker.png)
+![Bookmarker](https://raw.githubusercontent.com/dellsystem/bookmarker/master/django/static/bookmarker.png)
 
 A personal project to help me retain information from the books I'm reading. 
 
@@ -23,7 +23,7 @@ Django 1.10. Run `python django/manage.py runserver`.
 * `GOODREADS_KEY` and `GOODREADS_SECRET` for using the [Goodreads API](https://www.goodreads.com/api/keys)
 
 CAVEATS: The `page_number` field on Section, Note, TermOccurrence needs to be
-converted into an int on the database level.  See [this commit](/dellsystem/bookmarker/commit/9838ef6a391b50f8e4fd7cdfd8914437d25bc652)
+converted into an int on the database level.  See [this commit](https://github.com/dellsystem/bookmarker/commit/9838ef6a391b50f8e4fd7cdfd8914437d25bc652)
 for details.
 
 License

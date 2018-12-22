@@ -17,7 +17,7 @@
                     <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
                 </div>
             </h3>
-            {% include 'term_occurrence_display.html' with o=o hide_timestamp=1 only %}
+            {% include 'term_occurrence_display.html' with o=o truncate=True only %}
             {% else %}
             <div class="ui error message">
                 <div class="header">

@@ -29,4 +29,4 @@ class NoteAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ['slug', 'description', 'colour']
+    list_display = ['slug', 'description', 'colour', 'faved']

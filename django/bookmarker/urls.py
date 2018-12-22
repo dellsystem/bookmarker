@@ -56,6 +56,8 @@ urlpatterns = [
         name='edit_note'),
     url(r'^term/(?P<term_id>\d+)$', bookmarker.views.view_term,
         name='view_term'),
+    url(r'^term/(?P<term_id>\d+)/flag$', bookmarker.views.flag_term,
+        name='flag_term'),
     url(r'^occurrence/(?P<occurrence_id>\d+)/edit$',
         bookmarker.views.edit_occurrence,
         name='edit_occurrence'),
@@ -72,7 +74,9 @@ urlpatterns = [
     url(r'^stats$', bookmarker.views.view_stats, name='view_stats'),
     url(r'^api/suggest.json$', bookmarker.views.suggest_terms),
     url(r'^api/define.json$', bookmarker.views.get_definition),
+    url(r'^faves$', bookmarker.views.view_faves, name='view_faves'),
     url(r'^search$', bookmarker.views.search, name='search'),
+    url(r'^search.json$', bookmarker.views.search_json, name='search_json'),
 ]
 
 

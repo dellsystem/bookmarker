@@ -26,17 +26,24 @@
     &mdash;p.{{ o.get_page_display }}
     <i class="ellipsis vertical icon"></i>
 {% endif %}
+{% if show_book %}
+    <i class="book icon"></i>
+    <a href="{{ o.book.get_absolute_url }}">
+        {{ o.book.title }}
+    </a>
+    <i class="ellipsis vertical icon"></i>
+{% endif %}
 {% if not hide_section and o.section %}
     {% include "section_link.html" with section=o.section only %}
     <i class="ellipsis vertical icon"></i>
 {% endif %}
 {% if o.authors.count %}
     {% if o.has_default_authors %}
-    <span title="{{ o.authors.all|join:", " }}">
-        default author
-    </span>
-    {% else %}
     {% include 'author_list.html' with authors=o.authors %}
+    {% else %}
+    <strong>
+    {% include 'author_list.html' with authors=o.authors %}
+    </strong>
     {% endif %}
 {% else %}
 <span class="ui red label">missing author</span>
@@ -49,13 +56,13 @@
 <i class="quote left icon" title="Defined"></i>
 {% endif %}
 <div class="ui label {{ o.category }}-category">{{ o.category }}</div>
-{% if not hide_timestamp %}
+{% if not truncate %}
 <i class="ellipsis vertical icon"></i>
 <a href="{{ o.get_absolute_url }}" title="{{ o.added }}">
     {{ o.added|timesince }} ago
 </a>
-{% endif %}
 <i class="ellipsis vertical icon"></i>
 <a href="{% url 'edit_occurrence' o.pk %}">
     <i class="edit icon"></i>
 </a>
+{% endif %}

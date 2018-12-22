@@ -1,17 +1,20 @@
 import collections
 import datetime
+import random
+import re
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
+from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
-from activity.models import Action
+from activity.models import Action, FILTER_CATEGORIES
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm
@@ -24,8 +27,14 @@ from vocab.models import Term, TermOccurrence
 
 def home(request):
     actions_list = Action.objects.all()
-    paginator = Paginator(actions_list, 25)
 
+    mode = request.GET.get('mode')
+    if mode in FILTER_CATEGORIES:
+        actions_list = actions_list.filter(category=mode)
+    else:
+        mode = 'all'
+
+    paginator = Paginator(actions_list, 25)
     page = request.GET.get('page')
     try:
         actions = paginator.page(page)
@@ -63,6 +72,8 @@ def home(request):
     context = {
         'books': books,
         'actions': actions,
+        'mode': mode,
+        'filter_categories': sorted(FILTER_CATEGORIES),
     }
     return render(request, 'activity.html', context)
 
@@ -488,6 +499,7 @@ def add_author(request):
         return render(request, 'add_author.html', context)
 
 
+GR_IMAGE_URL_RE = re.compile(r'm(?=/\d+.jpg$)')
 @staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
@@ -506,11 +518,16 @@ def add_book(request):
                 num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
             )
 
+            # Replace the 'm' in '1234m/12345.jpg' with 'l'
+            image_url = GR_IMAGE_URL_RE.sub('l', gr_book.image_url)
+            # If there's a :, strip out everything after it for the slug.
+            slug = slugify(gr_book.title.split(':')[0])
+
             book = Book.objects.create(
                 details=details,
                 title=gr_book.title,
-                image_url=gr_book.image_url,
-                slug=slugify(gr_book.title)[:50],
+                image_url=image_url,
+                slug=slug,
             )
 
             Action.objects.create(
@@ -865,6 +882,24 @@ def view_occurrence(request, occurrence_id):
     return render(request, 'view_occurrence.html', context)
 
 
+@require_POST
+def flag_term(request, term_id):
+    term = Term.objects.get(pk=term_id)
+    action = request.POST.get('action')
+    if term.flagged and action == 'unflag':
+        term.flagged = False
+        term.save()
+        messages.success(request, 'Term unflagged')
+    elif not term.flagged and action == 'flag':
+        term.flagged = True
+        term.save()
+        messages.success(request, 'Term flagged')
+    else:
+        messages.error(request, 'Term flag status not changed')
+
+    return redirect(term)
+
+
 def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
     query = request.GET.get('q')
@@ -964,7 +999,7 @@ def view_author(request, slug):
 
 
 def view_all_terms(request):
-    terms = Term.objects.order_by('text')
+    terms = Term.objects.order_by(Lower('text'))
 
     author_pk = request.GET.get('author')
     author = None
@@ -1108,6 +1143,47 @@ def view_section(request, section_id):
     }
 
     return render(request, 'view_section.html', context)
+
+
+def search_json(request):
+    """Suggest authors/books/sections with that name"""
+    query = request.GET.get('q')
+    books = []
+    authors = []
+    sections = []
+    if len(query) >= 3:
+        for book in Book.objects.filter(title__icontains=query):
+            books.append({
+                'title': book.title,
+                'url': book.get_absolute_url(),
+            })
+        for author in Author.objects.filter(name__icontains=query):
+            authors.append({
+                'title': author.name,
+                'url': author.get_absolute_url(),
+            })
+        for section in Section.objects.filter(title__icontains=query):
+            sections.append({
+                'title': section.title,
+                'url': section.get_absolute_url(),
+            })
+
+    return JsonResponse({
+        'results': {
+            'books': {
+                'name': 'Books',
+                'results': books,
+            },
+            'authors': {
+                'name': 'Authors',
+                'results': authors,
+            },
+            'sections': {
+                'name': 'Sections',
+                'results': sections,
+            },
+        }
+    })
 
 
 def search(request):
@@ -1402,3 +1478,49 @@ def view_all_tags(request):
     }
 
     return render(request, 'view_all_tags.html', context)
+
+
+def view_faves(request):
+    strict = bool(request.GET.get('strict'))
+    min_rating = 5 if strict else 4
+
+    tags = Tag.objects.filter(faved=True).prefetch_related('notes')
+    fave_sections = Section.objects.filter(rating__gte=min_rating)
+    articles = fave_sections.filter(book__details=None).prefetch_related(
+        'authors', 'book',
+    )
+    chapters = fave_sections.exclude(book__details=None).prefetch_related(
+        'authors', 'book'
+    )
+    chapters_books = set(chapters.values_list('book', flat=True))
+
+    # Randomly choose a note from the above tags/articles/chapters.
+    note_ids = set(tags.values_list('notes__id', flat=True))
+    note_ids |= set(articles.values_list('notes__id', flat=True))
+    note_ids |= set(chapters.values_list('notes__id', flat=True))
+    random_note = Note.objects.get(pk=random.choice(list(note_ids)))
+
+    # Randomly choose a term occurrence (with a non-empty quote) for a flagged term.
+    occurrence_ids = TermOccurrence.objects.filter(
+        term__flagged=True,
+    ).exclude(
+        quote='',
+    ).values_list(
+        'pk',
+        flat=True
+    )
+    random_vocab = TermOccurrence.objects.get(pk=random.choice(occurrence_ids))
+
+    # Also include any books that are not covered by the sections.
+    books = Book.objects.filter(details__rating__gte=min_rating).exclude(id__in=chapters_books)
+
+    context = {
+        'strict': strict,
+        'random_note': random_note,
+        'random_vocab': random_vocab,
+        'tags': tags,
+        'articles': articles,
+        'chapters': chapters,
+        'books': books,
+    }
+    return render(request, 'view_faves.html', context)
