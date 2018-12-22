@@ -92,3 +92,8 @@ blockquote {
 .ui.feed>.event>.content .extra.text {
     max-width: initial !important;
 }
+
+#site-search>.results {
+    left: unset;
+    right: 0;
+}
