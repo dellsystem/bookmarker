@@ -14,75 +14,7 @@
 </head>
 <body>
     <div class="ui container">
-        <div class="ui large stackable menu" id="navbar">
-            <div class="active item">
-                <a href="{% url 'home' %}">
-                    <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
-                </a>
-            </div>
-            <div class="ui dropdown item">
-                Books
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a class="item" href="{% url 'view_books' 'new' %}">
-                        New
-                    </a>
-                    <a class="item" href="{% url 'view_books' 'started' %}">
-                        Started
-                    </a>
-                    <a class="item" href="{% url 'view_books' 'unread' %}">
-                        Unread
-                    </a>
-                    <a class="item" href="{% url 'view_books' 'publications' %}">
-                        Publications
-                    </a>
-                    <a class="item" href="{% url 'view_books' 'complete' %}">
-                        Complete
-                    </a>
-                </div>
-            </div>
-            <div class="ui dropdown item">
-                Browse
-                <i class="dropdown icon"></i>
-                <div class="menu">
-                    <a class="item" href="{% url 'view_all_authors' %}">
-                        <i class="user icon"></i>
-                        Authors
-                    </a>
-                    <a class="item" href="{% url 'view_all_terms' %}">
-                        <i class="flag icon"></i>
-                        Terms
-                    </a>
-                    <a class="item" href="{% url 'view_all_notes' %}">
-                        <i class="sticky note icon"></i>
-                        Notes
-                    </a>
-                    <a class="item" href="{% url 'view_all_tags' %}">
-                        <i class="tag icon"></i>
-                        Tags
-                    </a>
-                </div>
-            </div>
-            <div class="item">
-                <a href="{% url 'view_stats' %}">Stats</a>
-            </div>
-            <div class="item">
-                <a href="{% url 'admin:index' %}">Admin</a>
-            </div>
-            <div class="right item">
-                <form action="{% url 'search' %}">
-                    <div class="ui search" id="site-search">
-                        <div class="ui icon input">
-                            <input name="q" type="text" placeholder="Search..."
-                                   class="prompt"
-                                   value="{% if query %}{{ query }}{% endif %}">
-                            <i class="search icon"></i>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
+        {% include "menu.html" %}
         {% for message in messages %}
         <div class="ui {{ message.tags }} icon message">
             {% if message.level > 25 %}
