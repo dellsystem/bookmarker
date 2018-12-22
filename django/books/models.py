@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import collections
 from heapq import merge
 import operator
 
@@ -433,12 +434,27 @@ class Tag(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     colour = models.CharField(blank=True, max_length=50)
+    faved = models.BooleanField(
+        default=False,
+        help_text='Whether it shows up in the "View faves" page'
+    )
 
     def __unicode__(self):
         return self.slug
 
     def get_absolute_url(self):
         return reverse('view_tag', args=[self.slug])
+
+    def get_authors(self, limit=10):
+        author_ids = self.notes.values_list('authors__id', flat=True)
+        counter = collections.Counter(author_ids)
+
+        # Return the authors in order of note count (descending), with a limit
+        authors = []
+        for author_id, count in counter.most_common(limit):
+            if author_id is not None:
+                authors.append(Author.objects.get(pk=author_id))
+        return authors
 
     def get_bibliography(self):
         book_ids = set()

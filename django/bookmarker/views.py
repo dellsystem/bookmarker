@@ -1,5 +1,6 @@
 import collections
 import datetime
+import random
 import re
 
 from django.contrib import messages
@@ -1469,3 +1470,49 @@ def view_all_tags(request):
     }
 
     return render(request, 'view_all_tags.html', context)
+
+
+def view_faves(request):
+    strict = bool(request.GET.get('strict'))
+    min_rating = 5 if strict else 4
+
+    tags = Tag.objects.filter(faved=True).prefetch_related('notes')
+    fave_sections = Section.objects.filter(rating__gte=min_rating)
+    articles = fave_sections.filter(book__details=None).prefetch_related(
+        'authors', 'book',
+    )
+    chapters = fave_sections.exclude(book__details=None).prefetch_related(
+        'authors', 'book'
+    )
+    chapters_books = set(chapters.values_list('book', flat=True))
+
+    # Randomly choose a note from the above tags/articles/chapters.
+    note_ids = set(tags.values_list('notes__id', flat=True))
+    note_ids |= set(articles.values_list('notes__id', flat=True))
+    note_ids |= set(chapters.values_list('notes__id', flat=True))
+    random_note = Note.objects.get(pk=random.choice(list(note_ids)))
+
+    # Randomly choose a term occurrence (with a non-empty quote) for a flagged term.
+    occurrence_ids = TermOccurrence.objects.filter(
+        term__flagged=True,
+    ).exclude(
+        quote='',
+    ).values_list(
+        'pk',
+        flat=True
+    )
+    random_vocab = TermOccurrence.objects.get(pk=random.choice(occurrence_ids))
+
+    # Also include any books that are not covered by the sections.
+    books = Book.objects.filter(details__rating__gte=min_rating).exclude(id__in=chapters_books)
+
+    context = {
+        'strict': strict,
+        'random_note': random_note,
+        'random_vocab': random_vocab,
+        'tags': tags,
+        'articles': articles,
+        'chapters': chapters,
+        'books': books,
+    }
+    return render(request, 'view_faves.html', context)

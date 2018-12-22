@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% load markdown_filter %}
+
+{% block title %}View faves{% endblock %}
+
+{% block breadcrumbs %}
+<div class="active section">View faves</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="twelve wide column">
+        <h1 class="ui header">
+            View faves
+            {% if strict %}(STRICT){% endif %}
+            <div class="sub header">
+                {% if not strict%}4 to {% endif %}5 star sections/books, tagged notes, etc. For writing inspiration.
+            </div>
+        </h1>
+    </div>
+    <div class="four wide right aligned column">
+        {% if strict %}
+        <a href="?" class="ui button">
+            Show 4-star ratings
+        </a>
+        {% else %}
+        <a href="?strict=1" class="ui blue button">
+            Hide 4-star ratings
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="ui divider"></div>
+
+<h2>
+    Random
+</h2>
+<div class="ui two column stackable grid">
+    <div class="column">
+        <h3>
+            <i class="yellow sticky note icon"></i>
+            <a href="{{ random_note.get_absolute_url }}">
+                {{ random_note.subject|markdownify_title }}
+            </a>
+        </h3>
+        {% include "note_body.html" with note=random_note truncate=True hide_page=True show_book=True %}
+    </div>
+    <div class="column">
+        <h3>
+            <i class="blue flag icon"></i>
+            <a href="{{ random_vocab.term.get_absolute_url }}">
+                {{ random_vocab.term.text }}
+            </a>
+            ({{ random_vocab.term.language }})
+        </h3>
+        {{ random_vocab.term.definition|markdownify }}
+        {% include 'term_occurrence_display.html' with o=random_vocab truncate=True hide_page=True show_book=True %}
+    </div>
+</div>
+<div class="ui divider"></div>
+
+<h2>
+    Tags
+</h2>
+<div class="ui two column grid">
+    {% for tag in tags %}
+    <div class="column">
+        <div class="ui segment">
+            <a class="ui big {{ tag.colour }} label" href="{{ tag.get_absolute_url }}">
+                {{ tag.slug }}
+                ({{ tag.notes.count }})
+            </a>
+            <h2 class="ui header">
+                <div class="sub header">
+                    {% for author in tag.get_authors %}
+                    {{ author.name }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </div>
+            </h2>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="ui divider"></div>
+<h2>Articles ({{ articles.count }})</h2>
+<div class="ui two column grid">
+    {% for section in articles %}
+        <div class="column">
+            <div class="ui segment">
+                <h3 class="ui header">
+                    <a href="{{ section.get_absolute_url }}">
+                        {{ section.title|markdownify_title }}
+                    </a>
+                    {% if section.source_url %}
+                    <a href="{{ section.source_url }}">
+                        <i class="external link icon"></i>
+                    </a>
+                    {% endif %}
+                    <div class="ui heart rating display-rating"
+                         data-rating="{{ section.rating }}">
+                    </div>
+                    <div class="sub header">
+                        {% if section.authors.count %}
+                        {% include 'author_list.html' with authors=section.authors %}
+                        {% else %}
+                        {{ section.subtitle }}
+                        {% endif %}
+                        -
+                        {{ section.book.title }}
+                    </div>
+                </h3>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="ui divider"></div>
+<h2>Book chapters ({{ chapters.count }})</h2>
+<div class="ui two column grid">
+    {% for section in chapters %}
+        <div class="column">
+            <div class="ui segment">
+                <h3 class="ui header">
+                    <a href="{{ section.get_absolute_url }}">
+                        {{ section.title|markdownify_title }}
+                    </a>
+                    {% if section.source_url %}
+                    <a href="{{ section.source_url }}">
+                        <i class="external link icon"></i>
+                    </a>
+                    {% endif %}
+                    <div class="ui heart rating display-rating"
+                         data-rating="{{ section.rating }}">
+                    </div>
+                    <div class="sub header">
+                        {% if section.authors.count %}
+                        {% include 'author_list.html' with authors=section.authors %}
+                        {% else %}
+                        {{ section.subtitle }}
+                        {% endif %}
+                        -
+                        <a href="{{ section.book.get_absolute_url }}">
+                            {{ section.book }}
+                        </a>
+                    </div>
+                </h3>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="ui divider"></div>
+<h2>Books ({{ books.count }})</h2>
+
+<div class="ui six column grid">
+    {% for book in books %}
+    <div class="center aligned column">
+        <a href="{{ book.get_absolute_url }}">
+            <img src="{{ book.image_url }}"
+                 class="ui fluid image"
+                 title="{{ book.title }}" />
+        </a>
+        <br />
+        <div class="ui heart rating display-rating" data-rating="{{ book.details.rating }}"></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
