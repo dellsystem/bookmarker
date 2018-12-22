@@ -7,6 +7,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
+from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.text import slugify
@@ -971,7 +972,7 @@ def view_author(request, slug):
 
 
 def view_all_terms(request):
-    terms = Term.objects.order_by('text')
+    terms = Term.objects.order_by(Lower('text'))
 
     author_pk = request.GET.get('author')
     author = None
