@@ -1,5 +1,6 @@
 import collections
 import datetime
+import re
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -488,6 +489,7 @@ def add_author(request):
         return render(request, 'add_author.html', context)
 
 
+GR_IMAGE_URL_RE = re.compile(r'm(?=/\d+.jpg$)')
 @staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
@@ -506,11 +508,16 @@ def add_book(request):
                 num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
             )
 
+            # Replace the 'm' in '1234m/12345.jpg' with 'l'
+            image_url = GR_IMAGE_URL_RE.sub('l', gr_book.image_url)
+            # If there's a :, strip out everything after it for the slug.
+            slug = slugify(gr_book.title.split(':')[0])
+
             book = Book.objects.create(
                 details=details,
                 title=gr_book.title,
-                image_url=gr_book.image_url,
-                slug=slugify(gr_book.title)[:50],
+                image_url=image_url,
+                slug=slug,
             )
 
             Action.objects.create(
