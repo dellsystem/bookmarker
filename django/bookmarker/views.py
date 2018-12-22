@@ -873,6 +873,24 @@ def view_occurrence(request, occurrence_id):
     return render(request, 'view_occurrence.html', context)
 
 
+@require_POST
+def flag_term(request, term_id):
+    term = Term.objects.get(pk=term_id)
+    action = request.POST.get('action')
+    if term.flagged and action == 'unflag':
+        term.flagged = False
+        term.save()
+        messages.success(request, 'Term unflagged')
+    elif not term.flagged and action == 'flag':
+        term.flagged = True
+        term.save()
+        messages.success(request, 'Term flagged')
+    else:
+        messages.error(request, 'Term flag status not changed')
+
+    return redirect(term)
+
+
 def view_term(request, term_id):
     term = Term.objects.get(pk=term_id)
     query = request.GET.get('q')

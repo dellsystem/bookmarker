@@ -8,8 +8,24 @@
 
 {% block content %}
 <div class="ui stackable grid">
-    <div class="twelve wide column">
+    <div class="ten wide column">
         {% include 'term_header.html' with term=term highlight=query %}
+    </div>
+    <div class="two wide column">
+        <form method="post" action="{% url 'flag_term' term.pk %}">
+            {% csrf_token %}
+            {% if term.flagged %}
+            <button class="ui fluid button" name="action" value="unflag">
+                <i class="flag icon"></i>
+                Unflag
+            </button>
+            {% else %}
+            <button class="ui fluid blue button" name="action" value="flag">
+                <i class="flag icon"></i>
+                Flag
+            </button>
+            {% endif %}
+        </form>
     </div>
     <div class="four wide column">
         <h4>Highlighted phrases</h4>

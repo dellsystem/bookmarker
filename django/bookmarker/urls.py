@@ -56,6 +56,8 @@ urlpatterns = [
         name='edit_note'),
     url(r'^term/(?P<term_id>\d+)$', bookmarker.views.view_term,
         name='view_term'),
+    url(r'^term/(?P<term_id>\d+)/flag$', bookmarker.views.flag_term,
+        name='flag_term'),
     url(r'^occurrence/(?P<occurrence_id>\d+)/edit$',
         bookmarker.views.edit_occurrence,
         name='edit_occurrence'),
