@@ -1117,6 +1117,47 @@ def view_section(request, section_id):
     return render(request, 'view_section.html', context)
 
 
+def search_json(request):
+    """Suggest authors/books/sections with that name"""
+    query = request.GET.get('q')
+    books = []
+    authors = []
+    sections = []
+    if len(query) >= 3:
+        for book in Book.objects.filter(title__icontains=query):
+            books.append({
+                'title': book.title,
+                'url': book.get_absolute_url(),
+            })
+        for author in Author.objects.filter(name__icontains=query):
+            authors.append({
+                'title': author.name,
+                'url': author.get_absolute_url(),
+            })
+        for section in Section.objects.filter(title__icontains=query):
+            sections.append({
+                'title': section.title,
+                'url': section.get_absolute_url(),
+            })
+
+    return JsonResponse({
+        'results': {
+            'books': {
+                'name': 'Books',
+                'results': books,
+            },
+            'authors': {
+                'name': 'Authors',
+                'results': authors,
+            },
+            'sections': {
+                'name': 'Sections',
+                'results': sections,
+            },
+        }
+    })
+
+
 def search(request):
     query = request.GET.get('q')
 

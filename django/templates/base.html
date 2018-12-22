@@ -71,10 +71,13 @@
             </div>
             <div class="right item">
                 <form action="{% url 'search' %}">
-                    <div class="ui icon input">
-                        <input name="q" type="text" placeholder="Search..."
-                               value="{% if query %}{{ query }}{% endif %}">
-                        <i class="search icon"></i>
+                    <div class="ui search" id="site-search">
+                        <div class="ui icon input">
+                            <input name="q" type="text" placeholder="Search..."
+                                   class="prompt"
+                                   value="{% if query %}{{ query }}{% endif %}">
+                            <i class="search icon"></i>
+                        </div>
                     </div>
                 </form>
             </div>

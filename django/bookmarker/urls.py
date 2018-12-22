@@ -73,6 +73,7 @@ urlpatterns = [
     url(r'^api/suggest.json$', bookmarker.views.suggest_terms),
     url(r'^api/define.json$', bookmarker.views.get_definition),
     url(r'^search$', bookmarker.views.search, name='search'),
+    url(r'^search.json$', bookmarker.views.search_json, name='search_json'),
 ]
 
 

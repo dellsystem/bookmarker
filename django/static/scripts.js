@@ -147,3 +147,12 @@ $('.display-rating').rating({
 
 $('.ui.dropdown').dropdown();
 $('.ui.checkbox').checkbox();
+$('#site-search').search({
+    // change search endpoint to a custom endpoint by manipulating apiSettings
+    apiSettings: {
+      url: '/search.json?q={query}'
+    },
+    type: 'category',
+    minCharacters: 3
+  })
+;
