@@ -13,6 +13,7 @@ CATEGORIES = {
         'secondary_model': None,
         'icon': 'user',
         'noun': 'an author',
+        'filter': True,
     },
     'book': {
         'primary_model': Book,
@@ -20,18 +21,21 @@ CATEGORIES = {
         'icon': 'book',
         # TODO: differentiate between books & publications
         'noun': 'a book',
+        'filter': True,
     },
     'tag': {
         'primary_model': Tag,
         'secondary_model': None,
         'icon': 'tag',
         'noun': 'a tag',
+        'filter': True,
     },
     'note': {
         'primary_model': Note,
         'secondary_model': Book,
         'icon': 'sticky note',
         'noun': 'a note',
+        'filter': True,
     },
     'section': {
         'primary_model': Section,
@@ -39,18 +43,21 @@ CATEGORIES = {
         'icon': 'file alternate outline',
         # TODO: differentiate between chapters/articles/webpages?
         'noun': 'a section',
+        'filter': True,
     },
     'note_tag': {
         'primary_model': Note,
         'secondary_model': Tag,
         'icon': 'tags',
         'noun': 'a note tag',
+        'filter': False,
     },
     'term': {
         'primary_model': TermOccurrence,
         'secondary_model': Book,
         'icon': 'flag',  # TODO: this is wrong
         'noun': 'a vocabulary term',
+        'filter': True,
     }
 }
 CATEGORY_CHOICES = [
@@ -61,6 +68,8 @@ VERB_CHOICES = [
     ('edited', 'edited'),
     ('deleted', 'deleted'),
 ]
+# For filtering on the homepage.
+FILTER_CATEGORIES = set(c for c in CATEGORIES if CATEGORIES[c]['filter'])
 
 
 class Action(models.Model):

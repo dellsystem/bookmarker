@@ -14,7 +14,7 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
-from activity.models import Action
+from activity.models import Action, FILTER_CATEGORIES
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm
@@ -27,8 +27,14 @@ from vocab.models import Term, TermOccurrence
 
 def home(request):
     actions_list = Action.objects.all()
-    paginator = Paginator(actions_list, 25)
 
+    mode = request.GET.get('mode')
+    if mode in FILTER_CATEGORIES:
+        actions_list = actions_list.filter(category=mode)
+    else:
+        mode = 'all'
+
+    paginator = Paginator(actions_list, 25)
     page = request.GET.get('page')
     try:
         actions = paginator.page(page)
@@ -66,6 +72,8 @@ def home(request):
     context = {
         'books': books,
         'actions': actions,
+        'mode': mode,
+        'filter_categories': sorted(FILTER_CATEGORIES),
     }
     return render(request, 'activity.html', context)
 
