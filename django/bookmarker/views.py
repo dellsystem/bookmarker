@@ -1291,8 +1291,11 @@ def search(request):
 
         results[mode] = results[mode].prefetch_related(*to_prefetch[mode])
 
+        author_field_name = 'authors'
+        if mode == 'books':
+            author_field_name = 'details__authors'
         author_pks = [
-            i for l in results[mode].values_list('authors') for i in l if i
+            i for l in results[mode].values_list(author_field_name) for i in l if i
         ]
 
         filter_form.fields['author'].queryset = Author.objects.filter(
