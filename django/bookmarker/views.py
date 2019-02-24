@@ -12,6 +12,7 @@ from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
+from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
 from activity.models import Action, FILTER_CATEGORIES
@@ -1357,7 +1358,7 @@ def search(request):
         'query': query,
         'mode': mode,
         'modes': MODES,
-        'qs': '?q=' + query,
+        'qs': '?' + urlencode({'q': query}),
         'filter_form': filter_form,
     }
 
