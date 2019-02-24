@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
 from django.db.models.functions import Lower
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
@@ -112,7 +112,7 @@ def view_books(request, book_type):
 
 
 def view_book(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
 
     recent_terms = book.terms.order_by('-added')[:5].prefetch_related(
         'term', 'category', 'section'
@@ -142,7 +142,7 @@ def view_book(request, slug):
 
 @staff_member_required
 def edit_book(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
 
     if request.method == 'POST':
         book_form = BookForm(request.POST, instance=book)
@@ -191,7 +191,7 @@ def edit_book(request, slug):
 
 
 def view_terms(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
     terms = book.terms.all().prefetch_related(
         'category', 'term', 'authors', 'section', 'section__authors', 'book',
         'book__details__default_authors',
@@ -227,7 +227,7 @@ def view_terms(request, slug):
 
 @staff_member_required
 def add_section(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
     if book.completed_sections:
         messages.error(request, 'Sections are already completed!')
         return redirect(book)
@@ -305,7 +305,7 @@ def add_section(request, slug):
 
 @staff_member_required
 def edit_occurrence(request, occurrence_id):
-    occurrence = TermOccurrence.objects.get(pk=occurrence_id)
+    occurrence = get_object_or_404(TermOccurrence, pk=occurrence_id)
 
     if request.POST:
         term_form = TermForm(
@@ -368,7 +368,7 @@ def edit_occurrence(request, occurrence_id):
 
 @staff_member_required
 def add_term(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
 
     if not book.completed_sections and book.details:
         messages.error(request, 'Sections need to be completed first')
@@ -679,8 +679,8 @@ def get_definition(request):
 @staff_member_required
 def add_note(request, slug):
     section_id = request.GET.get('section')
+    book = get_object_or_404(Book, slug=slug)
 
-    book = Book.objects.get(slug=slug)
     # If the "book" is actually a publication, and there is no section passed
     # as a GET param, just use the most recently-added article/section.
     if not section_id and book.is_publication():
@@ -797,7 +797,7 @@ def view_all_notes(request):
 
 
 def view_notes(request, slug):
-    book = Book.objects.get(slug=slug)
+    book = get_object_or_404(Book, slug=slug)
     notes = book.notes.all().prefetch_related(
         'tags', 'authors', 'section', 'section__authors', 'book',
         'book__details__default_authors',
@@ -833,7 +833,7 @@ def view_notes(request, slug):
 
 
 def view_note(request, note_id):
-    note = Note.objects.get(pk=note_id)
+    note = get_object_or_404(Note, pk=note_id)
     book = note.book
     query = request.GET.get('q')
 
@@ -873,7 +873,7 @@ def view_note(request, note_id):
 
 
 def view_occurrence(request, occurrence_id):
-    occurrence = TermOccurrence.objects.get(pk=occurrence_id)
+    occurrence = get_object_or_404(TermOccurrence, pk=occurrence_id)
     query = request.GET.get('q')
 
     context = {
@@ -888,7 +888,7 @@ def view_occurrence(request, occurrence_id):
 
 @require_POST
 def flag_term(request, term_id):
-    term = Term.objects.get(pk=term_id)
+    term = get_object_or_404(Term, pk=term_id)
     action = request.POST.get('action')
     if term.flagged and action == 'unflag':
         term.flagged = False
@@ -905,7 +905,7 @@ def flag_term(request, term_id):
 
 
 def view_term(request, term_id):
-    term = Term.objects.get(pk=term_id)
+    term = get_object_or_404(Term, pk=term_id)
     query = request.GET.get('q')
     occurrences = term.occurrences.order_by('book__title').prefetch_related(
         'book', 'authors', 'book__details__default_authors', 'category', 'section',
@@ -921,13 +921,13 @@ def view_term(request, term_id):
 
 
 def section_redirect(request, slug):
-    section = Section.objects.get(slug=slug)
+    section = get_object_or_404(Section, slug=slug)
 
     return redirect(section)
 
 
 def view_author(request, slug):
-    author = Author.objects.get(slug=slug)
+    author = get_object_or_404(Author, slug=slug)
     author_section_ids = set()
     book_ids = set()
 
@@ -1049,7 +1049,7 @@ def view_all_terms(request):
 @staff_member_required
 @require_POST
 def mark_complete(request, book_id):
-    book = Book.objects.get(pk=book_id)
+    book = get_object_or_404(Book, pk=book_id)
 
     mode = request.POST.get('mode')
     if mode == 'processed':
@@ -1074,7 +1074,7 @@ def mark_complete(request, book_id):
 
 @staff_member_required
 def edit_section(request, section_id):
-    section = Section.objects.get(pk=section_id)
+    section = get_object_or_404(Section, pk=section_id)
 
     if request.method == 'POST':
         if request.POST.get('submit') == 'delete':
@@ -1140,7 +1140,7 @@ def edit_section(request, section_id):
 
 
 def view_section(request, section_id):
-    section = Section.objects.get(pk=section_id)
+    section = get_object_or_404(Section, pk=section_id)
 
     # Find the previous and next sections (if any) for this book.
     # TODO: Is there a better way to do this? get_next_by is only for DateField
@@ -1380,7 +1380,7 @@ def view_stats(request):
 
 @staff_member_required
 def edit_note(request, note_id):
-    note = Note.objects.get(pk=note_id)
+    note = get_object_by_404(Note, pk=note_id)
 
     if request.method == 'POST':
         if request.POST.get('submit') == 'delete':
@@ -1441,7 +1441,7 @@ def edit_note(request, note_id):
 
 
 def cite_tag(request, slug):
-    tag = Tag.objects.get(slug=slug)
+    tag = get_object_by_404(Tag, slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
@@ -1456,7 +1456,7 @@ def cite_tag(request, slug):
 
 
 def view_tag(request, slug):
-    tag = Tag.objects.get(slug=slug)
+    tag = get_object_by_404(Tag, slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
