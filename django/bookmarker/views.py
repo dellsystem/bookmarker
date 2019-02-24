@@ -937,7 +937,13 @@ def view_author(request, slug):
 
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)
-    for section in author.sections.all().prefetch_related('authors', 'book__details__default_authors'):
+    sections = author.sections.all().annotate(
+        num_terms=Count('terms', distinct=True),
+        num_notes=Count('notes', distinct=True),
+    ).prefetch_related(
+        'authors', 'book__details__default_authors'
+    )
+    for section in sections:
         book_id = section.book_id
         book_ids.add(book_id)
 
