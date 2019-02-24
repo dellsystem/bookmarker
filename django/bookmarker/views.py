@@ -126,6 +126,10 @@ def view_book(request, slug):
         num_notes=Count('notes', distinct=True),
     )
 
+    # If it's a publication, order the articles alphabetically by name.
+    if book.details is None:
+        sections = sections.order_by('title')
+
     context = {
         'book': book,
         'details': book.details,
