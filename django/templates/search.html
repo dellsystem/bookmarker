@@ -186,7 +186,11 @@
                         <a href="{{ book.get_absolute_url }}">
                             <strong>{{ book.title }}</strong>
                         </a>
+                        {% if book.details %}
                         {% include 'author_list.html' with authors=book.details.default_authors only %}
+                        {% else %}
+                        (publication)
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
