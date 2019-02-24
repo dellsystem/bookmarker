@@ -188,6 +188,8 @@ class PageNumberField(models.PositiveSmallIntegerField):
         return value
 
     def formfield(self, **kwargs):
+        # Get rid of the min/max value validatosr (Postgres only)
+        self.validators = []
         return forms.CharField(**kwargs)
 
 
