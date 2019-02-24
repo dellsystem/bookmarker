@@ -25,7 +25,7 @@ def get_backup_filename(hostname):
         datetime.datetime.now().strftime('%Y-%m-%d-%H%M')
     )
 
-BACKUP_COMMAND = './django/manage.py dumpdata books vocab > '
+BACKUP_COMMAND = './django/manage.py dumpdata books vocab activity > '
 def backup():
     """Does a local database dump. Returns the filename."""
     local_filename = get_backup_filename(hostname=socket.gethostname())
