@@ -1383,7 +1383,7 @@ def view_stats(request):
 
 @staff_member_required
 def edit_note(request, note_id):
-    note = get_object_by_404(Note, pk=note_id)
+    note = get_object_or_404(Note, pk=note_id)
 
     if request.method == 'POST':
         if request.POST.get('submit') == 'delete':
@@ -1444,7 +1444,7 @@ def edit_note(request, note_id):
 
 
 def cite_tag(request, slug):
-    tag = get_object_by_404(Tag, slug=slug)
+    tag = get_object_or_404(Tag, slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
@@ -1459,7 +1459,7 @@ def cite_tag(request, slug):
 
 
 def view_tag(request, slug):
-    tag = get_object_by_404(Tag, slug=slug)
+    tag = get_object_or_404(Tag, slug=slug)
 
     notes = tag.notes.prefetch_related(
         'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
