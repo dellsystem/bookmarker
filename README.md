@@ -22,10 +22,6 @@ Django 1.10. Run `python django/manage.py runserver`.
 * `POSTGRES_PASSWORD`
 * `GOODREADS_KEY` and `GOODREADS_SECRET` for using the [Goodreads API](https://www.goodreads.com/api/keys)
 
-CAVEATS: The `page_number` field on Section, Note, TermOccurrence needs to be
-converted into an int on the database level.  See [this commit](https://github.com/dellsystem/bookmarker/commit/9838ef6a391b50f8e4fd7cdfd8914437d25bc652)
-for details.
-
 License
 -------
 
