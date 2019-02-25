@@ -26,9 +26,9 @@
     {% if note.tags.count %}
     <div class="four wide right aligned column">
         {% for tag in note.tags.all %}
-        <a class="ui {{ tag.colour }} label" title="{{ tag.description }}"
+        <a class="ui {{ tag.get_colour }} label" title="{{ tag.description }}"
            href="{{ tag.get_absolute_url }}">
-            {{ tag.slug }}
+            {{ tag }}
         </a>
         {% endfor %}
     </div>

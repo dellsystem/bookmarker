@@ -9,15 +9,12 @@
 
 {% block content %}
 <h1>
-    <span class="ui big {{ tag.colour }} label">
-        {{ tag.slug }}
+    <span class="ui big {{ tag.get_colour }} label">
+        {{ tag }}
     </span>
 </h1>
 <p>
     {{ tag.description }}
-    <a href="{% url 'admin:books_notetag_change' tag.pk %}">
-        <i class="edit icon"></i>
-    </a>
 </p>
 
 <div class="ui segment">

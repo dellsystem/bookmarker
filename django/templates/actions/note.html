@@ -16,9 +16,9 @@
                     {{ note.subject|markdownify_title }}
                 </a>
                 {% for tag in note.tags.all %}
-                <a class="ui {{ tag.colour }} label" title="{{ tag.description }}"
+                <a class="ui {{ tag.get_colour }} label" title="{{ tag.description }}"
                    href="{{ tag.get_absolute_url }}">
-                    {{ tag.slug }}
+                    {{ tag }}
                 </a>
                 {% endfor %}
                 <div class="sub header">

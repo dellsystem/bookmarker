@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+
+{% load static %}
+
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="{% static "semantic.min.css" %}" />
+<link rel="stylesheet" type="text/css" href="{% static "admin.css" %}" />
+<script src="{% static 'semantic.min.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block branding %}
+Bookmarker admin
+{% endblock %}

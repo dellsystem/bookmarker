@@ -68,8 +68,8 @@
     {% for tag in tags %}
     <div class="column">
         <div class="ui segment">
-            <a class="ui big {{ tag.colour }} label" href="{{ tag.get_absolute_url }}">
-                {{ tag.slug }}
+            <a class="ui big {{ tag.get_colour }} label" href="{{ tag.get_absolute_url }}">
+                {{ tag }}
                 ({{ tag.notes.count }})
             </a>
             <h2 class="ui header">

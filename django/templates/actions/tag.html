@@ -1,6 +1,6 @@
 {% with tag=action.primary_instance %}
     <div class="extra text">
-    <div class="ui {{ tag.colour }} label">
+    <div class="ui {{ tag.get_colour }} label">
         <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>
     </div>
     </div>

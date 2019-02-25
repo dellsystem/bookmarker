@@ -426,20 +426,44 @@ class SectionArtefact(PageArtefact):
         self.authors.add(*default_authors)
 
 
-class Tag(models.Model):
+class TagCategory(models.Model):
+    colour = models.CharField(blank=True, max_length=50)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
-    colour = models.CharField(blank=True, max_length=50)
-    faved = models.BooleanField(
-        default=False,
-        help_text='Whether it shows up in the "View faves" page'
-    )
+
+    class Meta:
+        verbose_name_plural = 'Tag categories'
 
     def __unicode__(self):
         return self.slug
 
+
+class Tag(models.Model):
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    faved = models.BooleanField(
+        default=False,
+        help_text='Whether it shows up in the "View faves" page'
+    )
+    category = models.ForeignKey(TagCategory, blank=True, null=True)
+
+    class Meta:
+        ordering = ['category__slug', 'slug']
+
+    def __unicode__(self):
+        if self.category:
+            return '{} / {}'.format(self.category.slug, self.slug)
+        else:
+            return self.slug
+
     def get_absolute_url(self):
         return reverse('view_tag', args=[self.slug])
+
+    def get_colour(self):
+        if self.category:
+            return self.category.colour
+        else:
+            return ''
 
     def get_authors(self, limit=10):
         author_ids = self.notes.values_list('authors__id', flat=True)
