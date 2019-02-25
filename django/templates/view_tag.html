@@ -11,8 +11,8 @@
 
 {% block content %}
 <h1>
-    <span class="ui big {{ tag.colour }} label">
-        {{ tag.slug }}
+    <span class="ui big {{ tag.get_colour }} label">
+        {{ tag }}
     </span>
 </h1>
 <p>

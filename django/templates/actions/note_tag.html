@@ -6,7 +6,7 @@
     <a href="{{ note.book.get_absolute_url }}">{{ note.book }}</a>
     {% with tag=action.secondary_instance %}
     <br />
-    <div class="ui {{ tag.colour }} label">
+    <div class="ui {{ tag.get_colour }} label">
         <a href="{{ tag.get_absolute_url }}">{{ tag }}</a>
     </div>
     {% endwith %}

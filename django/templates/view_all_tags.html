@@ -16,7 +16,7 @@
     <div class="column">
         <div class="ui segment">
             <p>
-                <a class="ui big {{ tag.colour }} label"
+                <a class="ui big {{ tag.get_colour }} label"
                    href="{{ tag.get_absolute_url }}">
                     {{ tag }} ({{ tag.notes.count }})
                 </a>
