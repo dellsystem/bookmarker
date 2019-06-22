@@ -70,6 +70,10 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         super(TermOccurrenceForm, self).__init__(*args, **kwargs)
         self.fields['section'].queryset = book.sections.all()
 
+        # Sections are required only for publications.
+        if book.is_publication():
+            self.fields['section'].required = True
+
     def save(self, author_form, term=None):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
