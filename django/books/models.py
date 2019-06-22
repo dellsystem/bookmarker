@@ -452,7 +452,7 @@ class Tag(models.Model):
 
     def __unicode__(self):
         if self.category:
-            return '{} / {}'.format(self.category.slug, self.slug)
+            return '{}/{}'.format(self.category.slug, self.slug)
         else:
             return self.slug
 

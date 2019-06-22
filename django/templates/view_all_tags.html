@@ -7,7 +7,19 @@
 {% endblock %}
 
 {% block content %}
-<h2>View all tags</h2>
+<div class="ui stackable grid">
+    <div class="row">
+        <div class="twelve wide column">
+            <h2>View all tags</h2>
+        </div>
+        <div class="four wide right aligned column">
+            <a class="ui green icon button" href="{% url 'add_tag' %}">
+                <i class="plus icon"></i>
+                Add tag
+            </a>
+        </div>
+    </div>
+</div>
 
 <div class="ui divider"></div>
 
@@ -20,6 +32,9 @@
                    href="{{ tag.get_absolute_url }}">
                     {{ tag }} ({{ tag.notes.count }})
                 </a>
+                {% if tag.faved %}
+                <i class="big red heart icon" title="Faved"></i>
+                {% endif %}
             </p>
             <p>
                 {{ tag.description }}

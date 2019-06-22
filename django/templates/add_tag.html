@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Add tag{% endblock %}
+
+{% block breadcrumbs %}
+<a class="section" href="{% url 'view_all_tags' %}">View tags</a>
+<i class="right angle icon divider"></i>
+<div class="active section">Add tag</div>
+{% endblock %}
+
+{% block content %}
+<h2>Add tag</h2>
+
+{% include 'tag_form.html' %}
+
+<h3>Existing tags</h3>
+<div class="ui bulleted list">
+    {% for category in categories %}
+    <div class="item"><strong>{{ category }}</strong>:
+    {% for tag in category.tag_set.all %}
+    {{ tag.slug }}
+    {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

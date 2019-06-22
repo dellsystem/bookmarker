@@ -71,6 +71,7 @@ urlpatterns = [
     url(r'^tag/(?P<slug>[^/]+)/cite$', bookmarker.views.cite_tag,
         name='cite_tag'),
     url(r'^tags$', bookmarker.views.view_all_tags, name='view_all_tags'),
+    url(r'^tags/add$', bookmarker.views.add_tag, name='add_tag'),
     url(r'^stats$', bookmarker.views.view_stats, name='view_stats'),
     url(r'^api/suggest.json$', bookmarker.views.suggest_terms),
     url(r'^api/define.json$', bookmarker.views.get_definition),
