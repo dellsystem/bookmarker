@@ -45,7 +45,7 @@
                 {{ random_note.subject|markdownify_title }}
             </a>
         </h3>
-        {% include "note_body.html" with note=random_note truncate=True hide_page=True show_book=True %}
+        {% include "note_body.html" with note=random_note truncate=True show_book=True %}
     </div>
     <div class="column">
         <h3>
@@ -56,7 +56,7 @@
             ({{ random_vocab.term.language }})
         </h3>
         {{ random_vocab.term.definition|markdownify }}
-        {% include 'term_occurrence_display.html' with o=random_vocab truncate=True hide_page=True show_book=True %}
+        {% include 'term_occurrence_display.html' with o=random_vocab truncate=True show_book=True %}
     </div>
 </div>
 <div class="ui divider"></div>

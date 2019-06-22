@@ -25,7 +25,7 @@
     {% endif %}
 </div>
 
-{% if not hide_page %}
+{% if note.book.has_pages %}
     &mdash;p.{{ note.get_page_display }}
     <i class="ellipsis vertical icon"></i>
 {% endif %}

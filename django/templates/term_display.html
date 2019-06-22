@@ -10,7 +10,7 @@
 </div>
 {% endifchanged %}
 <div class="computer only row">
-    {% if not hide_page %}
+    {% if x.book.has_pages %}
     <div class="center aligned one wide column">
         <div class="ui big circular label">
             {{ x.get_page_display }}
@@ -20,7 +20,7 @@
     {% else %}
     <div class="sixteen wide column">
     {% endif %}
-        {% include 'term_occurrence_display.html' with o=x hide_section=hide_section hide_page=hide_page only %}
+        {% include 'term_occurrence_display.html' with o=x hide_section=hide_section only %}
     </div>
 </div>
 <div class="mobile tablet only row">
