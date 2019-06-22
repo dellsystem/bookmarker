@@ -1,3 +1,8 @@
+{% if note_form.errors %}
+<div class="ui error message">
+    {{ note_form.errors|safe }}
+</div>
+{% endif %}
 <div class="ui segment">
     <form class="ui form" method="post">
         {% csrf_token %}

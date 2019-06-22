@@ -1,3 +1,10 @@
+{% if term_form.errors or occurrence_form.errors %}
+<div class="ui error message">
+    {{ term_form.errors|safe }}
+    {{ occurrence_form.errors|safe }}
+</div>
+{% endif %}
+
 <form class="ui form" method="post">
     <div class="ui segment">
         {% csrf_token %}

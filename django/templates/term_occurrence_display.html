@@ -22,7 +22,7 @@
 </div>
 {% endif %}
 
-{% if not hide_page %}
+{% if o.book.has_pages %}
     &mdash;p.{{ o.get_page_display }}
     <i class="ellipsis vertical icon"></i>
 {% endif %}

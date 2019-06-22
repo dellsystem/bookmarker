@@ -68,7 +68,9 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         self.book = book
         super(NoteForm, self).__init__(*args, **kwargs)
         self.fields['section'].queryset = book.sections.all()
-        if not book.has_pages():
+
+        # Sections are required only for publications.
+        if book.is_publication():
             self.fields['section'].required = True
 
     class Meta:
