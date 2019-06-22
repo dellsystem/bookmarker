@@ -1,6 +1,6 @@
 from django import forms
 
-from books.models import Author, Note, Section, Book, BookDetails
+from books.models import Author, Note, Section, Book, BookDetails, Tag
 from books.utils import roman_to_int
 
 
@@ -251,3 +251,12 @@ class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
         exclude = ['goodreads_id']
+
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 2}),
+        }

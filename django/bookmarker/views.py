@@ -18,8 +18,9 @@ from django.views.decorators.http import require_POST
 from activity.models import Action, FILTER_CATEGORIES
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
-                        BookDetailsForm, AuthorForm
-from books.models import Book, Author, Note, Tag, Section, BookDetails
+                        BookDetailsForm, AuthorForm, TagForm
+from books.models import Book, Author, Note, Tag, Section, \
+                         BookDetails, TagCategory
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
@@ -1538,3 +1539,30 @@ def view_faves(request):
         'books': books,
     }
     return render(request, 'view_faves.html', context)
+
+
+@staff_member_required
+def add_tag(request):
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            tag = form.save()
+            messages.success(request, "Created tag")
+            Action.objects.create(
+                primary_id=tag.pk,
+                category='tag',
+                verb='added',
+                details=str(tag),
+                secondary_id=None,
+            )
+            return redirect(tag)
+        else:
+            messages.error(request, "Failed to create tag")
+    else:
+        form = TagForm()
+
+    context = {
+        'form': form,
+        'categories': TagCategory.objects.all(),
+    }
+    return render(request, 'add_tag.html', context)

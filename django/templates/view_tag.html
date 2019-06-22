@@ -6,6 +6,8 @@
 {% block title %}{{ tag.slug }} [tag]{% endblock %}
 
 {% block breadcrumbs %}
+<a class="section" href="{% url 'view_all_tags' %}">View tags</a>
+<i class="right angle icon divider"></i>
 <div class="active section">View tag</div>
 {% endblock %}
 
@@ -14,6 +16,9 @@
     <span class="ui big {{ tag.get_colour }} label">
         {{ tag }}
     </span>
+    {% if tag.faved %}
+    <i class="red heart icon" title="Faved"></i>
+    {% endif %}
 </h1>
 <p>
     {{ tag.description }}
@@ -23,11 +28,13 @@
 </p>
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=notes only %}
-
-<div class="ui grid">
-    {% include 'note_list_with_books.html' with notes=notes %}
-</div>
-
-{% include "pagination.html" with items=notes only %}
+{% if notes.count %}
+    {% include "pagination.html" with items=notes only %}
+    <div class="ui grid">
+        {% include 'note_list_with_books.html' with notes=notes %}
+    </div>
+    {% include "pagination.html" with items=notes only %}
+{% else %}
+    <div class="ui warning message">No notes yet</div>
+{% endif %}
 {% endblock %}
