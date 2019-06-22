@@ -1,0 +1,55 @@
+<div class="ui segment">
+    <form class="ui form" method="post">
+        {% csrf_token %}
+        <div class="ui stackable grid">
+            <div class="six wide column">
+                {% with error=form.category.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Category</label>
+                    {{ form.category }}
+                </div>
+                {% endwith %}
+            </div>
+            <div class="eight wide column">
+                {% with error=form.slug.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Slug</label>
+                    {{ form.slug }}
+                </div>
+                {% endwith %}
+            </div>
+            <div class="two wide collapsed column">
+                {% with error=form.faved.errors %}
+                <div class="{% if error %}error{% endif %} field"
+                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Faved?</label>
+                    <div class="ui toggle checkbox">
+                        {{ form.faved }}
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
+        </div>
+        <br />
+        <div class="field">
+            <label>Description</label>
+            {{ form.description }}
+        </div>
+        <div class="ui basic center aligned segment">
+            <br /><br />
+            <button type="submit" name="submit" value=""
+                    class="ui blue button">
+                Submit
+            </button>
+            {% if show_delete %}
+            <button type="submit" name="submit" value="delete"
+                    class="ui red icon button">
+                <i class="x icon"></i>
+                Delete
+            </button>
+            {% endif %}
+        </div>
+    </form>
+</div>
