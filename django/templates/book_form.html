@@ -17,49 +17,41 @@
         <div class="ui fields">
             <div class="three wide field">
                 <label>ISBN</label>
-                    {{ details_form.isbn }}
-                </label>
+                {{ details_form.isbn }}
             </div>
             <div class="four wide field">
                 <label>Publisher</label>
-                    {{ details_form.publisher }}
-                </label>
+                {{ details_form.publisher }}
             </div>
             <div class="two wide field">
                 <label>Year</label>
-                    {{ details_form.year }}
-                </label>
+                {{ details_form.year }}
             </div>
             <div class="one wide field">
                 <label>Pages</label>
-                    <div class="ui toggle checkbox">
-                        {{ details_form.has_pages }}
-                    </div>
-                </label>
+                <div class="ui toggle checkbox">
+                    {{ details_form.has_pages }}
+                </div>
             </div>
             <div class="two wide field">
                 <label>Number of pages</label>
-                    {{ details_form.num_pages }}
-                </label>
+                {{ details_form.num_pages }}
             </div>
             <div class="two wide field">
                 <label>Issue #</label>
-                    {{ details_form.issue_number }}
-                </label>
+                {{ details_form.issue_number }}
             </div>
             <div class="one wide field">
                 <label>Edited?</label>
-                    <div class="ui toggle checkbox">
+                <div class="ui toggle checkbox">
                     {{ details_form.is_edited }}
-                    </div>
-                </label>
+                </div>
             </div>
             <div class="one wide field">
                 <label>Verified</label>
-                    <div class="ui toggle checkbox">
-                        {{ details_form.verified }}
-                    </div>
-                </label>
+                <div class="ui toggle checkbox">
+                    {{ details_form.verified }}
+                </div>
             </div>
         </div>
         <div class="ui fields">
