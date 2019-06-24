@@ -2,12 +2,12 @@
 <div class="extra text">
     {% with book=action.secondary_instance %}
     <div class="ui grid">
-        <div class="two wide column">
+        <div class="two wide computer three wide tablet four wide mobile column">
             <a href="{{ book.get_absolute_url }}">
-                <img src="{{ book.image_url }}" class="ui fluid image" />
+                <img src="{{ book.image_url }}" class="ui tiny image" />
             </a>
         </div>
-        <div class="fourteen wide column">
+        <div class="fourteen wide computer thirteen wide tablet twelve wide mobile column">
             {% if section %}
             <h3 class="ui header">
                 <a href="{{ section.get_absolute_url }}">
