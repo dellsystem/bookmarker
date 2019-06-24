@@ -15,7 +15,7 @@ from django.utils.text import slugify
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
-from activity.models import Action, FILTER_CATEGORIES
+from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm
@@ -71,11 +71,15 @@ def home(request):
         ),
     }
 
+    # Create a sorted list of available categories (with associated icon).
+    filter_categories = [
+        (c, CATEGORIES[c]['icon']) for c in FILTER_CATEGORIES
+    ]
     context = {
         'books': books,
         'actions': actions,
         'mode': mode,
-        'filter_categories': sorted(FILTER_CATEGORIES),
+        'filter_categories': filter_categories,
     }
     return render(request, 'activity.html', context)
 

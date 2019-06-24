@@ -7,24 +7,24 @@
 
 {% block content %}
 {% include 'admin_tools.html' %}
-<div class="ui grid">
-    <div class="six wide column">
+<div class="ui two column grid">
+    <div class="column">
         <h1>Activity</h1>
     </div>
-    <div class="ten wide right aligned column">
-        Show:
-        <div class="ui buttons">
-            <a class="ui {% if mode == 'all' %}positive{% endif %} button"
-               href="?mode=all">
-                All
-            </a>
-            {% for category in filter_categories %}
-            <div class="or"></div>
-            <a class="ui {% if mode == category %}positive{% endif %} button"
-               href="?mode={{ category }}">
-                {{ category|title }}{{ category|pluralize }}
-            </a>
-            {% endfor %}
+    <div class="right aligned column">
+        <div class="ui floating dropdown labeled icon button">
+            <i class="filter icon"></i>
+            <span class="text">Filter</span>
+            <div class="menu">
+                <div class="scrolling menu">
+                    {% for category, icon in filter_categories %}
+                    <a class="{% if mode == category %}active{% endif %} item" href="?mode={{ category }}">
+                        <i class="ui {{ icon }} icon"></i>
+                        {{ category|title }}{{ category|pluralize }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
