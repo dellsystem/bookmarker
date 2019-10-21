@@ -9,7 +9,7 @@ Django==1.9.13
 django-config-models==0.1.5
 django-debug-toolbar==1.8
 django-language-field==0.0.3
-djangorestframework==3.7.7
+djangorestframework==3.9.1
 enum34==1.1.6
 Fabric==1.14.0
 -e git+https://github.com/dellsystem/goodreads@5f6dad481dc0601413581acb6b4b8a00e94dd7b3#egg=goodreads
