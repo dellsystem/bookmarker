@@ -41,9 +41,11 @@
                      data-rating="{{ section.rating }}">
                 </div>
                 {% endif %}
+                {% if request.user.is_staff %}
                 <a href="{% url 'edit_section' section.pk %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
                 <div class="sub header">
                     {{ section.subtitle|markdownify }}
                     {% if section.authors.count %}
@@ -77,9 +79,11 @@
                     </div>
                     <div class="label">
                         terms
+                        {% if request.user.is_staff %}
                         <a href="{% url 'add_term' book.slug %}">
                             <i class="plus icon"></i>
                         </a>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="statistic">
@@ -88,9 +92,11 @@
                     </div>
                     <div class="label">
                         notes
+                        {% if request.user.is_staff %}
                         <a href="{% url 'add_note' book.slug %}?section={{ section.pk }}">
                             <i class="plus icon"></i>
                         </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -123,15 +129,21 @@
         {{ section.summary|markdownify|safe }}
     </div>
 {% else %}
+{% if request.user.is_staff %}
 <div class="ui icon warning message">
     <i class="warning icon"></i>
     Needs summary
 </div>
 {% endif %}
+{% endif %}
 
 {% with citation=section.get_citation %}
 {% if citation %}
-<p>{{ citation|markdownify }}</p>
+<div class="ui message">
+    <code>
+        {{ citation|markdownify }}
+    </code>
+</div>
 {% endif %}
 {% endwith %}
 

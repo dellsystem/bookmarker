@@ -19,22 +19,24 @@
         <div class="fourteen wide column">
             {% include 'book_header.html' with book=book only %}
         </div>
+        {% if request.user.is_staff %}
         <div class="two wide column">
             <a class="ui green icon button" href="{% url 'add_note' book.slug %}">
                 <i class="plus icon"></i>
                 Add note
             </a>
         </div>
+        {% endif %}
     </div>
 </div>
 <div class="ui divider"></div>
 
 <div class="ui center aligned basic segment">
-    <div class="ui right pagination menu">
+    <div class="ui stackable fluid menu">
         {% if previous_note %}
         <a class="item" href="{{ previous_note.get_absolute_url }}">
            <i class="left angle icon"></i>
-           {{ previous_note.subject }}
+           {{ previous_note.subject|truncatechars:50 }}
         </a>
         {% else %}
         <a class="disabled item">No previous note</a>
@@ -46,7 +48,7 @@
 
         {% if next_note %}
         <a class="item" href="{{ next_note.get_absolute_url }}">
-           {{ next_note.subject }}
+           {{ next_note.subject|truncatechars:50 }}
            <i class="right angle icon"></i>
         </a>
         {% else %}
@@ -55,6 +57,6 @@
     </div>
 </div>
 
-{% include 'note_header.html' with note=note highlight=query only %}
+{% include 'note_header.html' with note=note highlight=query %}
 {% include 'note_body.html' with note=note highlight=query only %}
 {% endblock %}

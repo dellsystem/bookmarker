@@ -40,14 +40,10 @@ class TagAdmin(admin.ModelAdmin):
     list_display_links = None
 
     def display_tag(self, obj):
-        if obj.category:
-            return mark_safe(
-                '<a class="ui large {c} label" href="{u}">{s1} / {s2}</a>'.format(
-                    c=obj.category.colour,
-                    u=reverse('admin:books_tag_change', args=[obj.id]),
-                    s1=obj.category.slug,
-                    s2=obj.slug,
-                )
+        return mark_safe(
+            '<a class="ui large {c} label" href="{u}">{s}</a>'.format(
+                c=obj.get_colour(),
+                u=reverse('admin:books_tag_change', args=[obj.id]),
+                s=obj,
             )
-        else:
-            return obj.slug
+        )

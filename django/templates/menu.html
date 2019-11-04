@@ -51,12 +51,14 @@
             </a>
         </div>
     </div>
+    {% if request.user.is_staff %}
     <div class="item">
         <a href="{% url 'view_stats' %}">Stats</a>
     </div>
     <div class="item">
         <a href="{% url 'admin:index' %}">Admin</a>
     </div>
+    {% endif %}
     <div class="right item">
         <form action="{% url 'search' %}">
             <div class="ui search" id="site-search">

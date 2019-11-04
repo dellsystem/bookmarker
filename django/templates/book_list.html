@@ -8,9 +8,11 @@
             </a>
             <h3 class="ui header">
                 <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
+                {% if request.user.is_staff %}
                 <a href="{% url 'edit_book' book.slug %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
                 <div class="sub header">
                     {% if book.details %}
                     {% include "author_list.html" with authors=book.details.default_authors %}

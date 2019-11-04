@@ -33,9 +33,11 @@
                     <i class="quote left icon" title="Defined"></i>
                     {% endif %}
                     <strong>{{ term.category }}</strong>
+                    {% if request.user.is_staff %}
                     <a href="{% url 'edit_occurrence' term.pk %}">
                         <i class="edit icon"></i>
                     </a>
+                    {% endif %}
                 </div>
             </div>
             <div class="text">

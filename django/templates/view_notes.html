@@ -16,15 +16,17 @@
 
 {% block content %}
 <div class="ui stackable grid">
-    <div class="fourteen wide column">
+    <div class="{% if request.user.is_staff %}fourteen{% else %}sixteen{% endif %} wide column">
         {% include 'book_header.html' with book=book only %}
     </div>
+    {% if request.user.is_staff %}
     <div class="two wide column">
         <a class="ui fluid green icon button" href="{% url 'add_note' book.slug %}">
             <i class="plus icon"></i>
             Add note
         </a>
     </div>
+    {% endif %}
 </div>
 <div class="ui divider"></div>
 

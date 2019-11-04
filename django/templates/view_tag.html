@@ -22,13 +22,15 @@
 </h1>
 <p>
     {{ tag.description }}
+    {% if request.user.is_staff %}
     <a href="{% url 'admin:books_tag_change' tag.pk %}">
         <i class="edit icon"></i>
     </a>
+    {% endif %}
 </p>
 <div class="ui divider"></div>
 
-{% if notes.count %}
+{% if notes %}
     {% include "pagination.html" with items=notes only %}
     <div class="ui grid">
         {% include 'note_list_with_books.html' with notes=notes %}
