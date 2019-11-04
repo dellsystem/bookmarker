@@ -5,7 +5,7 @@ certifi==2017.11.5
 cffi==1.11.2
 chardet==3.0.4
 cryptography==2.1.4
-Django==1.9.13
+Django==1.11.23
 django-config-models==0.1.5
 django-debug-toolbar==1.8
 django-language-field==0.0.3
