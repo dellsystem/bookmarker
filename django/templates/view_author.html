@@ -21,13 +21,16 @@
                     {{ num_notes }}
                     <i class="sticky note icon"></i>
                 </a>
+                {% if request.user.is_staff %}
                 /
                 <a href="{% url 'admin:books_author_change' author.pk %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
             </div>
         </h2>
     </div>
+    {% if request.user.is_staff %}
     <div class="four wide right aligned column">
         <form method="post" action="{% url 'add_author' %}">
             <div class="ui fluid labeled action input">
@@ -41,6 +44,7 @@
             {% csrf_token %}
         </form>
     </div>
+    {% endif %}
 </div>
 
 <div class="ui divider"></div>

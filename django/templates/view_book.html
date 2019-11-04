@@ -19,9 +19,11 @@
     <div class="twelve wide column">
         <h2 class="ui header">
             {{ book.title }}
+            {% if request.user.is_staff %}
             <a href="{% url 'edit_book' book.slug %}">
                 <i class="edit icon"></i>
             </a>
+            {% endif %}
             {% if book.details %}
             <div class="sub header">
                 {% include 'author_list.html' with authors=book.details.default_authors is_edited=book.details.is_edited only %}
@@ -36,6 +38,7 @@
             {% endif %}
         </h2>
     </div>
+    {% if request.user.is_staff %}
     <div class="four wide center aligned column">
         {% if not book.is_processed %}
         <form method="post" action="{% url 'mark_complete' book.id %}">
@@ -74,6 +77,7 @@
         </div>
         {% endif %}
     </div>
+    {% endif %}
 </div>
 <div class="ui divider"></div>
 {% if book.summary %}

@@ -2,7 +2,7 @@
 {% load highlight_filter %}
 
 <div class="ui vertically padded stackable grid">
-    <div class="twelve wide column">
+    <div class="{% if note.tags.count %}twelve{% else %}sixteen{% endif %} wide column">
         <h2 class="ui header">
             <div class="content">
                 <i class="yellow sticky note icon"></i>
@@ -17,9 +17,11 @@
                     {% endif %}
                 </a>
                 {% endif %}
+                {% if request.user.is_staff %}
                 <a href="{% url 'edit_note' note.pk %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
             </div>
         </h2>
     </div>

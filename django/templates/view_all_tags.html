@@ -38,9 +38,11 @@
             </p>
             <p>
                 {{ tag.description }}
+                {% if request.user.is_staff %}
                 <a href="{% url 'admin:books_tag_change' tag.pk %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
             </p>
         </div>
     </div>

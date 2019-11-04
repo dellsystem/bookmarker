@@ -17,9 +17,11 @@
                     {{ note.subject|truncatechars:65 }}
                     {% endif %}
                 </a>
+                {% if request.user.is_staff %}
                 <a href="{% url 'edit_note' note.pk %}">
                     <i class="edit icon"></i>
                 </a>
+                {% endif %}
             </span>
             <div class="metadata">
                 <div class="date" title="{{ note.added }}">

@@ -84,12 +84,14 @@
             {{ section.num_notes }} <i class="sticky note icon"></i>
             {% endif %}
         </div>
+        {% if request.user.is_staff %}
         <div class="one wide right aligned column">
             <a class="ui mini icon {% if not section.summary %}red{% endif %} button"
                href="{% url 'edit_section' section.pk %}">
                 <i class="edit icon"></i>
             </a>
         </div>
+        {% endif %}
     </div>
     <div class="tablet mobile only row">
         <div class="three wide column">
@@ -130,10 +132,12 @@
             {{ section.num_terms }} <i class="flag icon"></i>
             /
             {{ section.num_notes }} <i class="sticky note icon"></i>
+            {% if request.user.is_staff %}
             <a class="ui mini icon {% if not section.summary %}red{% endif %} button"
                href="{% url 'edit_section' section.pk %}">
                 <i class="edit icon"></i>
             </a>
+            {% endif %}
         </div>
     </div>
     {% endwith %}
