@@ -14,7 +14,8 @@ is also a great way to creep on what books I'm reading.
 Setup
 -----
 
-Django 1.10. Run `python django/manage.py runserver`.
+Django 1.11. Run `python django/manage.py runserver`. Deploy with nginx,
+guinicorn, and systemd.
 
 (Optional) set the following environment variables (ideally using virtualenv)
 
