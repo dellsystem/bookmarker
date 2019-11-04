@@ -30,5 +30,5 @@ six==1.11.0
 sqlparse==0.2.4
 terminaltables==3.1.0
 -e git+https://github.com/dellsystem/translate-term.git@e1a585826d64cb16c83d783a16b0e84d848bfc44#egg=translate_term
-urllib3==1.22
+urllib3==1.24.2
 xmltodict==0.11.0
