@@ -3,10 +3,10 @@
 {% with o=action.primary_instance %}
 <div class="extra text">
     {% with book=action.secondary_instance %}
-    <div class="ui grid">
+    <div class="ui stackable grid">
         <div class="two wide column">
             <a href="{{ book.get_absolute_url }}">
-                <img src="{{ book.image_url }}" class="ui fluid image" />
+                <img src="{{ book.image_url }}" class="ui tiny image" />
             </a>
         </div>
         <div class="fourteen wide column">
