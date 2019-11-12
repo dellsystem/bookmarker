@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'config_models',
     'debug_toolbar',
     'bookmarker',
     'languages',
