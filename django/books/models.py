@@ -4,8 +4,8 @@ from heapq import merge
 import operator
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 from languages.fields import LanguageField
 
 from .api import CLIENT
@@ -21,7 +21,7 @@ class Author(models.Model):
     class Meta:
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_absolute_url(self):
@@ -69,6 +69,8 @@ class BookDetails(models.Model):
     publisher = models.CharField(max_length=50, blank=True, null=True)
     num_pages = models.PositiveSmallIntegerField(blank=True, null=True)
     verified = models.BooleanField(default=False)  # the ISBN and related details
+    review = models.TextField(blank=True)
+    shelves = models.TextField(blank=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     rating = RatingField(default=0, blank=True)
@@ -101,7 +103,7 @@ class Book(models.Model):
     source_url = models.URLField(blank=True)
     slug = models.SlugField(unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def is_publication(self):
@@ -242,7 +244,8 @@ class PageArtefact(models.Model):
 
 class Section(PageArtefact):
     # TODO: unique together for book & number
-    book = models.ForeignKey(Book, related_name='sections')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE,
+        related_name='sections')
     number = models.PositiveSmallIntegerField(blank=True, null=True,
         help_text='Chapter number (if relevant')
     authors = models.ManyToManyField(Author, related_name='sections', blank=True)
@@ -251,7 +254,8 @@ class Section(PageArtefact):
     summary = models.TextField(blank=True)
     rating = RatingField(default=0, blank=True)
     source_url = models.URLField(blank=True)
-    related_to = models.ForeignKey('self', blank=True, null=True)
+    related_to = models.ForeignKey('self', on_delete=models.CASCADE,
+        blank=True, null=True)
     slug = models.SlugField(blank=True)  # only for link-worthy sections
     skipped = models.BooleanField(default=False, help_text='Not yet read')
     date = models.DateField(blank=True, null=True)  # only publications
@@ -259,7 +263,7 @@ class Section(PageArtefact):
     class Meta:
         ordering = ['-in_preface', 'page_number']
 
-    def __unicode__(self):
+    def __str__(self):
         return "{book} - {title}".format(
             title=self.title,
             book=self.book.title
@@ -434,7 +438,7 @@ class TagCategory(models.Model):
     class Meta:
         verbose_name_plural = 'Tag categories'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
 
@@ -445,12 +449,13 @@ class Tag(models.Model):
         default=False,
         help_text='Whether it shows up in the "View faves" page'
     )
-    category = models.ForeignKey(TagCategory, blank=True, null=True)
+    category = models.ForeignKey(TagCategory, on_delete=models.CASCADE,
+        blank=True, null=True)
 
     class Meta:
         ordering = ['category__slug', 'slug']
 
-    def __unicode__(self):
+    def __str__(self):
         if self.category:
             return '{}/{}'.format(self.category.slug, self.slug)
         else:
@@ -512,13 +517,14 @@ class Tag(models.Model):
 
 
 class Note(SectionArtefact):
-    book = models.ForeignKey(Book, related_name='notes')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE,
+        related_name='notes')
     added = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=100)
-    quote = models.TextField(blank=True)
+    quote = models.TextField()
     comment = models.TextField(blank=True)
-    section = models.ForeignKey(Section, blank=True, null=True,
-                                related_name='notes')
+    section = models.ForeignKey(Section, on_delete=models.CASCADE,
+        blank=True, null=True, related_name='notes')
     # Should only be empty if the original author isn't in our database.
     # Will usually inherit from the Section, if present, or the book.
     authors = models.ManyToManyField(Author, blank=True, related_name='notes')
@@ -567,7 +573,7 @@ class Note(SectionArtefact):
             page=self.page_number
         )
 
-    def __unicode__(self):
+    def __str__(self):
         return "{subject} - {book}".format(
             subject=self.subject,
             book=self.book.title

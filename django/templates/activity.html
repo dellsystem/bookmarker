@@ -29,24 +29,29 @@
     </div>
 </div>
 
-{% include "pagination.html" with items=actions  only %}
+{% include "pagination.html" with items=paged_actions  only %}
 <div class="ui large feed">
-    {% for action in actions %}
+    {% for action, show_book in actions %}
     <div class="event">
         <div class="label">
             <i class="{{ action.icon }} icon"></i>
         </div>
         <div class="content">
             <div class="summary">
-                You {{ action.verb }} {{ action.noun }}
+                You {{ action.verb }}
+                {% if action.category == 'book' and not show_book %}
+                    the same book as above
+                {% else %}
+                {{ action.noun }}
+                {% endif %}
                 <div class="date" title="{{ action.timestamp }}">
                     {{ action.timestamp|naturaltime }}
                 </div>
             </div>
-            {% include action.display_template with action=action only %}
+            {% include action.display_template with action=action show_book=show_book only %}
         </div>
     </div>
     {% endfor %}
 </div>
-{% include "pagination.html" with items=actions  only %}
+{% include "pagination.html" with items=paged_actions  only %}
 {% endblock %}

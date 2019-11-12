@@ -3,9 +3,11 @@
     {% with book=action.secondary_instance %}
     <div class="ui grid">
         <div class="two wide computer three wide tablet four wide mobile column">
+            {% if show_book %}
             <a href="{{ book.get_absolute_url }}">
                 <img src="{{ book.image_url }}" class="ui tiny image" />
             </a>
+            {% endif %}
         </div>
         <div class="fourteen wide computer thirteen wide tablet twelve wide mobile column">
             {% if section %}
@@ -21,9 +23,11 @@
                 {% else %}
                 (missing author)
                 {% endif %}
+                {% if show_book %}
                 <div class="sub header">
                     <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
                 </div>
+                {% endif %}
             </h3>
             {% else %}
             <div class="ui error message">

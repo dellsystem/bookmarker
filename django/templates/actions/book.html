@@ -1,3 +1,4 @@
+{% if show_book %}
 {% with book=action.primary_instance %}
 <div class="extra text">
     <div class="ui grid">
@@ -23,3 +24,4 @@
     </div>
 </div>
 {% endwith %}
+{% endif %}

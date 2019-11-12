@@ -13,8 +13,7 @@ def markdownify(text):
     return mark_safe(
         markdown.markdown(
             text,
-            ['superscript'],
-            safe_mode='escape',
+            extensions=['superscript'],
             smart_emphasis=False
         ).replace('    ', '&ensp;')
     )
@@ -27,7 +26,7 @@ def markdownify_title(text):
     prevents ordered lists from being created."""
     if OL_REGEX.match(text):
         text = OL_REGEX.sub(r'\1\\. ', text)
-    output = markdown.markdown(text, safe_mode='escape', smart_emphasis=False)
+    output = markdown.markdown(text, smart_emphasis=False)
     if output.startswith('<p>') and output.endswith('</p>'):
         output = output[3:-4]
     if output.startswith('<h1>') and output.endswith('</h1>'):

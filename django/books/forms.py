@@ -55,7 +55,7 @@ class PageNumberForm:
 
 class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
     # This has to be here and not in SectionChoiceForm, otherwise the label
-    # won't show up correctly (it'll default to __unicode__)
+    # won't show up correctly (it'll default to __str__)
     section = SectionChoiceField(
         queryset=Section.objects.none(),
         required=False,
