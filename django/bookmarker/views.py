@@ -39,13 +39,13 @@ def home(request):
     paginator = Paginator(actions_list, 25)
     page = request.GET.get('page')
     try:
-        actions = paginator.page(page)
+        paged_actions = paginator.page(page)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        actions = paginator.page(1)
+        paged_actions = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        actions = paginator.page(paginator.num_pages)
+        paged_actions = paginator.page(paginator.num_pages)
 
     all_books = Book.objects.order_by(
         'is_processed', 'completed_sections', '-pk'
@@ -71,6 +71,15 @@ def home(request):
         ),
     }
 
+    # Hide the book info for actions that have the same book as the preceding
+    # action.
+    previous_book_id = None
+    actions = []
+    for action in paged_actions:
+        show_book = action.book_id != previous_book_id
+        actions.append((action, show_book))
+        previous_book_id = action.book_id
+
     # Create a sorted list of available categories (with associated icon).
     filter_categories = [
         (c, CATEGORIES[c]['icon']) for c in FILTER_CATEGORIES
@@ -78,6 +87,7 @@ def home(request):
     context = {
         'books': books,
         'actions': actions,
+        'paged_actions': paged_actions,
         'mode': mode,
         'filter_categories': filter_categories,
     }

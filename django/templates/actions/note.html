@@ -5,9 +5,11 @@
     {% with book=action.secondary_instance %}
     <div class="ui stackable grid">
         <div class="two wide column">
+            {% if show_book %}
             <a href="{{ book.get_absolute_url }}">
                 <img src="{{ book.image_url }}" class="ui tiny image" />
             </a>
+            {% endif %}
         </div>
         <div class="fourteen wide column">
             {% if note %}
@@ -21,9 +23,11 @@
                     {{ tag }}
                 </a>
                 {% endfor %}
+                {% if show_book %}
                 <div class="sub header">
                     <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
                 </div>
+                {% endif %}
             </h3>
             {% include "note_body.html" with note=note truncate=1 only %}
             {% else %}

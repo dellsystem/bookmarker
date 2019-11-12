@@ -5,17 +5,21 @@
     {% with book=action.secondary_instance %}
     <div class="ui stackable grid">
         <div class="two wide column">
+            {% if show_book %}
             <a href="{{ book.get_absolute_url }}">
                 <img src="{{ book.image_url }}" class="ui tiny image" />
             </a>
+            {% endif %}
         </div>
         <div class="fourteen wide column">
             {% if o %}
             <h3 class="ui header">
                 <a href="{{ o.get_absolute_url }}">{{ o.term }}</a>
+                {% if show_book %}
                 <div class="sub header">
                     <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
                 </div>
+                {% endif %}
             </h3>
             {% include 'term_occurrence_display.html' with o=o truncate=True only %}
             {% else %}

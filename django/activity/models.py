@@ -14,6 +14,7 @@ CATEGORIES = {
         'icon': 'user',
         'noun': 'an author',
         'filter': True,
+        'book_model': None,
     },
     'book': {
         'primary_model': Book,
@@ -22,6 +23,7 @@ CATEGORIES = {
         # TODO: differentiate between books & publications
         'noun': 'a book',
         'filter': True,
+        'book_model': 'primary',
     },
     'tag': {
         'primary_model': Tag,
@@ -29,6 +31,7 @@ CATEGORIES = {
         'icon': 'tag',
         'noun': 'a tag',
         'filter': True,
+        'book_model': None,
     },
     'note': {
         'primary_model': Note,
@@ -36,6 +39,7 @@ CATEGORIES = {
         'icon': 'sticky note',
         'noun': 'a note',
         'filter': True,
+        'book_model': 'secondary',
     },
     'section': {
         'primary_model': Section,
@@ -44,6 +48,7 @@ CATEGORIES = {
         # TODO: differentiate between chapters/articles/webpages?
         'noun': 'a section',
         'filter': True,
+        'book_model': 'secondary',
     },
     'note_tag': {
         'primary_model': Note,
@@ -51,6 +56,7 @@ CATEGORIES = {
         'icon': 'tags',
         'noun': 'a note tag',
         'filter': False,
+        'book_model': None,
     },
     'term': {
         'primary_model': TermOccurrence,
@@ -58,6 +64,7 @@ CATEGORIES = {
         'icon': 'flag',  # TODO: this is wrong
         'noun': 'a vocabulary term',
         'filter': True,
+        'book_model': 'secondary',
     }
 }
 CATEGORY_CHOICES = [
@@ -109,6 +116,15 @@ class Action(models.Model):
     def secondary_instance(self):
         model = CATEGORIES[self.category]['secondary_model']
         return model.objects.get(pk=self.secondary_id)
+
+    @property
+    def book_id(self):
+        """Needs tests. Should be simplified w/o overengineering."""
+        book_model = CATEGORIES[self.category]['book_model']
+        if book_model is not None:
+            if book_model == 'primary':
+                return self.primary_id
+            return self.secondary_id
 
     def __str__(self):
         return "{verb}: {noun} ({primary}, {secondary})".format(
