@@ -69,6 +69,8 @@ class BookDetails(models.Model):
     publisher = models.CharField(max_length=50, blank=True, null=True)
     num_pages = models.PositiveSmallIntegerField(blank=True, null=True)
     verified = models.BooleanField(default=False)  # the ISBN and related details
+    review = models.TextField(blank=True)
+    shelves = models.TextField(blank=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     rating = RatingField(default=0, blank=True)
