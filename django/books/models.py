@@ -519,7 +519,7 @@ class Note(SectionArtefact):
         related_name='notes')
     added = models.DateTimeField(auto_now_add=True)
     subject = models.CharField(max_length=100)
-    quote = models.TextField(blank=True)
+    quote = models.TextField()
     comment = models.TextField(blank=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE,
         blank=True, null=True, related_name='notes')
