@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from .models import Author, Book, Note, TagCategory, Tag, Section
+from .models import Author, Book, BookDetails, Note, TagCategory, Tag, Section
 
 
 @admin.register(Author)
@@ -21,6 +21,13 @@ class SectionAdmin(admin.ModelAdmin):
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug']
+    search_fields = ['title']
+
+
+@admin.register(BookDetails)
+class BookDetailsAdmin(admin.ModelAdmin):
+    list_display = ['book']
+    search_fields = ['book__title']
 
 
 @admin.register(Note)
