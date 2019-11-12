@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.html import mark_safe
 
 from .models import Author, Book, Note, TagCategory, Tag, Section

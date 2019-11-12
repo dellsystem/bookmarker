@@ -1,13 +1,13 @@
 from datetime import datetime
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from books.api import CLIENT
 from books.models import Book, BookDetails
 
 
 DATE_FORMAT = '%a %b %d %H:%M:%S %Y'
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     def handle_noargs(self, **options):
         CLIENT.authenticate()
         user = CLIENT.user('60292716')

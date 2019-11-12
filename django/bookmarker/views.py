@@ -6,11 +6,11 @@ import re
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
 from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST

@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import re
 
 from django.db import models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from languages.fields import LanguageField
 import markdown
@@ -19,7 +19,7 @@ class TermCategory(models.Model):
         verbose_name_plural = 'Term categories'
         ordering = ['confidence']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -33,7 +33,7 @@ class Term(models.Model):
     class Meta:
         ordering = ['text']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text
 
     def get_absolute_url(self):
@@ -44,14 +44,16 @@ class Term(models.Model):
 
 
 class TermOccurrence(SectionArtefact):
-    term = models.ForeignKey(Term, related_name='occurrences')
-    book = models.ForeignKey(Book, related_name='terms')
+    term = models.ForeignKey(Term, on_delete=models.CASCADE,
+        related_name='occurrences')
+    book = models.ForeignKey(Book, on_delete=models.CASCADE,
+        related_name='terms')
     added = models.DateTimeField(auto_now_add=True)
-    section = models.ForeignKey(Section, blank=True, null=True,
-                                related_name='terms')
+    section = models.ForeignKey(Section, on_delete=models.CASCADE,
+        blank=True, null=True, related_name='terms')
     quote = models.TextField(blank=True)
     comments = models.TextField(blank=True)
-    category = models.ForeignKey(TermCategory)
+    category = models.ForeignKey(TermCategory, on_delete=models.CASCADE)
     is_new = models.BooleanField()
     is_defined = models.BooleanField()  # if the author expects unfamiliarity
     # Should only be empty if the original author isn't in our database.
@@ -68,7 +70,7 @@ class TermOccurrence(SectionArtefact):
     def get_absolute_url(self):
         return reverse('view_occurrence', args=[str(self.id)])
 
-    def __unicode__(self):
+    def __str__(self):
         return "{term} in {book}".format(
             term=self.term.text,
             book=self.book.title,
@@ -90,4 +92,5 @@ class TermOccurrence(SectionArtefact):
                 # Only need to highlight on one term.
                 break
 
-        return markdown.markdown(q, ['superscript'], smart_emphasis=False)
+        return markdown.markdown(q, extensions=['superscript'],
+            smart_emphasis=False)

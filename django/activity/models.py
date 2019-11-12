@@ -61,7 +61,7 @@ CATEGORIES = {
     }
 }
 CATEGORY_CHOICES = [
-    (key, value['noun']) for key, value in CATEGORIES.iteritems()
+    (key, value['noun']) for key, value in CATEGORIES.items()
 ]
 VERB_CHOICES = [
     ('added', 'added'),
@@ -110,7 +110,7 @@ class Action(models.Model):
         model = CATEGORIES[self.category]['secondary_model']
         return model.objects.get(pk=self.secondary_id)
 
-    def __unicode__(self):
+    def __str__(self):
         return "{verb}: {noun} ({primary}, {secondary})".format(
             verb=self.verb,
             noun=self.noun,
