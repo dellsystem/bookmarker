@@ -9,5 +9,5 @@
 {% block content %}
 {% include 'admin_tools.html' %}
 <h1>View {{ book_type }} ({{ displayed_books.count }})</h1>
-{% include 'book_list.html' with books=displayed_books only %}
+{% include 'book_list.html' with books=displayed_books %}
 {% endblock %}
