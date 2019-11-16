@@ -250,7 +250,7 @@ class BookForm(forms.ModelForm):
 class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
-        exclude = ['goodreads_id']
+        fields = '__all__'
 
 
 class TagForm(forms.ModelForm):

@@ -2,21 +2,59 @@ from __future__ import unicode_literals
 import collections
 from heapq import merge
 import operator
+import re
 
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 from languages.fields import LanguageField
 
 from .api import CLIENT
 from .utils import int_to_roman, roman_to_int
 
 
+class AuthorManager(models.Manager):
+    def create_from_goodreads(self, goodreads_id, goodreads_name, goodreads_link):
+        """Only call this if you're sure the goodreads author doesn'ta lready
+        exist."""
+        # Clean the name (get rid of extraneous whitespace).
+        name = ' '.join(goodreads_name.split())
+        slug = slugify(name)
+
+        # If the author already exists for this slug, assume it's different,
+        # and give this author a different slug.
+        existing_author = Author.objects.filter(slug=slug)
+        if existing_author.exists():
+            i = 2
+            while True:
+                potential_slug = "{}-{}".format(slug, i)
+                if Author.objects.filter(slug=potential_slug).exists():
+                    i += 1
+                else:
+                    slug = potential_slug
+                    name = "{} {}".format(name, i)
+                    break
+
+        # Create the author and the goodreads author.
+        author = Author.objects.create(
+            name=name,
+            link=goodreads_link,
+            slug=slug,
+        )
+        author.goodreadsauthor_set.create(
+            goodreads_id=goodreads_id,
+            goodreads_link=goodreads_link,
+        )
+        return author
+
+
 class Author(models.Model):
-    goodreads_id = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=100)
-    link = models.URLField()
-    slug = models.SlugField(null=True)
+    link = models.URLField(help_text='Only needed if no goodreads author')
+    slug = models.SlugField(unique=True)
+    objects = AuthorManager()
 
     class Meta:
         ordering = ['name']
@@ -39,10 +77,51 @@ class Author(models.Model):
         return books
 
 
-class BookManager(models.Manager):
-    def create_book(self, goodreads_id):
-        pass
+class GoodreadsAuthor(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    goodreads_id = models.CharField(max_length=20, unique=True)
+    goodreads_link = models.URLField()
 
+
+GR_IMAGE_URL_RE = re.compile(r'_SX98_.jpg$')
+class BookManager(models.Manager):
+    def create_from_goodreads(self, goodreads_id, title, link, publication_date,
+                              isbn13, publisher, num_pages, image_url):
+        details = BookDetails.objects.create(
+            goodreads_id=goodreads_id,
+            link=link,
+            year=int(publication_date[2]),
+            isbn=isbn13,
+            publisher=publisher,
+            num_pages=int(num_pages) if num_pages else None,
+        )
+
+        # Replace the SX98_.jpg at the end with SX475_.jpg
+        image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
+        # If there's a :, strip out everything after it for the slug.
+        slug = slugify(title.split(':')[0])
+
+        # If the book already exists for this slug, give this book a number
+        # after the slug.
+        existing_book = Book.objects.filter(slug=slug)
+        if existing_book.exists():
+            i = 2
+            while True:
+                potential_slug = "{}-{}".format(slug, i)
+                if Book.objects.filter(slug=potential_slug).exists():
+                    i += 1
+                else:
+                    slug = potential_slug
+                    break
+
+        book = Book.objects.create(
+            details=details,
+            title=title,
+            image_url=image_url,
+            slug=slug,
+        )
+
+        return book
 
 class RatingField(models.IntegerField):
     def __init__(self, min_value=0, max_value=5, **kwargs):
@@ -222,6 +301,13 @@ class PageArtefact(models.Model):
             'authors': authors,
         }
 
+    @property
+    def int_page_number(self):
+        if self.in_preface:
+            return -self.page_number
+        else:
+            return self.page_number
+
     def __cmp__(self, other):
         """So we can compare notes with terms."""
         if self.in_preface:
@@ -285,6 +371,7 @@ class Section(PageArtefact):
             self.terms.all().prefetch_related(
                 'category', 'authors', 'term', 'section__authors',
             ),
+            key=lambda x: x.int_page_number
         )
 
     def has_default_authors(self):

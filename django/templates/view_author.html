@@ -72,7 +72,9 @@
                 <div class="content">
                     <a href="{{ row.book.get_absolute_url }}">{{ row.book.title }}</a>
                     <div class="sub header">
-                        {% include 'author_list.html' with authors=row.book.default_authors only %}
+                        {% if row.book.details %}
+                        {% include 'author_list.html' with authors=row.book.details.default_authors only %}
+                        {% endif %}
                     </div>
                 </div>
             </h3>
