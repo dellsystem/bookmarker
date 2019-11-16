@@ -301,6 +301,13 @@ class PageArtefact(models.Model):
             'authors': authors,
         }
 
+    @property
+    def int_page_number(self):
+        if self.in_preface:
+            return -self.page_number
+        else:
+            return self.page_number
+
     def __cmp__(self, other):
         """So we can compare notes with terms."""
         if self.in_preface:
@@ -364,6 +371,7 @@ class Section(PageArtefact):
             self.terms.all().prefetch_related(
                 'category', 'authors', 'term', 'section__authors',
             ),
+            key=lambda x: x.int_page_number
         )
 
     def has_default_authors(self):
