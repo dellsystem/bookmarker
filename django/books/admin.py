@@ -2,14 +2,20 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from .models import Author, Book, BookDetails, Note, TagCategory, Tag, Section
+from .models import GoodreadsAuthor, Author, Book, BookDetails, Note, \
+                    TagCategory, Tag, Section
+
+
+class GoodreadsAuthorInline(admin.TabularInline):
+    model = GoodreadsAuthor
 
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'goodreads_id']
+    list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',), }
     search_fields = ['name']
+    inlines = [GoodreadsAuthorInline]
 
 
 @admin.register(Section)

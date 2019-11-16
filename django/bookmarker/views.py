@@ -1,7 +1,6 @@
 import collections
 import datetime
 import random
-import re
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -11,7 +10,6 @@ from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.utils.text import slugify
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
@@ -20,7 +18,7 @@ from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm
 from books.models import Book, Author, Note, Tag, Section, \
-                         BookDetails, TagCategory
+                         BookDetails, TagCategory, GoodreadsAuthor
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
@@ -466,27 +464,33 @@ def add_term(request, slug):
 def add_author(request):
     goodreads_id = request.POST.get('goodreads_id')
     if goodreads_id:
-        gr_author = CLIENT.author(goodreads_id)
-
-        try:
-            author = Author.objects.get(goodreads_id=goodreads_id)
-        except Author.DoesNotExist:
-            author = Author.objects.create(
-                goodreads_id=goodreads_id,
-                name=gr_author.name,
-                link=gr_author.link,
-                slug=slugify(gr_author.name)[:50],
-            )
-            Action.objects.create(
-                category='author',
-                primary_id=author.pk,
-                verb='added',
-                details=author.name,
-            )
-            messages.success(
+        # See if author already exists.
+        gr_author = GoodreadsAuthor.objects.filter(goodreads_id=goodreads_id)
+        if gr_author.exists():
+            messages.error(
                 request,
-                u'Added author: {}'.format(author.name),
+                'Author for ID {} already exists'.format(goodreads_id)
             )
+            return redirect(gr_author.first().author)
+
+        # Author doesn't exist - fetch from goodreads api
+        author_data = CLIENT.author(goodreads_id)
+        author = Author.objects.create_from_goodreads(
+            goodreads_id=goodreads_id,
+            goodreads_name=author_data.name,
+            goodreads_link=author_data.link,
+        )
+
+        Action.objects.create(
+            category='author',
+            primary_id=author.pk,
+            verb='added',
+            details=author.name,
+        )
+        messages.success(
+            request,
+            u'Added author: {}'.format(author.name),
+        )
 
         return redirect(author)
     else:
@@ -519,75 +523,71 @@ def add_author(request):
         return render(request, 'add_author.html', context)
 
 
-GR_IMAGE_URL_RE = re.compile(r'm(?=/\d+.jpg$)')
 @staff_member_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
     if goodreads_id:
-        gr_book = CLIENT.book(goodreads_id)
-
-        try:
-            book = Book.objects.get(details__goodreads_id=goodreads_id)
-        except Book.DoesNotExist:
-            details = BookDetails.objects.create(
-                goodreads_id=goodreads_id,
-                link=gr_book.link,
-                year=gr_book.publication_date[2],
-                isbn=gr_book.isbn13,
-                publisher=gr_book.publisher,
-                num_pages=int(gr_book.num_pages) if gr_book.num_pages else None,
-            )
-
-            # Replace the 'm' in '1234m/12345.jpg' with 'l'
-            image_url = GR_IMAGE_URL_RE.sub('l', gr_book.image_url)
-            # If there's a :, strip out everything after it for the slug.
-            slug = slugify(gr_book.title.split(':')[0])
-
-            book = Book.objects.create(
-                details=details,
-                title=gr_book.title,
-                image_url=image_url,
-                slug=slug,
-            )
-
-            Action.objects.create(
-                category='book',
-                primary_id=book.pk,
-                details=book.title,
-                verb='added',
-            )
-
-            messages.success(
+        # Check if book already exists.
+        book_qs = Book.objects.filter(details__goodreads_id=goodreads_id)
+        if book_qs.exists():
+            messages.error(
                 request,
-                u'Added book: {}'.format(book.title),
+                'Book for ID {} already exists'.format(goodreads_id)
             )
+            return redirect(book_qs.first())
 
-            for gr_author in gr_book.authors:
-                try:
-                    author = Author.objects.get(goodreads_id=gr_author.gid)
-                except Author.DoesNotExist:
-                    author = None
+        # Book doesn't exist, so get data from goodreads api.
+        book_data = CLIENT.book(goodreads_id)
+        book = Book.objects.create_from_goodreads(
+            goodreads_id=goodreads_id,
+            title=book_data.title,
+            link=book_data.link,
+            publication_date=book_data.publication_date,
+            isbn13=book_data.isbn13,
+            publisher=book_data.publisher,
+            num_pages=book_data.num_pages,
+            image_url=book_data.image_url,
+        )
 
-                if author is None:
-                    author = Author.objects.create(
-                        goodreads_id=gr_author.gid,
-                        name=gr_author.name,
-                        link=gr_author.link,
-                        slug=slugify(gr_author.name)[:50],
-                    )
-                    Action.objects.create(
-                        category='author',
-                        primary_id=author.pk,
-                        details=author.name,
-                        verb='added',
-                    )
-                    messages.success(
-                        request,
-                        u'Added author: {}'.format(author.name),
-                    )
+        Action.objects.create(
+            category='book',
+            primary_id=book.pk,
+            details=book.title,
+            verb='added',
+        )
 
-                details.authors.add(author)
-                details.default_authors.add(author)
+        messages.success(
+            request,
+            u'Added book: {}'.format(book.title),
+        )
+
+        for author_data in book_data.authors:
+            goodreads_id = author_data.gid
+            gr_author = GoodreadsAuthor.objects.filter(
+                goodreads_id=goodreads_id
+            )
+            if gr_author.exists():
+                author = gr_author.first().author
+            else:
+                # Author doesn't exist yet - must create.
+                author = Author.objects.create_from_goodreads(
+                    goodreads_id=goodreads_id,
+                    goodreads_name=author_data.name,
+                    goodreads_link=author_data.link,
+                )
+                Action.objects.create(
+                    category='author',
+                    primary_id=author.pk,
+                    details=author.name,
+                    verb='added',
+                )
+                messages.success(
+                    request,
+                    u'Added author: {}'.format(author.name),
+                )
+
+            book.details.authors.add(author)
+            book.details.default_authors.add(author)
 
         return redirect(book)
     else:
