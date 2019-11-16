@@ -61,8 +61,9 @@ def home(request):
             details__isnull=False,
         ),
         'unread': all_books.filter(completed_read=False),
-        'started': all_books.filter(
-            completed_sections=True
+        'incomplete': all_books.filter(
+            completed_sections=True,
+            is_processed=False,
         ),
         'publications': all_books.filter(
             details__isnull=True
@@ -109,8 +110,9 @@ def view_books(request, book_type):
             details__isnull=False,
         ),
         'unread': all_books.filter(completed_read=False),
-        'started': all_books.filter(
-            completed_sections=True
+        'incomplete': all_books.filter(
+            completed_sections=True,
+            is_processed=False,
         ),
         'publications': all_books.filter(
             details__isnull=True
