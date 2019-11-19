@@ -7,7 +7,7 @@
             </div>
             <div class="fifteen wide column">
                 {% for note in book.list %}
-                    {% include 'note_header.html' with note=note highlight=highlight only %}
+                    {% include 'note_header.html' with note=note highlight=highlight %}
                     {% include 'note_body.html' with note=note highlight=highlight %}
                     <br />
                 {% endfor %}
