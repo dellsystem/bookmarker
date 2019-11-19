@@ -71,6 +71,8 @@ class Author(models.Model):
         # This needs to be optimised
         for details in self.books.all():
             books.add(details.book.pk)
+        for details in self.default_books.all():
+            books.add(details.book.pk)
         for section in self.sections.all():
             books.add(section.book_id)
 
@@ -157,10 +159,13 @@ class BookDetails(models.Model):
         default=False,
         help_text='If the authors are actually editors'
     )
-    # 'authors' is taken directly from GoodReads. Currently not used anywhere.
+    # 'authors' is taken directly from GoodReads. Currently used for display
+    # purposes only (not when inferring the author for a Section, e.g.).
+    # Not currently editable via the web interface.
     authors = models.ManyToManyField(Author, blank=True, related_name='books')
     # The default authors set on a Section/Term/Note if they aren't specified.
-    # If empty, then it's assumed that most sections are by different authors.
+    # If empty (e.g., if it's an edited collection), then it's assumed that
+    # most sections are by different authors.
     default_authors = models.ManyToManyField(Author,
                                              blank=True,
                                              related_name='default_books')
