@@ -952,6 +952,8 @@ def view_author(request, slug):
     # Find the author's direct books.
     for details in author.books.all():
         book_ids.add(details.book.pk)
+    for details in author.default_books.all():
+        book_ids.add(details.book.pk)
 
     # Find all the books for which the author has some sections.
     sections_by_book = collections.defaultdict(list)

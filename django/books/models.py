@@ -71,6 +71,8 @@ class Author(models.Model):
         # This needs to be optimised
         for details in self.books.all():
             books.add(details.book.pk)
+        for details in self.default_books.all():
+            books.add(details.book.pk)
         for section in self.sections.all():
             books.add(section.book_id)
 
@@ -157,10 +159,13 @@ class BookDetails(models.Model):
         default=False,
         help_text='If the authors are actually editors'
     )
-    # 'authors' is taken directly from GoodReads. Currently not used anywhere.
+    # 'authors' is taken directly from GoodReads. Currently used for display
+    # purposes only (not when inferring the author for a Section, e.g.).
+    # Not currently editable via the web interface.
     authors = models.ManyToManyField(Author, blank=True, related_name='books')
     # The default authors set on a Section/Term/Note if they aren't specified.
-    # If empty, then it's assumed that most sections are by different authors.
+    # If empty (e.g., if it's an edited collection), then it's assumed that
+    # most sections are by different authors.
     default_authors = models.ManyToManyField(Author,
                                              blank=True,
                                              related_name='default_books')
@@ -308,19 +313,6 @@ class PageArtefact(models.Model):
         else:
             return self.page_number
 
-    def __cmp__(self, other):
-        """So we can compare notes with terms."""
-        if self.in_preface:
-            if other.in_preface:
-                return cmp(self.page_number, other.page_number)
-            else:
-                return -1
-        else:
-            if other.in_preface:
-                return 1
-            else:
-                return cmp(self.page_number, other.page_number)
-
     def get_page_display(self):
         if self.in_preface:
             return int_to_roman(self.page_number)
@@ -363,7 +355,7 @@ class Section(PageArtefact):
 
     def get_artefacts(self):
         """Returns a generator mixing notes and termoccurrences, ordered by
-        page (only because PageArtefact defines a custom __cmp__ method)."""
+        page (see the int_page_number property on PageArtefact)."""
         return merge(
             self.notes.all().prefetch_related(
                 'tags', 'authors', 'section__authors'
