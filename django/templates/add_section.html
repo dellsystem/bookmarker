@@ -34,7 +34,7 @@
 <h3>
     Existing sections ({{ count }} total)
 </h3>
-{% include 'section_list.html' with sections=sections only %}
+{% include 'section_list.html' with sections=sections hide_counts=True %}
 {% else %}
 <div class="ui warning message">
     <div class="header">
