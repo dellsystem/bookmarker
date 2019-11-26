@@ -92,14 +92,18 @@ class BookManager(models.Manager):
         details = BookDetails.objects.create(
             goodreads_id=goodreads_id,
             link=link,
-            year=int(publication_date[2]),
+            year=int(publication_date[2]) if publication_date[2] else None,
             isbn=isbn13,
             publisher=publisher,
             num_pages=int(num_pages) if num_pages else None,
         )
 
         # Replace the SX98_.jpg at the end with SX475_.jpg
-        image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
+        if image_url:
+            image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
+        else:
+            image_url = ''
+
         # If there's a :, strip out everything after it for the slug.
         slug = slugify(title.split(':')[0])
 
