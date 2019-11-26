@@ -304,9 +304,6 @@ def add_section(request, slug):
 
     sections = book.sections.prefetch_related(
         'authors', 'book__details__default_authors',
-    ).annotate(
-        num_terms=Count('terms', distinct=True),
-        num_notes=Count('notes', distinct=True),
     )
 
     context = {
