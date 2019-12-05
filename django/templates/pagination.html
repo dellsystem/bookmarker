@@ -15,7 +15,7 @@
         {% if items.has_previous %}
         <a class="item"
            title="First"
-           href="?page=1{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
+           href="?page=1{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
@@ -24,7 +24,7 @@
         {% if items.has_previous %}
         <a class="item"
            title="Previous"
-           href="?page={{ items.previous_page_number }}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
+           href="?page={{ items.previous_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
@@ -37,7 +37,7 @@
         {% if items.has_next %}
         <a class="item"
            title="Next"
-           href="?page={{ items.next_page_number }}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
+           href="?page={{ items.next_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
@@ -46,7 +46,7 @@
         {% if items.has_next %}
         <a class="item"
            title="Last"
-           href="?page={{ items.paginator.num_pages }}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
+           href="?page={{ items.paginator.num_pages }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}">
         {% else %}
         <a class="disabled item">
         {% endif %}
