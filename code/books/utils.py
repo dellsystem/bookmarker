@@ -34,3 +34,19 @@ def roman_to_int(n):
             result += integer
             i += len(numeral)
     return result
+
+
+def get_page_details(page):
+    """Given a string representing a page number that may be in roman numeral
+    form, return an integer and whether it's a roman numeral or not."""
+    in_preface = False
+    try:
+        value = int(page)
+    except ValueError:
+        value = roman_to_int(page)
+        in_preface = True
+
+    if value > 0:
+        return value, in_preface
+    else:
+        raise ValueError

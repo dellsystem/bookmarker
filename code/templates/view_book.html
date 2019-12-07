@@ -53,11 +53,15 @@
                     chapter
                     {% endif %}
                 </a>
+                <a class="ui black icon button" href="{% url 'add_sections' book.slug %}"
+                   title="Add multiple sections">
+                    <i class="upload icon"></i>
+                </a>
                 {% if book.details %}
                 <button class="ui green icon button"
                         name="mode"
                         value="sections">
-                    <i class="check icon"></i> Done
+                    <i class="check icon"></i>
                 </button>
                 {% endif %}
             </div>

@@ -1,7 +1,40 @@
 from django import forms
 
 from books.models import Author, Note, Section, Book, BookDetails, Tag
-from books.utils import roman_to_int
+from books.utils import roman_to_int, get_page_details
+
+
+class MultipleSectionsForm(forms.Form):
+    """For adding multiple sections at a time, in the format of
+    [section title] [page number]
+    for each line"""
+    sections = forms.CharField(widget=forms.Textarea)
+
+    def clean_sections(self):
+        data = self.cleaned_data['sections']
+        sections = []
+        for line in data.splitlines():
+            words = line.strip().split()
+            if not words:
+                # Skip empty lines and whitespace-only lines
+                continue
+
+            title = ' '.join(words[:-1])
+            if not title:
+                raise forms.ValidationError(
+                    "Invalid line: {}".format(line)
+                )
+
+            try:
+                page_number, in_preface = get_page_details(words[-1])
+            except ValueError:
+                raise forms.ValidationError(
+                    "Invalid number: {}".format(words[-1])
+            )
+
+            sections.append((title, page_number, in_preface))
+
+        return sections
 
 
 class SectionChoiceField(forms.ModelChoiceField):
@@ -97,21 +130,10 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         else:
             note.book = self.book
 
-        page = note.page_number
-        try:
-            page_number = int(page)
-        except ValueError:
-            page_number = None
-
-        in_preface = False
-        if page_number is None:
-            # Check if it's a roman numeral.
-            page_number = roman_to_int(page)
-            if page_number:
-                in_preface = True
-
+        page_number, in_preface = get_page_details(note.page_number)
         note.page_number = page_number
         note.in_preface = in_preface
+
         section = self.cleaned_data.get('section')
         if section:
             note.section = section
@@ -168,18 +190,7 @@ class SectionForm(forms.ModelForm, PageNumberForm):
             # We're creating the section for the first time.
             section.book = self.book
 
-        page = section.page_number
-        try:
-            page_number = int(page)
-        except ValueError:
-            page_number = None
-
-        in_preface = False
-        if page_number is None:
-            # Check if it's a roman numeral.
-            page_number = roman_to_int(page)
-            if page_number:
-                in_preface = True
+        page_number, in_preface = get_page_details(section.page_number)
 
         if section.rating is None:
             section.rating = 0
@@ -195,7 +206,7 @@ class SectionForm(forms.ModelForm, PageNumberForm):
         if author_form.cleaned_data['mode'] == 'default' and section.book.details:
             section.authors.add(*section.book.details.default_authors.all())
         elif author_form.cleaned_data['mode'] == 'custom':
-                section.authors.add(*author_form.cleaned_data['authors'])
+            section.authors.add(*author_form.cleaned_data['authors'])
 
         return section
 

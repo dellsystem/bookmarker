@@ -16,7 +16,8 @@ from django.views.decorators.http import require_POST
 from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
 from books.api import CLIENT
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
-                        BookDetailsForm, AuthorForm, TagForm
+                        BookDetailsForm, AuthorForm, TagForm, \
+                        MultipleSectionsForm
 from books.models import Book, Author, Note, Tag, Section, \
                          BookDetails, TagCategory, GoodreadsAuthor
 from bookmarker.forms import SearchFilterForm
@@ -314,6 +315,57 @@ def add_section(request, slug):
     }
 
     return render(request, 'add_section.html', context)
+
+
+@staff_member_required
+def add_sections(request, slug):
+    book = get_object_or_404(Book, slug=slug)
+    if book.completed_sections:
+        messages.error(request, 'Sections are already completed!')
+        return redirect(book)
+
+    if request.method == 'POST':
+        form = MultipleSectionsForm(request.POST)
+
+        if form.is_valid():
+            section_data = form.cleaned_data['sections']
+            for section_title, page_number, in_preface in section_data:
+                section = Section.objects.create(
+                    book=book,
+                    page_number=page_number,
+                    in_preface=in_preface,
+                    title=section_title,
+                )
+                if book.details:
+                    section.authors.add(*book.details.default_authors.all())
+
+                Action.objects.create(
+                    primary_id=section.pk,
+                    category='section',
+                    verb='added',
+                    details=section_title,
+                    secondary_id=book.pk,
+                )
+
+            messages.success(request, u'Added {} sections'.format(len(section_data)))
+
+            return redirect(book)
+        else:
+            messages.error(request, 'Failed to add sections')
+    else:
+        form = MultipleSectionsForm()
+
+    sections = book.sections.prefetch_related(
+        'authors', 'book__details__default_authors',
+    )
+
+    context = {
+        'book': book,
+        'sections': sections,
+        'form': form,
+    }
+
+    return render(request, 'add_sections.html', context)
 
 
 @staff_member_required

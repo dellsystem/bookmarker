@@ -14,14 +14,20 @@ is also a great way to creep on what books I'm reading.
 Setup
 -----
 
-Django 1.11. Run `python django/manage.py runserver`. Deploy with nginx,
+Django 2.27. Run `python code/manage.py runserver`. Deploy with nginx,
 guinicorn, and systemd.
 
 (Optional) set the following environment variables (ideally using virtualenv)
 
 * `DJANGO_SECRET_KEY`
-* `POSTGRES_PASSWORD`
-* `GOODREADS_KEY` and `GOODREADS_SECRET` for using the [Goodreads API](https://www.goodreads.com/api/keys)
+* `POSTGRES_PASSWORD` (only for prod)
+* for using the [Goodreads API](https://www.goodreads.com/api/keys):
+    * `GOODREADS_KEY`
+    * `GOODREADS_SECRET`
+    * `GOODREADS_ACCESS_TOKEN`
+    * `GOODREADS_ACCESS_SECRET`
+
+Run unit tests with `python code/manage.py test`.
 
 License
 -------

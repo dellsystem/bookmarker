@@ -42,6 +42,8 @@ urlpatterns = [
         name='add_note'),
     url(r'^book/(?P<slug>[\w-]+)/addsection$', bookmarker.views.add_section,
         name='add_section'),
+    url(r'^book/(?P<slug>[\w-]+)/addsections$', bookmarker.views.add_sections,
+        name='add_sections'),
     url(r'^book/(?P<slug>[\w-]+)/notes$', bookmarker.views.view_notes,
         name='view_notes'),
     url(r'^book/(?P<book_id>\d+)/complete$', bookmarker.views.mark_complete,
