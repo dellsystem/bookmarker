@@ -2,7 +2,7 @@ from django import forms
 
 from books.forms import SectionChoiceForm, SectionChoiceField, PageNumberForm
 from books.models import Section
-from books.utils import roman_to_int
+from books.utils import roman_to_int, get_page_details
 from .models import Term, TermOccurrence
 
 
@@ -85,18 +85,7 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
             occurrence.book = self.book
             occurrence.term = term
 
-        page = occurrence.page_number
-        try:
-            page_number = int(page)
-        except ValueError:
-            page_number = None
-
-        in_preface = False
-        if page_number is None:
-            # Check if it's a roman numeral.
-            page_number = roman_to_int(page)
-            if page_number:
-                in_preface = True
+        page_number, in_preface = get_page_details(occurrence.page_number)
         occurrence.page_number = page_number
         occurrence.in_preface = in_preface
 
