@@ -80,9 +80,9 @@
             /
             {{ related.notes.count }} <i class="sticky note icon"></i>
             {% else %}
-            {{ section.terms.count}} <i class="flag icon"></i>
+            {{ section.num_terms }} <i class="flag icon"></i>
             /
-            {{ section.terms.count }} <i class="sticky note icon"></i>
+            {{ section.num_notes }} <i class="sticky note icon"></i>
             {% endif %}
             {% endif %}
         </div>
@@ -132,9 +132,9 @@
                 {{ section.summary|markdownify }}
             {% endif %}
             {% if not hide_counts %}
-            {{ section.terms.count }} <i class="flag icon"></i>
+            {{ section.num_terms }} <i class="flag icon"></i>
             /
-            {{ section.notes.count }} <i class="sticky note icon"></i>
+            {{ section.num_notes }} <i class="sticky note icon"></i>
             {% endif %}
             {% if request.user.is_staff %}
             <a class="ui mini icon {% if not section.summary %}red{% endif %} button"

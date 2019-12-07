@@ -1396,6 +1396,13 @@ def search(request):
                 pk__in=section_pks
             ).select_related('book')
 
+        # If sections, show the term/note counts.
+        if mode == 'sections':
+            results[mode] = results[mode].annotate(
+                num_terms=Count('terms', distinct=True),
+                num_notes=Count('notes', distinct=True),
+            )
+
         # Apply the filters.
         if filter_form.is_valid():
             filters = {}
