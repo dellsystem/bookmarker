@@ -50,3 +50,10 @@ def get_page_details(page):
         return value, in_preface
     else:
         raise ValueError
+
+
+def debug_callback(request):
+    if request.user.is_staff:
+        return True
+    else:
+        return False

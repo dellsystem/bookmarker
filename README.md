@@ -1,4 +1,4 @@
-![Bookmarker](https://raw.githubusercontent.com/dellsystem/bookmarker/master/django/static/bookmarker.png)
+![Bookmarker](https://raw.githubusercontent.com/dellsystem/bookmarker/master/code/static/bookmarker.png)
 
 A personal project to help me retain information from the books I'm reading. 
 
