@@ -93,6 +93,15 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         queryset=Section.objects.none(),
         required=False,
     )
+    tags = forms.ModelMultipleChoiceField(
+        Tag.objects.all().prefetch_related('category'),
+        required=False,
+        widget=forms.widgets.SelectMultiple(
+            attrs={
+                'class': 'ui fluid multiple search dropdown',
+            }
+        )
+    )
 
     def __init__(self, book, *args, **kwargs):
         # Store the book so we can use it for populating the sections and also
@@ -112,11 +121,6 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         widgets = {
             'subject': forms.TextInput(attrs={'autofocus': 'autofocus'}),
             'comment': forms.Textarea(attrs={'rows': 5}),
-            'tags': forms.SelectMultiple(
-                attrs={
-                    'class': 'ui fluid search dropdown multi-select',
-                }
-            ),
         }
 
     def save(self, author_form, book=None):
