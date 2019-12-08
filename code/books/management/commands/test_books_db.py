@@ -11,10 +11,6 @@ class Command(BaseCommand):
 
 
 class TestBooksDatabase(unittest.TestCase):
-    def setUp(self):
-        # test
-        print("setup")
-
     def test_author_slugs(self):
         """
         Tests that all authors have slugs, and that they're all unique.
