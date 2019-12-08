@@ -156,19 +156,9 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
 
 
 class SectionForm(forms.ModelForm, PageNumberForm):
-    related_to = forms.ModelChoiceField(
-        queryset=Section.objects.all().select_related('book').order_by('book__title', 'title'),
-        required=False,
-        widget=forms.widgets.Select(
-            attrs={
-                'class': 'ui fluid search dropdown',
-            }
-        )
-    )
-
     class Meta:
         model = Section
-        exclude = ['book', 'authors']
+        exclude = ['book', 'authors', 'related_to']
         widgets = {
             'title': forms.TextInput(attrs={'autofocus': 'autofocus'}),
         }

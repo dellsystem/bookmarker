@@ -11,7 +11,18 @@
 {% endblock %}
 
 {% block content %}
-{% include 'book_header.html' with book=book only %}
+<div class="ui grid">
+    <div class="thirteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="three wide center aligned column">
+        <a href="{% url 'admin:books_section_change' section.pk %}"
+           class="ui fluid blue icon button">
+           <i class="edit icon"></i>
+           Edit in admin
+        </a>
+    </div>
+</div>
 
 <div class="ui divider"></div>
 
