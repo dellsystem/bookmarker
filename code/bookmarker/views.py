@@ -498,7 +498,7 @@ def add_term(request, slug):
             prefix='author',
         )
 
-    recent_terms = book.terms.order_by('-added')
+    recent_terms = book.terms.order_by('-added').prefetch_related('category', 'term')
     context = {
         'book': book,
         'recent_terms_1': recent_terms[:3],

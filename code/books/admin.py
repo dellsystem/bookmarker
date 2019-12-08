@@ -22,6 +22,8 @@ class AuthorAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     list_display = ['title', 'subtitle', 'get_page_display', 'book']
     list_filter = ['book']
+    autocomplete_fields = ['related_to']
+    search_fields = ['title']
 
 
 @admin.register(Book)
