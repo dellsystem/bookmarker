@@ -397,7 +397,16 @@ def edit_occurrence(request, occurrence_id):
             occurrence.term.definition = term_form.cleaned_data['definition']
             occurrence.term.highlights = term_form.cleaned_data['highlights']
             occurrence.term.save()
-            messages.success(request, 'Theoretically worked')
+            messages.success(request, 'Edited term occurrence: {}'.format(
+                occurrence.term.text
+            ))
+            Action.objects.create(
+                category='term',
+                verb='edited',
+                primary_id=occurrence.pk,
+                secondary_id=occurrence.book.pk,
+                details=occurrence.term.text,
+            )
             return redirect(occurrence)
         else:
             messages.error(request, 'Failed to save term')
