@@ -20,6 +20,13 @@
     <i class="red heart icon" title="Faved"></i>
     {% endif %}
 </h1>
+<h2 class="ui header">
+    <div class="sub header">
+        {% for author in tag.get_authors %}
+        {{ author.name }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    </div>
+</h2>
 <p>
     {{ tag.description }}
     {% if request.user.is_staff %}

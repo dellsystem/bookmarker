@@ -1582,7 +1582,7 @@ def view_faves(request):
     strict = bool(request.GET.get('strict'))
     min_rating = 5 if strict else 4
 
-    tags = Tag.objects.filter(faved=True).prefetch_related('notes')
+    tags = Tag.objects.filter(faved=True).prefetch_related('notes', 'category')
     fave_sections = Section.objects.filter(rating__gte=min_rating)
     articles = fave_sections.filter(book__details=None).prefetch_related(
         'authors', 'book',
@@ -1610,7 +1610,7 @@ def view_faves(request):
     random_vocab = TermOccurrence.objects.get(pk=random.choice(occurrence_ids))
 
     # Also include any books that are not covered by the sections.
-    books = Book.objects.filter(details__rating__gte=min_rating).exclude(id__in=chapters_books)
+    books = Book.objects.filter(details__rating__gte=min_rating).exclude(id__in=chapters_books).prefetch_related('details')
 
     context = {
         'strict': strict,
