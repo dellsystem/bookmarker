@@ -72,13 +72,6 @@
                 {{ tag }}
                 ({{ tag.notes.count }})
             </a>
-            <h2 class="ui header">
-                <div class="sub header">
-                    {% for author in tag.get_authors %}
-                    {{ author.name }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                </div>
-            </h2>
         </div>
     </div>
     {% endfor %}
