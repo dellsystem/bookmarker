@@ -1569,7 +1569,9 @@ def view_tag(request, slug):
 
 
 def view_all_tags(request):
-    tags = Tag.objects.all()
+    tags = Tag.objects.all().prefetch_related('category').annotate(
+        num_notes=Count('notes', distinct=True),
+    )
 
     context = {
         'tags': tags,
