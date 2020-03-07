@@ -23,6 +23,9 @@
                         {{ category|title }}{{ category|pluralize }}
                     </a>
                     {% endfor %}
+                    <a class="{% if mode == 'all' %}active{% endif %} item" href="?mode=all">
+                        <i class="ui list icon"></i>All
+                    </a>
                 </div>
             </div>
         </div>

@@ -35,7 +35,7 @@ def home(request):
     else:
         mode = 'all'
 
-    paginator = Paginator(actions_list, 25)
+    paginator = Paginator(actions_list, 5)
     page = request.GET.get('page')
     try:
         paged_actions = paginator.page(page)
