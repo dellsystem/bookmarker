@@ -65,19 +65,6 @@ class Author(models.Model):
     def get_absolute_url(self):
         return reverse('view_author', args=[self.slug])
 
-    def get_associated_books(self):
-        """Get books the author is associated with, by section or directly."""
-        books = set()
-        # This needs to be optimised
-        for details in self.books.all():
-            books.add(details.book.pk)
-        for details in self.default_books.all():
-            books.add(details.book.pk)
-        for section in self.sections.all():
-            books.add(section.book_id)
-
-        return books
-
 
 class GoodreadsAuthor(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)

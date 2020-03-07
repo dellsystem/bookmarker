@@ -817,12 +817,36 @@ def add_note(request, slug):
 
 
 def view_all_authors(request):
-    books_by_pk = {book.pk: book for book in Book.objects.all()}
-    authors = Author.objects.all().prefetch_related('books', 'sections')
+    authors = Author.objects.prefetch_related('sections', 'books', 'default_books')
+    book_values_list = Book.objects.values_list('id', 'title', 'slug', 'details_id')
+    book_data = {}
+    details_ids = {}
+    for book_id, book_title, book_slug, details_id in book_values_list:
+        book_data[book_id] = {
+            'title': book_title,
+            'url': reverse('view_book', args=[book_slug]),
+        }
+        details_ids[details_id] = book_id
 
     authors_and_books = []
     for author in authors:
-        author_books = [books_by_pk[b] for b in author.get_associated_books()]
+        # This is hacky (it should really be a method on the model) but
+        # necessary for performance, as otherwise Django creates n queries
+        # despite the use of prefetch_related. Hence the workaround with
+        # details_ids, which helps avoid further lookups in this for loop.
+        book_ids = set()
+        for section in author.sections.all():
+            book_ids.add(section.book_id)
+        for details in author.books.all():
+            book_id = details_ids.get(details.id)
+            if book_id:
+                book_ids.add(book_id)
+        for details in author.default_books.all():
+            book_id = details_ids.get(details.id)
+            if book_id:
+                book_ids.add(book_id)
+
+        author_books = [book_data[book_id] for book_id in book_ids]
         authors_and_books.append((author, author_books))
 
     context = {
