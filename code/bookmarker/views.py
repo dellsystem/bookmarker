@@ -1032,9 +1032,9 @@ def view_author(request, slug):
     book_ids = set()
 
     # Find the author's direct books.
-    for details in author.books.all():
+    for details in author.books.all().select_related('book'):
         book_ids.add(details.book.pk)
-    for details in author.default_books.all():
+    for details in author.default_books.all().select_related('book'):
         book_ids.add(details.book.pk)
 
     # Find all the books for which the author has some sections.
@@ -1043,8 +1043,9 @@ def view_author(request, slug):
         num_terms=Count('terms', distinct=True),
         num_notes=Count('notes', distinct=True),
     ).prefetch_related(
-        'authors', 'book__details__default_authors'
-    )
+        'authors', 'book__details__default_authors',  'related_to__terms',
+        'related_to__notes',
+    ).select_related('related_to', 'related_to__book',)
     for section in sections:
         book_id = section.book_id
         book_ids.add(book_id)
