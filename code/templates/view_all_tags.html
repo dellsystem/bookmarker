@@ -30,7 +30,7 @@
             <p>
                 <a class="ui big {{ tag.get_colour }} label"
                    href="{{ tag.get_absolute_url }}">
-                    {{ tag }} ({{ tag.notes.count }})
+                    {{ tag }} ({{ tag.num_notes }})
                 </a>
                 {% if tag.faved %}
                 <i class="big red heart icon" title="Faved"></i>

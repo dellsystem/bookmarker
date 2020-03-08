@@ -35,7 +35,7 @@ def home(request):
     else:
         mode = 'all'
 
-    paginator = Paginator(actions_list, 25)
+    paginator = Paginator(actions_list, 5)
     page = request.GET.get('page')
     try:
         paged_actions = paginator.page(page)
@@ -817,12 +817,36 @@ def add_note(request, slug):
 
 
 def view_all_authors(request):
-    books_by_pk = {book.pk: book for book in Book.objects.all()}
-    authors = Author.objects.all().prefetch_related('books', 'sections')
+    authors = Author.objects.prefetch_related('sections', 'books', 'default_books')
+    book_values_list = Book.objects.values_list('id', 'title', 'slug', 'details_id')
+    book_data = {}
+    details_ids = {}
+    for book_id, book_title, book_slug, details_id in book_values_list:
+        book_data[book_id] = {
+            'title': book_title,
+            'url': reverse('view_book', args=[book_slug]),
+        }
+        details_ids[details_id] = book_id
 
     authors_and_books = []
     for author in authors:
-        author_books = [books_by_pk[b] for b in author.get_associated_books()]
+        # This is hacky (it should really be a method on the model) but
+        # necessary for performance, as otherwise Django creates n queries
+        # despite the use of prefetch_related. Hence the workaround with
+        # details_ids, which helps avoid further lookups in this for loop.
+        book_ids = set()
+        for section in author.sections.all():
+            book_ids.add(section.book_id)
+        for details in author.books.all():
+            book_id = details_ids.get(details.id)
+            if book_id:
+                book_ids.add(book_id)
+        for details in author.default_books.all():
+            book_id = details_ids.get(details.id)
+            if book_id:
+                book_ids.add(book_id)
+
+        author_books = [book_data[book_id] for book_id in book_ids]
         authors_and_books.append((author, author_books))
 
     context = {
@@ -1008,9 +1032,9 @@ def view_author(request, slug):
     book_ids = set()
 
     # Find the author's direct books.
-    for details in author.books.all():
+    for details in author.books.all().select_related('book'):
         book_ids.add(details.book.pk)
-    for details in author.default_books.all():
+    for details in author.default_books.all().select_related('book'):
         book_ids.add(details.book.pk)
 
     # Find all the books for which the author has some sections.
@@ -1019,8 +1043,9 @@ def view_author(request, slug):
         num_terms=Count('terms', distinct=True),
         num_notes=Count('notes', distinct=True),
     ).prefetch_related(
-        'authors', 'book__details__default_authors'
-    )
+        'authors', 'book__details__default_authors',  'related_to__terms',
+        'related_to__notes',
+    ).select_related('related_to', 'related_to__book',)
     for section in sections:
         book_id = section.book_id
         book_ids.add(book_id)
@@ -1569,7 +1594,9 @@ def view_tag(request, slug):
 
 
 def view_all_tags(request):
-    tags = Tag.objects.all()
+    tags = Tag.objects.all().prefetch_related('category').annotate(
+        num_notes=Count('notes', distinct=True),
+    )
 
     context = {
         'tags': tags,

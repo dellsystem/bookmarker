@@ -92,7 +92,7 @@
         </div>
         <div class="thirteen wide column">
             {% if row.sections %}
-            {% include 'section_list.html' with sections=row.sections %}
+            {% include 'section_list.html' with sections=row.sections hide_book=1 %}
             {% elif row.num_terms or row.num_notes %}
             <div class="ui celled two column grid">
                 <div class="column">
