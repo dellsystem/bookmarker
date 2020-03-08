@@ -329,12 +329,13 @@ def add_sections(request, slug):
 
         if form.is_valid():
             section_data = form.cleaned_data['sections']
-            for section_title, page_number, in_preface in section_data:
+            for s in section_data:
                 section = Section.objects.create(
                     book=book,
-                    page_number=page_number,
-                    in_preface=in_preface,
-                    title=section_title,
+                    number=s['number'],
+                    page_number=s['page_number'],
+                    in_preface=s['in_preface'],
+                    title=s['title'],
                 )
                 if book.details:
                     section.authors.add(*book.details.default_authors.all())
@@ -343,7 +344,7 @@ def add_sections(request, slug):
                     primary_id=section.pk,
                     category='section',
                     verb='added',
-                    details=section_title,
+                    details=s['title'],
                     secondary_id=book.pk,
                 )
 

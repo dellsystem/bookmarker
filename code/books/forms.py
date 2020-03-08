@@ -32,7 +32,25 @@ class MultipleSectionsForm(forms.Form):
                     "Invalid number: {}".format(words[-1])
             )
 
-            sections.append((title, page_number, in_preface))
+            sections.append({
+                'title': title,
+                'page_number': page_number,
+                'in_preface': in_preface,
+                'number': None,
+            })
+
+        # Check if any of the titles should be converted into section numbers.
+        number = 1
+        for i, section in enumerate(sections):
+            # If the first 3 chapters don't have numbers, stop checking
+            if number == 1 and i == 3:
+                break
+
+            number_string = '{}.'.format(number)
+            if section['title'].startswith(number_string):
+                section['title'] = section['title'][len(number_string):]
+                section['number'] = number
+                number += 1
 
         return sections
 
