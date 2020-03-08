@@ -76,9 +76,9 @@
         {% endif %}
         </form>
         {% else %}
-        <div class="ui large fluid green basic button">
-            Done
-        </div>
+            {% if request.user.is_staff %}
+            {% include 'add_book_field.html' with label='Add more' %}
+            {% endif %}
         {% endif %}
     </div>
     {% endif %}
