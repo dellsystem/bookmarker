@@ -16,6 +16,59 @@ class TestCreateFromGoodreads(TestCase):
             image_url='https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1356348356l/14700203._SX98_.jpg',
         )
 
+    def test_long_title_with_colon(self):
+        book2 = Book.objects.create_from_goodreads(
+            goodreads_id='2',
+            title='Portrait of the Manager as a Young Author: On Storytelling, Business, and Literature',
+            link='link2',
+            publication_date=('5', '14', '2009'),
+            isbn13='9783531168051',
+            publisher='Publisher',
+            num_pages='100',
+            image_url='https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1356348356l/14700203._SX98_.jpg',
+        )
+        self.assertEqual(book2.slug, "portrait-of-the-manager-as-a-young-author")
+
+    def test_long_title_without_colon(self):
+        book2 = Book.objects.create_from_goodreads(
+            goodreads_id='2',
+            title='Portrait of the Manager as a Young Author, On Storytelling, Business, and Literature',
+            link='link2',
+            publication_date=('5', '14', '2009'),
+            isbn13='9783531168051',
+            publisher='Publisher',
+            num_pages='100',
+            image_url='https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1356348356l/14700203._SX98_.jpg',
+        )
+        self.assertEqual(book2.slug, "portrait-of-the-manager-as-a-young-author-on")
+
+    def test_long_title_without_spaces(self):
+        book2 = Book.objects.create_from_goodreads(
+            goodreads_id='2',
+            title='Portrait of the Manager asayoungauthoronstorytellingbusinessandliterature',
+            link='link2',
+            publication_date=('5', '14', '2009'),
+            isbn13='9783531168051',
+            publisher='Publisher',
+            num_pages='100',
+            image_url='https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1356348356l/14700203._SX98_.jpg',
+        )
+        self.assertEqual(book2.slug, "portrait-of-the-manager")
+
+    def test_long_title_without_spaces_at_all(self):
+        # Unlikely but you never know
+        book2 = Book.objects.create_from_goodreads(
+            goodreads_id='2',
+            title='Portraitofthemanagerasayoungauthoronstorytellingbusinessandliterature',
+            link='link2',
+            publication_date=('5', '14', '2009'),
+            isbn13='9783531168051',
+            publisher='Publisher',
+            num_pages='100',
+            image_url='https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1356348356l/14700203._SX98_.jpg',
+        )
+        self.assertEqual(book2.slug, "portraitofthemanagerasayoungauthoronstorytellingbu")
+
     def test_initial_book(self):
         self.assertEqual(Book.objects.count(), 1)
         self.assertEqual(BookDetails.objects.count(), 1)
