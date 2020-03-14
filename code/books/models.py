@@ -93,6 +93,14 @@ class BookManager(models.Manager):
 
         # If there's a :, strip out everything after it for the slug.
         slug = slugify(title.split(':')[0])
+        # Make sure the slug is 50 characters or less
+        if len(slug) > 50:
+            # First try cutting it to the part before the last -
+            # as long as it's not obscenely short
+            slug = slug[:50]
+            last_dash = slug.rfind('-')
+            if last_dash > 10:
+                slug = slug[:last_dash]
 
         # If the book already exists for this slug, give this book a number
         # after the slug.
