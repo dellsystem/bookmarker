@@ -161,3 +161,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, '..', 'static')
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': 'books.utils.debug_callback'
 }
+
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

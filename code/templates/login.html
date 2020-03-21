@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block breadcrumbs %}Login{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+
+<div class="ui grid">
+    <div class="eight wide column centered">
+        {% if next %}
+        <div class="ui message">
+            The page you are trying to access is only available to logged-in users.
+        </div>
+        {% endif %}
+        {% if form.non_field_errors %}
+        <div class="ui error message">
+        {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <div class="ui segment">
+            <form class="ui form" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="field">
+                    <label>Username</label>
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    {{ form.password }}
+                </div>
+
+                <div class="ui basic center aligned segment">
+                    <button type="submit" name="submit" value=""
+                            class="ui blue button">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
