@@ -58,7 +58,7 @@ I personally set up an alias to do this automatically every time I need to
 work on a project. In my bash profile, I have aliases like
 
 ```
-alias bm="cd ~/Projects/bookmarker && source env/bin/automate"
+alias bm="cd ~/Projects/bookmarker && source env/bin/activate"
 ```
 
 so I can just type "bm" in a terminal any time I need to work on Bookmarker.
