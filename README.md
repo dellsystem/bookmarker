@@ -1,18 +1,17 @@
 ![Bookmarker](https://raw.githubusercontent.com/dellsystem/bookmarker/master/code/static/bookmarker.png)
 
-A personal project to help me retain information from the books I'm reading. 
+A personal project to help me retain information from the books I'm reading.
+MIT license.
 
 Currently only supports a single user, but I plan to extend it to support
 multiple users eventually.
 
-Demo
-----
+## Demo
 
 You can view a read-only active demo at <http://bookmarker.dellsystem.me>. This
 is also a great way to creep on what books I'm reading.
 
-Setup
------
+## Setup
 
 If you're familiar with Django, you can skip this; it's a standard deployment
 with Django 2.28. Pip requirements can be found in requirements.txt.
@@ -20,7 +19,8 @@ with Django 2.28. Pip requirements can be found in requirements.txt.
 Here's the step-by-step for how to set it up via the command line on a Linux
 machine that already has git, Python (v3), and virtualenv installed:
 
-## Cloning from git
+### Cloning from git
+
 This will create a folder called "bookmarker" in your working directory with
 all the necessary code.
 
@@ -33,7 +33,7 @@ Otherwise:
 git clone https://github.com/dellsystem/bookmarker.git
 ```
 
-## Setting up the virtualenv
+### Setting up the virtualenv
 
 Now, access the new directory (`cd bookmarker`). You'll want to set up a
 virtualenv in this directory for installing all the dependencies (basically a
@@ -65,7 +65,7 @@ so I can just type "bm" in a terminal any time I need to work on Bookmarker.
 
 You can leave the virtualenv at any time with the command `deactivate`.
 
-## Installing the dependencies
+### Installing the dependencies
 
 Now that you're in the virtualenv, it's to install all the dependencies. This
 might be a little finnicky depending on your machine and on the state of the
@@ -80,7 +80,7 @@ pip install -r requirements.txt
 
 (Make sure you're in the project directory - mine is ~/Projects/bookmarker.)
 
-## Set up the database
+### Setting up the database
 
 For development, we use SQLite, which you may have to install through your OS
 package manager. In production, you should PostgreSQL or something like that
@@ -98,7 +98,7 @@ python code/manage.py migrate
 
 This will create all the database tables needed for this app to work.
 
-## Set up the superuser
+### Setting up your account
 
 You'll want to create an admin account to access the admin tools &
 add/edit/delete data via the frontend. Run
@@ -109,7 +109,7 @@ python code/manage.py createsuperuser
 
 and set your desired username/password. Don't worry about the email address.
 
-## Setting up Goodreads integration
+### Setting up the Goodreads integration
 
 For the moment, this app currently makes heavy use of the Goodreads API when
 adding books and authors. You'll need to get a Goodreads account, and then
@@ -200,7 +200,7 @@ Almost done, I promise! Final step: reactivate the virtualenv one more time.
 deactivate && source env/bin/activate
 ```
 
-## Run your server locally
+### Running your server locally
 
 Now you're all set to test it out! Run
 
@@ -217,8 +217,7 @@ To confirm that the Goodreads API integration worked, visit
 display your Goodreads profile picture as well as the number of books you have
 on your "read" and "to-read" shelves.
 
-Usage
------
+## Adding data
 
 To add a book, navigate to the book's page on Goodreads, then get the book's
 Goodreads ID from the URL. For example, if the URL is
@@ -242,21 +241,14 @@ guarantees when it comes to usability.
 
 If anything is confusing or buggy, feel free to contact me.
 
-Advanced
---------
+## Advanced
 
 If you want to deploy this in production, I'd recommend using nginx, gunicorn,
 systemd, and postgres. To enable postgres, set POSTGRES_PASSWORD.
 
 Unit tests (the few that exist) can be run with `python code/manage.py test`.
 
-License
--------
-
-MIT
-
-Contact
--------
+## Contact
 
 If this is something you'd be interested in using, send me an email at
 ilostwaldo@gmail.com.
