@@ -167,17 +167,16 @@ This _should_ pop up a window in your browser (if it doesn't, copy and paste
 the URL shown). Authorize the app in your browser, then return to your Python
 shell, and type 'y' in response to the prompt ("Have you authorized me?").
 
-Now you'll be able to get your token, secret, and user ID. In
-your Python shell, type
+Now you'll be able to get your token and secret. In your Python shell, type
 
 ```python
-CLIENT.session.access_token, CLIENT.session.access_token_secret, CLIENT.auth_user().id
+CLIENT.session.access_token, CLIENT.session.access_token_secret
 ```
 
-This will output three strings in a tuple, looking something like this:
+This will output two strings in a tuple, looking something like this:
 
 ```python
-('24o7htksgslilu5l3w5h', 'slektlyl3wy5wl3y53wskhgksdhgkldshgsdlg', '12345')
+('24o7htksgslilu5l3w5h', 'slektlyl3wy5wl3y53wskhgksdhgkldshgsdlg')
 ```
 
 Open up env/bin/activate one last time and add those to the bottom:
@@ -187,12 +186,9 @@ GOODREADS_ACCESS_TOKEN='24o7htksgslilu5l3w5h'
 export GOODREADS_ACCESS_TOKEN
 GOODREADS_ACCESS_SECRET='slektlyl3wy5wl3y53wskhgksdhgkldshgsdlg'
 export GOODREADS_ACCESS_SECRET
-GOODREADS_USER_ID='12345'
-export GOODREADS_USER_ID
 ```
 
-(replacing the token and secret and user ID above with whatever was output in
-your shell)
+(replacing the token and secret above with whatever was output in your shell)
 
 Almost done, I promise! Final step: reactivate the virtualenv one more time.
 

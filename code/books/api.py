@@ -11,4 +11,4 @@ CLIENT.authenticate(
     access_token=os.environ.get('GOODREADS_ACCESS_TOKEN'),
     access_token_secret=os.environ.get('GOODREADS_ACCESS_SECRET'),
 )
-USER = CLIENT.user(os.environ.get('GOODREADS_USER_ID'))
+USER = CLIENT.user()
