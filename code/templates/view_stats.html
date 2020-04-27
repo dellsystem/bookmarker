@@ -1,28 +1,69 @@
 {% extends "base.html" %}
 
-{% block title %}Reading stats{% endblock %}
+{% block title %}Goodreads stats{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block breadcrumbs %}Goodreads statistics{% endblock %}
 
 {% block content %}
-<h1>Reading stats</h1>
-<div class="ui two huge statistics">
-    <div class="statistic">
-        <div class="value">
-            {{ num_to_read }}
+<h1>Goodreads statistics</h1>
+
+<div class="ui grid">
+    <div class="row">
+        <div class="four wide center aligned column">
+            <img src="{{ user.image_url }}" class="ui centered circular image" />
+            <br />
+            <h2 class="ui header">
+                {{ user.name }} <a href="{{ user.link }}"><i class="external link icon"></i></a>
+                <div class="sub header">
+                    Member since {{ user.joined|date:"F, Y" }}
+                </div>
+            </h2>
         </div>
-        <div class="label">
-            Books to read
+        <div class="four wide center aligned column">
+            <div class="ui large statistic">
+                <div class="label">Number of books read</div>
+                <div class="value">{{ num_read }}</div>
+            </div>
+
+            <div class="ui large statistic">
+                <div class="label">Number of books remaining</div>
+                <div class="value">{{ num_remaining }}</div>
+            </div>
+        </div>
+        <div class="eight wide column">
+            <table class="ui basic celled table">
+                <thead>
+                    <tr>
+                        <th>If you read ...</th>
+                        <th>You would be finished by ...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>One book per <strong>month</strong></td>
+                        <td>{{ dates.one_per_month|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Two books per <strong>month</strong></td>
+                        <td>{{ dates.two_per_month|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>One book per <strong>week</strong></td>
+                        <td>{{ dates.one_per_week|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>Two books per <strong>week</strong></td>
+                        <td>{{ dates.two_per_week|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td>One book per <strong>day</strong></td>
+                        <td>{{ dates.one_per_day|date:"F j, Y" }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="statistic">
-        <div class="value">
-            {{ end_date|date:"M Y" }}
-        </div>
-        <div class="label">
-            Estimated completion date
-        </div>
-    </div>
+</div>
 </div>
 {% endblock %}
 

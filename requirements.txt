@@ -8,7 +8,7 @@ Django==2.2.8
 django-debug-toolbar==2.0
 django-language-field==0.0.3
 Fabric3==1.14.post1
--e git+https://github.com/dellsystem/goodreads@096ea1691074cb306f0ffb6003cea52d15345b96#egg=goodreads
+-e git+https://github.com/dellsystem/goodreads@5bfeac70b8d3c8dfd70345bb1bc13dc9b06499bd#egg=goodreads
 idna==2.8
 Markdown==3.0.1
 MarkdownSuperscript==2.1.1

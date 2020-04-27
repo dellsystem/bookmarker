@@ -23,6 +23,8 @@ import bookmarker.views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', bookmarker.views.home, name='home'),
+    url(r'^login$', bookmarker.views.LoginView.as_view(), name='login'),
+    url(r'^logout$', bookmarker.views.LogoutView.as_view(), name='logout'),
     url(r'^addbook$', bookmarker.views.add_book, name='add_book'),
     url(r'^addauthor$', bookmarker.views.add_author, name='add_author'),
     url(r'^books/(?P<book_type>\w+)$', bookmarker.views.view_books, name='view_books'),
