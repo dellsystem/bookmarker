@@ -3,7 +3,8 @@ import datetime
 import random
 
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q, Count
 from django.db.models.functions import Lower
@@ -14,7 +15,7 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
 from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
-from books.api import CLIENT
+from books.api import CLIENT, USER
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm, \
                         MultipleSectionsForm
@@ -24,6 +25,14 @@ from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
 from vocab.models import Term, TermOccurrence
+
+
+class LoginView(auth_views.LoginView):
+    template_name = "login.html"
+
+
+class LogoutView(auth_views.LogoutView):
+    pass
 
 
 def home(request):
@@ -157,7 +166,7 @@ def view_book(request, slug):
     return render(request, 'view_book.html', context)
 
 
-@staff_member_required
+@login_required
 def edit_book(request, slug):
     book = get_object_or_404(Book, slug=slug)
 
@@ -242,7 +251,7 @@ def view_terms(request, slug):
     return render(request, 'view_terms.html', context)
 
 
-@staff_member_required
+@login_required
 def add_section(request, slug):
     book = get_object_or_404(Book, slug=slug)
     if book.completed_sections:
@@ -317,7 +326,7 @@ def add_section(request, slug):
     return render(request, 'add_section.html', context)
 
 
-@staff_member_required
+@login_required
 def add_sections(request, slug):
     book = get_object_or_404(Book, slug=slug)
     if book.completed_sections:
@@ -369,7 +378,7 @@ def add_sections(request, slug):
     return render(request, 'add_sections.html', context)
 
 
-@staff_member_required
+@login_required
 def edit_occurrence(request, occurrence_id):
     occurrence = get_object_or_404(TermOccurrence, pk=occurrence_id)
 
@@ -441,7 +450,7 @@ def edit_occurrence(request, occurrence_id):
     return render(request, 'edit_occurrence.html', context)
 
 
-@staff_member_required
+@login_required
 def add_term(request, slug):
     book = get_object_or_404(Book, slug=slug)
 
@@ -521,7 +530,7 @@ def add_term(request, slug):
     return render(request, 'add_term.html', context)
 
 
-@staff_member_required
+@login_required
 def add_author(request):
     goodreads_id = request.POST.get('goodreads_id')
     if goodreads_id:
@@ -584,7 +593,7 @@ def add_author(request):
         return render(request, 'add_author.html', context)
 
 
-@staff_member_required
+@login_required
 def add_book(request):
     goodreads_id = request.POST.get('goodreads_id')
     if goodreads_id:
@@ -753,7 +762,7 @@ def get_definition(request):
     })
 
 
-@staff_member_required
+@login_required
 def add_note(request, slug):
     section_id = request.GET.get('section')
     book = get_object_or_404(Book, slug=slug)
@@ -1150,7 +1159,7 @@ def view_all_terms(request):
     return render(request, 'view_all_terms.html', context)
 
 
-@staff_member_required
+@login_required
 @require_POST
 def mark_complete(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
@@ -1176,7 +1185,7 @@ def mark_complete(request, book_id):
     return redirect(book)
 
 
-@staff_member_required
+@login_required
 def edit_section(request, section_id):
     section = get_object_or_404(Section, pk=section_id)
 
@@ -1476,23 +1485,37 @@ def search(request):
 
 
 def view_stats(request):
-    shelf = CLIENT.user(60292716).shelves()[2]
-    num_to_read = shelf.count
+    # CLIENT/USER should be namespaced better
+    shelves = USER.shelves()
+    num_read = shelves[0].count  # assumes that read is first - confirm this
+    remaining_shelf = shelves[2]  # assumes that to-read is third - confirm this
+    num_remaining = remaining_shelf.count
 
-    # Estimate the end date.
-    num_per_year = 208
-    days_left = num_to_read / float(num_per_year) * 365
-    end_date = datetime.datetime.today() + datetime.timedelta(days=days_left)
+    # Estimate the end date based on various reading paces.
+    pace_per_year = {
+        'one_per_month': 12,
+        'two_per_month': 24,
+        'one_per_week': 52,
+        'two_per_week': 104,
+        'one_per_day': 365,
+    }
+    dates = {}
+    for pace, count in pace_per_year.items():
+        days_left = num_remaining / float(count) * 365
+        end_date = datetime.datetime.today() + datetime.timedelta(days=days_left)
+        dates[pace] = end_date
 
     context = {
-        'num_to_read': num_to_read,
-        'end_date': end_date,
+        'user': USER,
+        'num_read': num_read,
+        'num_remaining': num_remaining,
+        'dates': dates,
     }
 
     return render(request, 'view_stats.html', context)
 
 
-@staff_member_required
+@login_required
 def edit_note(request, note_id):
     note = get_object_or_404(Note, pk=note_id)
 
@@ -1652,7 +1675,7 @@ def view_faves(request):
     return render(request, 'view_faves.html', context)
 
 
-@staff_member_required
+@login_required
 def add_tag(request):
     if request.method == 'POST':
         form = TagForm(request.POST)

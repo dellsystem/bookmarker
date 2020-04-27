@@ -59,6 +59,15 @@
         <a href="{% url 'admin:index' %}">Admin</a>
     </div>
     {% endif %}
+    {% if request.user.is_authenticated %}
+    <div class="item">
+        <a href="{% url 'logout' %}">Log out ({{ request.user.username }})</a>
+    </div>
+    {% else %}
+    <div class="item">
+        <a href="{% url 'login' %}">Log in</a>
+    </div>
+    {% endif %}
     <div class="right item">
         <form action="{% url 'search' %}">
             <div class="ui search" id="site-search">
