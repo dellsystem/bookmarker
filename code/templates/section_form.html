@@ -31,42 +31,36 @@
                 {% endwith %}
             </div>
             {% endif %}
-            {% if section_form.number %}
-            <div class="one wide collapsed column">
-                <div class="field">
-                    <label>Number</label>
-                    {{ section_form.number }}
-                </div>
-            </div>
-            {% endif %}
-            <div class="six wide column">
-                <div class="field">
-                    <label>Subtitle</label>
-                    {{ section_form.subtitle }}
-                </div>
-            </div>
-        </div>
-        <br />
-        <div class="field">
-            <label>Summary</label>
-            {{ section_form.summary }}
-        </div>
-        <div class="fields">
-            {% with error=author_form.mode.errors %}
-            <div class="two wide {% if error %}error{% endif %} field"
-                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                <label>Author mode</label>
-                {{ author_form.mode }}
-            </div>
-            {% endwith %}
-            <div class="six wide field">
+            <div class="five wide column">
                 <div class="field">
                     <label>Author(s)</label>
                     {{ author_form.authors }}
                 </div>
             </div>
+            {% with error=author_form.mode.errors %}
+            <div class="two wide column">
+                <div class="{% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label>Author mode</label>
+                    {{ author_form.mode }}
+                </div>
+            </div>
+            {% endwith %}
+        </div>
+        <br />
+        <div class="fields">
+            {% if section_form.number %}
+            <div class="two wide collapsed field">
+                <label>Number</label>
+                {{ section_form.number }}
+            </div>
+            {% endif %}
+            <div class="seven wide field">
+                <label>Subtitle</label>
+                {{ section_form.subtitle }}
+            </div>
             {% with error=section_form.slug.errors %}
-            <div class="eight wide {% if error %}error{% endif %} field"
+            <div class="seven wide {% if error %}error{% endif %} field"
                      {% if error %}title="{{ error|join:"/" }}"{% endif %}>
                 <label>Slug
                     (<a href="#" onclick="fillSlugFromTitle(); return false">fill from title</a>)
@@ -86,6 +80,10 @@
                     {{ section_form.skipped }}
                 </div>
             </div>
+        </div>
+        <div class="field">
+            <label>Summary</label>
+            {{ section_form.summary }}
         </div>
         <div class="ui basic center aligned segment">
             <input type="hidden" name="section-rating"
