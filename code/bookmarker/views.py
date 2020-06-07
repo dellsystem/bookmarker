@@ -112,22 +112,25 @@ def view_books(request, book_type):
     ).prefetch_related('details__default_authors')
 
     books = {
-        'complete': all_books.filter(is_processed=True),
         'new': all_books.filter(
             is_processed=False,
             completed_sections=False,
             completed_read=True,
             details__isnull=False,
         ),
-        'unread': all_books.filter(completed_read=False),
         'incomplete': all_books.filter(
             completed_sections=True,
             is_processed=False,
         ),
+        'unread': all_books.filter(completed_read=False),
         'publications': all_books.filter(
             details__isnull=True
         ),
+        'complete': all_books.filter(is_processed=True),
     }
+    if book_type not in books:
+        book_type = 'complete'
+        messages.warning(request, 'Invalid book type - showing completed')
 
     context = {
         'books': books,
