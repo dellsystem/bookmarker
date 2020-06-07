@@ -10,9 +10,10 @@
                 </label>
             </div>
             <div class="eight wide field">
-                <label>Slug</label>
-                    {{ author_form.slug }}
+                <label>Slug
+                    (<a href="#" onclick="fillSlugFromInput('name', ''); return false">fill from title</a>)
                 </label>
+                {{ author_form.slug }}
             </div>
         </div>
         <div class="ui fields">

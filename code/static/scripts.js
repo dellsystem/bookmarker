@@ -1,8 +1,8 @@
-function fillSlugFromTitle() {
-    var title = document.getElementById('id_section-title').value;
+function fillSlugFromInput(inputName, inputPrefix) {
+    var value = document.getElementById('id_' + inputPrefix + inputName).value;
     // Replace spaces with - and remove non-word chars
-    var slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
-    document.getElementById('id_section-slug').value = slug;
+    var slug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '');
+    document.getElementById('id_' + inputPrefix + 'slug').value = slug;
 }
 
 function reformatQuote(elementId) {

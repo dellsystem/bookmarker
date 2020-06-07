@@ -117,7 +117,10 @@
         </div>
         <div class="ui fields">
             <div class="{% if error %}error{% endif %} ten wide field">
-                <label>Slug{% if error %} (REQUIRED){% endif %}</label>
+                <label>
+                    Slug{% if error %} (REQUIRED){% endif %}
+                    (<a href="#" onclick="fillSlugFromInput('title', ''); return false">fill from title</a>)
+                </label>
                 {{ book_form.slug }}
             </div>
             <div class="two wide field">
