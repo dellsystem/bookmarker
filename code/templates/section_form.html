@@ -63,7 +63,7 @@
             <div class="seven wide {% if error %}error{% endif %} field"
                      {% if error %}title="{{ error|join:"/" }}"{% endif %}>
                 <label>Slug
-                    (<a href="#" onclick="fillSlugFromTitle(); return false">fill from title</a>)
+                    (<a href="#" onclick="fillSlugFromInput('title', 'section-'); return false">fill from title</a>)
                 </label>
                 {{ section_form.slug }}
             </div>
