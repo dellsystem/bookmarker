@@ -205,7 +205,10 @@ class Book(models.Model):
         else:
             if details.issue_number:
                 # It's a periodical. Set the title to the first author's name.
-                title = details.default_authors.first().name
+                if details.default_authors.exists():
+                    title = details.default_authors.first().name
+                else:
+                    title = ''
                 authors = ''
                 num_authors = 0
             else:
