@@ -5,6 +5,57 @@ function fillSlugFromInput(inputName, inputPrefix) {
     document.getElementById('id_' + inputPrefix + 'slug').value = slug;
 }
 
+function fixOcr(elementId) {
+    var field = document.getElementById(elementId);
+    var lines = field.value.split(/\n/g);
+
+    var newLines = [];
+    var newLine = [];
+    var line, nextLine, n;
+    for (var i = 0; i < lines.length; i++) {
+        line = lines[i];
+        if (i == lines.length - 1) {
+            nextLine = '';
+        } else {
+            nextLine = lines[i+1];
+        }
+
+        n = line.length;
+        if (n > 0) {
+            if (line[n-1] === '-' && (n == 1 || line[n-2] != '-')) {
+                // Get rid of the -.
+                newLine.push(line.substring(0, n-1) + nextLine);
+                i++;
+            } else {
+                newLine.push(line);
+            }
+        } else {
+            // Preserve the empty line.
+            newLines.push(newLine.join(' '));
+            newLines.push('');
+            newLine = [];
+        }
+    }
+    if (newLine) {
+        newLines.push(newLine.join(' '));
+    }
+
+    var newValue = newLines.join('\n');
+    // replace various things
+    var replacements = {
+        ' o f ': ' of ',
+        '­ ': '',
+    };
+    var key, regex, replace;
+    for (key in replacements) {
+        regex = new RegExp(key, 'g');
+        replace = replacements[key];
+        newValue = newValue.replace(regex, replace);
+    }
+    field.value = newValue;
+}
+
+
 function reformatQuote(elementId) {
     var field = document.getElementById(elementId);
     var lines = field.value.split(/\n/g);

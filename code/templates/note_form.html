@@ -50,7 +50,10 @@
             <div class="two column row">
                 <div class="column">
                     <div class="field">
-                        <label>Quote (<a href="#" onclick="reformatQuote('id_note-quote'); return false">reformat</a>)</label>
+                        <label>Quote
+                            (<a href="#" onclick="reformatQuote('id_note-quote'); return false">reformat</a>)
+                            (<a href="#" onclick="fixOcr('id_note-quote'); return false">fix OCR</a>)
+                        </label>
                         {{ note_form.quote }}
                     </div>
                 </div>
