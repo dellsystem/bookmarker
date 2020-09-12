@@ -1,0 +1,42 @@
+<div class="ui modal" id="keyboard-shortcuts">
+    <div class="header">Keyboard shortcuts</div>
+    <div class="content">
+    </div>
+</div>
+
+<div class="ui modal" id="keyboard-action-author">
+    <div class="header">Search for an author</div>
+    <div class="content">
+        <form method="POST" action="{% url 'add_author_from_id' %}">
+            {% csrf_token %}
+            <div class="ui search" id="author-search">
+                <div class="ui fluid icon input">
+                    <input type="text" class="prompt" name="q" placeholder="Search by name ..." autocomplete="off" />
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="actions">
+        <div class="ui positive button">Add author</div>
+    </div>
+</div>
+
+
+<div class="ui modal" id="keyboard-action-book">
+    <div class="header">Search for a book</div>
+    <div class="content">
+        <form method="POST" action="{% url 'add_book_from_id' %}">
+            <div class="ui search" id="book-search">
+                <div class="ui fluid icon input">
+                    {% csrf_token %}
+                    <input type="text" class="prompt" name="q" placeholder="Search by title ..." autocomplete="off" />
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="actions">
+        <div class="ui positive button">Add book</div>
+    </div>
+</div>

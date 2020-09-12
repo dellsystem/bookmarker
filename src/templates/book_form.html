@@ -1,0 +1,181 @@
+<form class="ui form" method="post">
+    {% csrf_token %}
+    {{ details_form.errors }}
+
+    {% if details_form %}
+    <div class="ui segment">
+        <div class="ui fields">
+            <div class="two wide field">
+                <label>Goodreads ID</label>
+                {{ details_form.goodreads_id }}
+            </div>
+            <div class="fourteen wide field">
+                <label>Link</label>
+                {{ details_form.link }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="three wide field">
+                <label>ISBN</label>
+                {{ details_form.isbn }}
+            </div>
+            <div class="four wide field">
+                <label>Publisher</label>
+                {{ details_form.publisher }}
+            </div>
+            <div class="two wide field">
+                <label>Year</label>
+                {{ details_form.year }}
+            </div>
+            <div class="one wide field">
+                <label>Pages</label>
+                <div class="ui toggle checkbox">
+                    {{ details_form.has_pages }}
+                </div>
+            </div>
+            <div class="two wide field">
+                <label>Number of pages</label>
+                {{ details_form.num_pages }}
+            </div>
+            <div class="two wide field">
+                <label>Format</label>
+                {{ details_form.format }}
+            </div>
+            <div class="two wide field">
+                <label>Issue #</label>
+                {{ details_form.issue_number }}
+            </div>
+        </div>
+        <div class="ui fields">
+            {% with error=details_form.default_authors.errors %}
+            <div class="{% if error %}error{% endif %} seven wide field">
+                <label>Default author (for creating child items){% if error %} (REQUIRED){% endif %}</label>
+                {{ details_form.default_authors }}
+            </div>
+            {% endwith %}
+            {% with error=details_form.authors.errors %}
+            <div class="{% if error %}error{% endif %} seven wide field">
+                <label>Author (for display){% if error %} (REQUIRED){% endif %}</label>
+                {{ details_form.authors }}
+            </div>
+            {% endwith %}
+            <div class="one wide field">
+                <label>Edited?</label>
+                <div class="ui toggle checkbox">
+                    {{ details_form.is_edited }}
+                </div>
+            </div>
+            <div class="one wide field">
+                <label>Verified</label>
+                <div class="ui toggle checkbox">
+                    {{ details_form.verified }}
+                </div>
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="two wide field">
+                <label>Rating</label>
+                {% if book.details %}
+                <div class="ui heart rating editable-rating" data-rating="{{ details_form.rating.value }}">
+                </div>
+                <input type="hidden" id="rating-input" name="rating" value="{{ book.details.rating }}" />
+                {% endif %}
+            </div>
+            <div class="two wide field">
+                <label>Start date</label>
+                {{ details_form.start_date }}
+            </div>
+            <div class="two wide field">
+                <label>End date</label>
+                {{ details_form.end_date }}
+            </div>
+            <div class="two wide field">
+                <label>Shelves</label>
+                {{ details_form.shelves }}
+            </div>
+            <div class="eight wide field">
+                <label>Review</label>
+                {{ details_form.review }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {{ book_form.errors }}
+
+    <div class="ui segment">
+        {% with error=book_form.title.errors %}
+        <div class="{% if error %}error{% endif %} ui field">
+            <label>Title{% if error %} (REQUIRED){% endif %}</label>
+            {{ book_form.title }}
+        </div>
+        {% endwith %}
+        <div class="ui two fields">
+            <div class="field">
+                <label>Summary</label>
+                {{ book_form.summary }}
+            </div>
+            <div class="field">
+                <label>Comments</label>
+                {{ book_form.comments }}
+            </div>
+        </div>
+        <div class="ui fields">
+            {% with error=book_form.image_url.errors %}
+            <div class="{% if error %}error{% endif %} eight wide field">
+                <label>Image URL{% if error %} (REQUIRED){% endif %}</label>
+                {{ book_form.image_url }}
+            </div>
+            {% endwith %}
+            <div class="eight wide field">
+                <label>Source URL</label>
+                {{ book_form.source_url }}
+            </div>
+        </div>
+        <div class="ui fields">
+            <div class="{% if error %}error{% endif %} ten wide field">
+                <label>
+                    Slug{% if error %} (REQUIRED){% endif %}
+                    (<a href="#" onclick="fillSlugFromInput('title', ''); return false">fill from title</a>)
+                </label>
+                {{ book_form.slug }}
+            </div>
+            <div class="two wide field">
+                <label>Language</label>
+                {{ book_form.language }}
+            </div>
+            <div class="one wide field">
+                <label>Processed</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.is_processed }}
+                    </div>
+                </label>
+            </div>
+            <div class="two wide field">
+                <label>Completed sections</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.completed_sections }}
+                    </div>
+                </label>
+            </div>
+            <div class="one wide field">
+                <label>Read</label>
+                    <div class="ui toggle checkbox">
+                        {{ book_form.completed_read }}
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui center aligned segment">
+        <button type="submit" name="submit" value="create"
+                class="ui blue button">
+            Submit without details
+        </button>
+        <button type="submit" name="submit" value="details"
+                class="ui blue button">
+            Submit
+        </button>
+    </div>
+</form>

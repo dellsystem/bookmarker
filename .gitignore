@@ -5,3 +5,4 @@
 backups/*
 env
 static/
+export.csv

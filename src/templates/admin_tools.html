@@ -1,0 +1,73 @@
+{% if request.user.is_staff %}
+<div class="ui stackable grid">
+    <div class="eight wide column">
+{% endif %}
+        <div class="ui segment">
+            <div class="ui five mini statistics">
+                <div class="statistic">
+                    <div class="value">
+                        {{ books.new.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_books' 'new' %}"
+                           class="keyboard-shortcut"
+                           data-shortcut="b n"
+                           data-label="View new books">New</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ books.incomplete.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_books' 'incomplete' %}"
+                           class="keyboard-shortcut"
+                           data-shortcut="b i"
+                           data-label="View incomplete books">Incomplete</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ books.unread.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_books' 'unread' %}"
+                           class="keyboard-shortcut"
+                           data-shortcut="b u"
+                           data-label="View unread books">Unread</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ books.publications.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_books' 'publications' %}"
+                           class="keyboard-shortcut"
+                           data-shortcut="b p"
+                           data-label="View publications">Publications</a>
+                    </div>
+                </div>
+                <div class="statistic">
+                    <div class="value">
+                        {{ books.complete.count }}
+                    </div>
+                    <div class="label">
+                        <a href="{% url 'view_books' 'complete' %}"
+                           class="keyboard-shortcut"
+                           data-shortcut="b c"
+                           data-label="View complete books">Complete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if request.user.is_staff %}
+    </div>
+    <div class="four wide column">
+        {% include 'add_author_field.html' %}
+    </div>
+    <div class="four wide column">
+        {% include 'add_book_field.html' with label='Book' %}
+    </div>
+</div>
+{% endif %}

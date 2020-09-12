@@ -14,7 +14,7 @@ is also a great way to creep on what books I'm reading.
 ## Setup
 
 If you're familiar with Django, you can skip this; it's a standard deployment
-with Django 2.28. Pip requirements can be found in requirements.txt.
+with Django 3.11. Pip requirements can be found in requirements.txt.
 
 Here's the step-by-step for how to set it up via the command line on a Linux
 machine that already has git, Python (v3), and virtualenv installed:
@@ -228,6 +228,10 @@ chapters to the book if you like (optional). Click the green arrow button when
 done, and you'll be presented with the option to add notes (for quotes) and
 terms (for vocabulary). If the book details didn't quite get saved properly,
 click the edit icon next to the book title.
+
+**NEW**: You can now add books via the "b b" keyboard shortcut. This is
+recommended over the copy-and-paste the ID method above. To add an author, use
+"a a".
 
 To add an author, find the Goodreads ID for the author (same method), and use
 the Author field from the dashboard or the author page. If the author doesn't

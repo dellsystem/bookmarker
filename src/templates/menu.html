@@ -1,0 +1,93 @@
+<div class="ui large stackable menu" id="navbar">
+    <div class="active item">
+        <a href="{% url 'home' %}" class="keyboard-shortcut" data-shortcut="h" data-label="Home">
+            <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
+        </a>
+    </div>
+    <div class="ui dropdown item">
+        Books
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a class="item" href="{% url 'view_books' 'new' %}">
+                New
+            </a>
+            <a class="item" href="{% url 'view_books' 'incomplete' %}">
+                Incomplete
+            </a>
+            <a class="item" href="{% url 'view_books' 'unread' %}">
+                Unread
+            </a>
+            <a class="item" href="{% url 'view_books' 'publications' %}">
+                Publications
+            </a>
+            <a class="item" href="{% url 'view_books' 'complete' %}">
+                Complete
+            </a>
+        </div>
+    </div>
+    <div class="ui dropdown item">
+        Browse
+        <i class="dropdown icon"></i>
+        <div class="menu">
+            <a class="item" href="{% url 'view_all_authors' %}">
+                <i class="user icon"></i>
+                Authors
+            </a>
+            <a class="item" href="{% url 'view_all_terms' %}">
+                <i class="flag icon"></i>
+                Terms
+            </a>
+            <a class="item" href="{% url 'view_all_notes' %}">
+                <i class="sticky note icon"></i>
+                Notes
+            </a>
+            <a class="item" href="{% url 'view_all_tags' %}">
+                <i class="tag icon"></i>
+                Tags
+            </a>
+            <a class="item" href="{% url 'view_faves' %}">
+                <i class="heart icon"></i>
+                Faves
+            </a>
+        </div>
+    </div>
+    {% if request.user.is_staff %}
+    <div class="ui dropdown item">
+        Goodreads
+        <i class="dropdown icon"></i>
+        <div class="menu">    
+            <a class="item" href="{% url 'view_stats' %}">Stats</a>
+            <a class="item" href="{% url 'sync_goodreads' %}">Sync</a>
+        </div>
+    </div>
+    <div class="item">
+        <a href="{% url 'admin:index' %}"
+           class="keyboard-shortcut"
+           data-shortcut="a d"
+           data-label="Go to admin">
+            Admin
+        </a>
+    </div>
+    {% endif %}
+    {% if request.user.is_authenticated %}
+    <div class="item">
+        <a href="{% url 'logout' %}">Log out ({{ request.user.username }})</a>
+    </div>
+    {% else %}
+    <div class="item">
+        <a href="{% url 'login' %}">Log in</a>
+    </div>
+    {% endif %}
+    <div class="right item">
+        <form action="{% url 'search' %}">
+            <div class="ui search" id="site-search">
+                <div class="ui icon input">
+                    <input name="q" type="text" placeholder="Search..."
+                           class="prompt"
+                           value="{% if query %}{{ query }}{% endif %}">
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

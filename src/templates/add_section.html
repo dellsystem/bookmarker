@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Add section{% endblock %}
+
+{% block breadcrumbs %}
+<a class="section" href="{% url 'view_book' book.slug %}">View book</a>
+<i class="right angle icon divider"></i>
+<div class="active section">Add section</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui grid">
+    <div class="fourteen wide column">
+        {% include 'book_header.html' with book=book only %}
+    </div>
+    <div class="two wide column">
+        <form method="post" action="{% url 'mark_complete' book.id %}">
+            {% csrf_token %}
+            <button class="ui fluid green icon button keyboard-shortcut"
+                    name="mode"
+                    data-label="Done with adding sections"
+                    data-shortcut="d"
+                    value="sections">
+                <i class="check icon"></i> Done
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="ui divider"></div>
+
+{% include 'section_form.html' %}
+
+{% with count=book.sections.count %}
+{% if count %}
+<h3>
+    Existing sections ({{ count }} total)
+</h3>
+{% include 'section_list.html' with sections=sections hide_counts=True %}
+{% else %}
+<div class="ui warning message">
+    <div class="header">
+        No sections yet!
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+{% endblock %}

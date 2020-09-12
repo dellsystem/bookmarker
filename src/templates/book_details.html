@@ -1,0 +1,47 @@
+{% if details %}
+    <p>
+    {% if admin %}
+        {% if details.isbn %}
+        <code>ISBN: {{ details.isbn }}</code>
+        {% elif not details.verified %}
+        <span class="ui red label">ISBN?</span>
+        {% endif %}
+        <br />
+        {% if details.goodreads_id %}
+        <code>ID: {{ details.goodreads_id }}</code>
+        {% elif not details.verified %}
+        <span class="ui red label">ID?</span>
+        {% endif %}
+        <br />
+    {% endif %}
+    {% if details.publisher %}
+    {{ details.publisher }},
+    {% elif admin and not details.verified %}
+    <span class="ui red label">Publisher?</span>,
+    {% endif %}
+    {% if details.year %}
+    {{ details.year }}.
+    {% elif admin and not details.verified %}
+    <span class="ui red label">Year?</span>.
+    {% endif %}
+    {% if details.num_pages %}
+    {{ details.num_pages }} pages.
+    {% elif admin and not details.verified %}
+    <span class="ui red label">Pages?</span>.
+    {% endif %}
+    {% if details.format %}
+    {{ details.format }}.
+    {% elif admin and not details.format %}
+    <span class="ui red label">Format?</span>.
+    {% endif %}
+
+    {% if admin %}
+        <br />
+        {% if details.verified %}
+        <i class="checkmark icon" title="Publication details verified"></i>
+        {% else %}
+        <span class="ui red label">Unverified</span>
+        {% endif %}
+    {% endif %}
+    </p>
+{% endif %}

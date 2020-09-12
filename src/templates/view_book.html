@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% load markdown_filter %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="active section">View
+    {% if book.is_publication %}
+    publication
+    {% else %}
+    book
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui stackable grid">
+    <div class="twelve wide column">
+        <h2 class="ui header">
+            {{ book.title }}
+            {% if request.user.is_staff %}
+            <a href="{% url 'edit_book' book.slug %}"
+               class="keyboard-shortcut"
+               data-label="Edit this book"
+               data-shortcut="e">
+                <i class="edit icon"></i>
+            </a>
+            {% endif %}
+            {% if book.details %}
+            <div class="sub header">
+                {% include 'author_list.html' with authors=book.details.default_authors is_edited=book.details.is_edited only %}
+                {% if book.details.issue_number %}(#{{ book.details.issue_number }}){% endif %}
+                <div class="ui rating display-rating"
+                     data-rating="{{ book.details.rating }}">
+                </div>
+                {% if book.details.start_date and book.details.end_date %}
+                {{ book.details.start_date }} - {{ book.details.end_date }}
+                {% endif %}
+                {% if book.details.shelves %}
+                ({{ book.details.shelves }})
+                {% endif %}
+            </div>
+            {% endif %}
+        </h2>
+    </div>
+    {% if request.user.is_staff %}
+    <div class="four wide center aligned column">
+        {% if not book.is_processed %}
+        <form method="post" action="{% url 'mark_complete' book.id %}">
+        {% csrf_token %}
+        {% if not book.completed_sections %}
+            <div class="ui fluid buttons">
+                <a class="ui blue icon button keyboard-shortcut" href="{% url 'add_section' book.slug %}" data-shortcut="s a" data-label="Add section">
+                    <i class="plus icon"></i> Add
+                    {% if book.is_publication %}
+                    article
+                    {% else %}
+                    chapter
+                    {% endif %}
+                </a>
+                <a class="ui black icon button keyboard-shortcut" href="{% url 'add_sections' book.slug %}"
+                   title="Add multiple sections" data-shortcut="s s" data-label="Add multiple section">
+                    <i class="upload icon"></i>
+                </a>
+                {% if book.details %}
+                <button class="ui green icon button keyboard-shortcut"
+                        data-shortcut="d"
+                        data-label="Done adding sections"
+                        name="mode"
+                        value="sections">
+                    <i class="check icon"></i>
+                </button>
+                {% endif %}
+            </div>
+        {% else %}
+            <button class="ui fluid black icon button keyboard-shortcut"
+                    name="mode"
+                    data-shortcut="d"
+                    data-label="Done adding terms/notes"
+                    value="processed"
+                    type="submit">
+               <i class="check icon"></i> Mark as processed
+            </button>
+        {% endif %}
+        </form>
+        {% else %}
+            {% if request.user.is_staff %}
+            {% include 'add_book_field.html' with label='Add more' %}
+            {% endif %}
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+<div class="ui divider"></div>
+{% if book.summary %}
+    <div class="ui message">
+        {{ book.summary|markdownify }}
+    </div>
+{% endif %}
+{% with citation=book.get_citation %}
+{% if citation %}
+<p>
+    {{ citation|markdownify }}
+</p>
+{% endif %}
+{% endwith %}
+
+<div class="ui stackable grid">
+    <div class="four wide column">
+        <a href="{% if details %}{{ book.details.link }}{% endif %}">
+            <img src="{{ book.image_url }}"
+                 class="ui fluid image"
+                 title="{{ book.title }}" />
+        </a>
+        <br />
+        <div style="text-align: center">
+            {% include 'book_details.html' with details=details admin=request.user.is_staff only %}
+            <a class="ui icon label" title="Terms" href="#terms">
+                <i class="flag icon"></i> {{ book.terms.count }}
+            </a>
+            <a class="ui icon label" title="Notes" href="#notes">
+                <i class="sticky note icon"></i> {{ book.notes.count }}
+            </a>
+            <div class="ui icon label" title="Sections">
+                <i class="angle right icon"></i> {{ book.sections.count }}
+            </div>
+        </div>
+        <br />
+        {% if book.comments %}
+        <div class="ui message">
+            <code>{{ book.comments }}</code>
+        </div>
+        {% endif %}
+        {% if book.source_url %}
+        <br />
+        <div style="text-align: center">
+            <a href="{{ book.source_url }}">
+                <i class="large external icon"></i>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="twelve wide column">
+        {% if book.completed_sections or not book.details %}
+        <div class="ui celled two column stackable grid">
+            <div class="column" id="terms">
+                {% with num_terms=book.terms.count %}
+                {% if num_terms or not book.is_processed %}
+                <div class="ui fluid buttons">
+                    {% if num_terms %}
+                    <a href="{% url 'view_terms' book.slug %}"
+                       class="ui basic blue icon button">
+                        <i class="list icon"></i>
+                        View terms ({{ num_terms }})
+                    </a>
+                    {% endif %}
+                    {% if not book.is_processed %}
+                    <a href="{% url 'add_term' book.slug %}"
+                       class="ui blue icon button keyboard-shortcut"
+                       data-label="Add term"
+                       data-shortcut="t">
+                        <i class="plus icon"></i> Add term
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if num_terms %}
+                    {% include 'term_snippets.html' with terms=recent_terms show_page=book.has_pages only %}
+                {% else %}
+                <div class="ui warning message">
+                    <div class="header">
+                        No terms yet!
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+            <div class="column" id="notes">
+                {% with num_notes=book.notes.count %}
+                {% if num_notes or not book.is_processed %}
+                <div class="ui fluid buttons">
+                    {% if num_notes %}
+                    <a href="{% url 'view_notes' book.slug %}"
+                       class="ui basic blue icon button">
+                        <i class="list icon"></i>
+                        View all {{ num_notes }} notes
+                    </a>
+                    {% endif %}
+                    {% if not book.is_processed %}
+                    <a href="{% url 'add_note' book.slug %}" class="ui blue icon button keyboard-shortcut"
+                       data-label="Add note"
+                       data-shortcut="n">
+                        <i class="plus icon"></i> Add note
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if num_notes %}
+                    {% include 'note_snippets.html' with notes=recent_notes show_page=book.has_pages only %}
+                {% else %}
+                <div class="ui warning message">
+                    <div class="header">
+                        No notes yet!
+                    </div>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {% else %}
+        <div class="ui warning message">
+            You must complete the sections before you can add terms or notes.
+        </div>
+        {% endif %}
+        {% if book.sections.count %}
+        {% include 'section_list.html' with sections=sections hide_book=True %}
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}

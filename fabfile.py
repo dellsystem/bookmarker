@@ -13,10 +13,10 @@ def re():
 
 
 def up():
-    local('code/manage.py runserver')
+    local('src/manage.py runserver')
 
 def static():
-    local('code/manage.py collectstatic --noinput')
+    local('src/manage.py collectstatic --noinput')
 
 
 def get_backup_filename(hostname):
@@ -25,7 +25,7 @@ def get_backup_filename(hostname):
         datetime.datetime.now().strftime('%Y-%m-%d-%H%M')
     )
 
-BACKUP_COMMAND = './code/manage.py dumpdata books vocab activity > '
+BACKUP_COMMAND = './src/manage.py dumpdata books vocab activity > '
 def backup():
     """Does a local database dump. Returns the filename."""
     local_filename = get_backup_filename(hostname=socket.gethostname())
@@ -67,4 +67,4 @@ def exp():
 
     with cd('bookmarker'):
         # Then run loaddata.
-        run('source env/bin/activate && code/manage.py loaddata ' + local_filename)
+        run('source env/bin/activate && src/manage.py loaddata ' + local_filename)
