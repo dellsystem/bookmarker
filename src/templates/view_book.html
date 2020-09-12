@@ -4,6 +4,8 @@
 
 {% block title %}{{ book.title }}{% endblock %}
 
+{% block modals %}{% include 'book_search_modal.html' with book=book only %}{% endblock %}
+
 {% block breadcrumbs %}
 <div class="active section">View
     {% if book.is_publication %}
@@ -218,6 +220,5 @@
         {% endif %}
     </div>
 </div>
-
 
 {% endblock %}

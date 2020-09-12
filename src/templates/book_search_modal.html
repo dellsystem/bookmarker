@@ -1,0 +1,18 @@
+<div class="ui modal modal-keyboard-shortcut"
+     data-shortcut="s"
+     data-label="Search within this book">
+    <div class="header">Search within this book</div>
+    <div class="content">
+        <form method="GET" action="{% url 'within_book_search_json' book.pk %}">
+            {% csrf_token %}
+            <div class="ui search json-search"
+                 data-search-url="{% url 'within_book_search_json' book.pk %}"
+                 data-search-type="category">
+                <div class="ui fluid icon input">
+                    <input type="text" class="prompt" name="q" placeholder="Search by keyword ..." autocomplete="off" />
+                    <i class="search icon"></i>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

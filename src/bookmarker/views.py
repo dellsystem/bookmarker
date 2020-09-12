@@ -15,7 +15,7 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
 from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
-from books import goodreadstools, redistools
+from books import goodreadstools, redistools, highlighter
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm, \
                         MultipleSectionsForm
@@ -1338,6 +1338,78 @@ def author_search_json(request):
 
     return JsonResponse({
         'results': results
+    })
+
+
+def within_book_search_json(request, book_id):
+    """Suggest notes/sections/terms with that keyword"""
+    query = request.GET.get('q')
+    term = query  # todo: meta options?
+    book = Book.objects.get(pk=book_id)
+
+    if len(query) < 3:
+        return
+
+    # todo: method on objectmanager to search by keyword
+    notes = book.notes.filter(
+        Q(subject__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(comment__icontains=term)
+    )
+    terms = book.terms.filter(
+        Q(term__text__icontains=term) |
+        Q(term__definition__icontains=term) |
+        Q(quote__icontains=term) |
+        Q(quote__icontains=term)
+    )
+    sections = book.sections.filter(
+        Q(title__icontains=term) |
+        Q(authors__name__icontains=term) |
+        Q(subtitle__icontains=term) |
+        Q(summary__icontains=term)
+    )
+
+    results = {'notes': [], 'terms': [], 'sections': []}
+    for note in notes:
+        results['notes'].append({
+            'title': highlighter.highlight(note.subject, query),
+            'description': highlighter.highlight(note.quote, query, 200),
+            'price': note.get_page_display(),
+            'url': note.get_absolute_url(),
+        })
+
+    for term in terms:
+        results['terms'].append({
+            'title': highlighter.highlight(term.term.text, query),
+            'description': highlighter.highlight(term.quote, query, 200),
+            'price': term.get_page_display(),
+            'url': term.get_absolute_url(),
+        })
+
+    for section in sections:
+        authors = ', '.join(a.name for a in section.authors.all())
+        results['sections'].append({
+            'title': highlighter.highlight(section.title, query),
+            'description': highlighter.highlight(authors, query),
+            'price': section.get_page_display(),
+            'url': section.get_absolute_url(),
+        })
+
+    return JsonResponse({
+        'results': {
+            'books': {
+                'name': 'Notes',
+                'results': results['notes'],
+            },
+            'authors': {
+                'name': 'Terms',
+                'results': results['terms'],
+            },
+            'sections': {
+                'name': 'Sections',
+                'results': results['sections'],
+            },
+        }
     })
 
 

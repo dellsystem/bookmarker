@@ -4,12 +4,13 @@
     </div>
 </div>
 
-<div class="ui modal" id="keyboard-action-author">
+<div class="ui modal modal-keyboard-shortcut" data-shortcut="a a" data-label="Search for an author by name">
     <div class="header">Search for an author</div>
     <div class="content">
         <form method="POST" action="{% url 'add_author_from_id' %}">
             {% csrf_token %}
-            <div class="ui search" id="author-search">
+            <div class="ui search json-search"
+                 data-search-url="/author_search.json">
                 <div class="ui fluid icon input">
                     <input type="text" class="prompt" name="q" placeholder="Search by name ..." autocomplete="off" />
                     <i class="search icon"></i>
@@ -23,11 +24,12 @@
 </div>
 
 
-<div class="ui modal" id="keyboard-action-book">
+<div class="ui modal modal-keyboard-shortcut" data-shortcut="b b" data-label="Search for a book by title">
     <div class="header">Search for a book</div>
     <div class="content">
         <form method="POST" action="{% url 'add_book_from_id' %}">
-            <div class="ui search" id="book-search">
+            <div class="ui search json-search"
+                 data-search-url="/book_search.json">
                 <div class="ui fluid icon input">
                     {% csrf_token %}
                     <input type="text" class="prompt" name="q" placeholder="Search by title ..." autocomplete="off" />

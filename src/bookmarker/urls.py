@@ -52,6 +52,8 @@ urlpatterns = [
         name='view_notes'),
     url(r'^book/(?P<book_id>\d+)/complete$', bookmarker.views.mark_complete,
         name='mark_complete'),
+    url(r'^book/(?P<book_id>\d+)/search.json$', bookmarker.views.within_book_search_json,
+        name='within_book_search_json'),
     url(r'^section/(?P<section_id>\d+)$', bookmarker.views.view_section,
         name='view_section'),
     url(r'^section/(?P<section_id>\d+)/edit$', bookmarker.views.edit_section,

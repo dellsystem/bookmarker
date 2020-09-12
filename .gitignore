@@ -4,5 +4,5 @@
 .log
 backups/*
 env
-static/
+/static
 export.csv
