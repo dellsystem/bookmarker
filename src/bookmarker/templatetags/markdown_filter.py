@@ -13,7 +13,7 @@ def markdownify(text):
     return mark_safe(
         markdown.markdown(
             text,
-            extensions=['superscript'],
+            extensions=['superscript', 'nl2br'],
             smart_emphasis=False
         ).replace('    ', '&ensp;')
     )
