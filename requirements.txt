@@ -27,5 +27,5 @@ soupsieve==1.9.5
 sqlparse==0.3.0
 terminaltables==3.1.0
 -e git+https://github.com/dellsystem/translate-term.git@e1a585826d64cb16c83d783a16b0e84d848bfc44#egg=translate_term
-urllib3==1.25.7
+urllib3==1.25.8
 xmltodict==0.12.0
