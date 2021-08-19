@@ -20,6 +20,11 @@
     <i class="red heart icon" title="Faved"></i>
     {% endif %}
 </h1>
+{% if tag.hidden and not request.user.is_staff %}
+<div class="ui negative message ">
+    <div class="header">You must log in to view this tag.</div>
+</div>
+{% else %}
 <h2 class="ui header">
     <div class="sub header">
         {% for author in tag.get_authors %}
@@ -45,5 +50,6 @@
     {% include "pagination.html" with items=notes only %}
 {% else %}
     <div class="ui warning message">No notes yet</div>
+{% endif %}
 {% endif %}
 {% endblock %}

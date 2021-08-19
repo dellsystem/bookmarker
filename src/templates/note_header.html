@@ -28,10 +28,12 @@
     {% if note.tags.count %}
     <div class="four wide right aligned column">
         {% for tag in note.tags.all %}
+        {% if not tag.hidden or request.user.is_staff %}
         <a class="ui {{ tag.get_colour }} label" title="{{ tag.description }}"
            href="{{ tag.get_absolute_url }}">
             {{ tag }}
         </a>
+        {% endif %}
         {% endfor %}
     </div>
     {% endif %}

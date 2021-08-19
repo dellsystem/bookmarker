@@ -1765,7 +1765,10 @@ def view_tag(request, slug):
 def view_all_tags(request):
     tags = Tag.objects.all().prefetch_related('category').annotate(
         num_notes=Count('notes', distinct=True),
-    )
+    ).order_by('category__slug', 'slug')
+
+    if not request.user.is_staff:
+        tags = tags.filter(hidden=False)
 
     context = {
         'tags': tags,
