@@ -5,7 +5,7 @@ cffi==1.13.2
 chardet==3.0.4
 cryptography==2.8
 Django==3.2
-django-debug-toolbar==2.2
+django-debug-toolbar==2.2.1
 -e git+https://github.com/dellsystem/django-language-field@a7f23fb4547e5633c54f71914091f9f8cf6c34ba#egg=django-language-field
 Fabric3==1.14.post1
 -e git+https://github.com/dellsystem/goodreads@23a693fe52c2f4fb6daf6e65b7277102de288943#egg=goodreads
