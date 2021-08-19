@@ -178,3 +178,5 @@ REST_FRAMEWORK = {
 
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField' # needed in 3.2
