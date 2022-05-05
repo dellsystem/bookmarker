@@ -19,7 +19,7 @@ _client.authenticate(
 def get_author_by_name(name):
     author = _client.find_author(name)
     if author is not None:
-        return redistools.save_author(author)
+        return redistools.save_author2(author)
 
 
 def get_author_by_id(goodreads_id):
@@ -27,7 +27,7 @@ def get_author_by_id(goodreads_id):
     if cached_data:
         return cached_data
 
-    return redistools.save_author(_client.author(goodreads_id))
+    return redistools.save_author2(_client.author(goodreads_id))
 
 
 def get_books_by_title(title):
@@ -43,7 +43,7 @@ def get_book_by_id(goodreads_id):
     if cached_data:
         return cached_data
 
-    return redistools.save_book(_client.book(goodreads_id))
+    return redistools.save_book2(_client.book(goodreads_id))
 
 
 def get_user():
@@ -58,12 +58,12 @@ def get_read_shelf(page=1):
             continue
 
         reviews.append({
-            'book': redistools.save_book(review.book),
+            'book': redistools.save_book2(review.book),
             'shelves': '/'.join(review.shelves),
             'review': review.body or '',
             'rating': int(review.rating),
-            'start_date': review.start_date,
-            'end_date': review.end_date,
+            'start_date': review.started_at,
+            'end_date': review.read_at,
         })
 
     return reviews

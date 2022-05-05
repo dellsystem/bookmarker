@@ -21,7 +21,7 @@ def get_author(goodreads_id):
         return json.loads(value)
 
 
-def save_author(author_data, titles=None):
+def save_author2(author_data, titles=None):
     key = AUTHOR_KEY.format(author_data.gid)
 
     # If author_data is empty, save it anyway.
@@ -44,6 +44,37 @@ def save_author(author_data, titles=None):
     # If value is None, dumps and loads cancel out
     _client.set(key, json.dumps(value))
 
+    # Return the dictionary being stored
+    return value
+
+
+
+def save_author(author_data, titles=None):
+    key = AUTHOR_KEY.format(author_data['id'])
+
+    # If author_data is empty, save it anyway.
+    if author_data is None:
+        value = None
+    else:
+        # Figure out the titles from the author's books, if any.
+        if titles is None:
+            titles = 'unknown'
+            """
+            titles = ', '.join(
+                sorted([book.title for book in author_data.books])
+            )
+            """
+
+        value = {
+            'id': author_data['id'],
+            'name': author_data['name'],
+            'link': author_data['link'],
+            'titles': titles,
+        }
+
+    # If value is None, dumps and loads cancel out
+    _client.set(key, json.dumps(value))
+
     # Return the dictionary being stored 
     return value
 
@@ -58,7 +89,7 @@ def get_book(goodreads_id):
         return json.loads(value)
 
 
-def save_book(book_data):
+def save_book2(book_data):
     key = BOOK_KEY.format(book_data.gid)
     if book_data is None:
         value = None
@@ -66,7 +97,7 @@ def save_book(book_data):
         authors = []
         for author_data in book_data.authors:
             # While we have the author data, store that too.
-            author = save_author(author_data, titles=book_data.title)
+            author = save_author2(author_data, titles=book_data.title)
             authors.append(author)
 
         value = {
@@ -83,6 +114,49 @@ def save_book(book_data):
         }
 
     # If value is None, dumps and loads cancel out
+    _client.set(key, json.dumps(value))
+
+    # Return the dictionary being stored
+    return value
+
+
+
+def save_book(book_data):
+    key = BOOK_KEY.format(book_data['id']['#text'])
+    if book_data is None:
+        value = None
+    else:
+        if 'author' in book_data['authors']:
+            authors = [save_author(book_data['authors']['author'], titles=book_data['title'])]
+        else:
+            print('missing author key:')
+            print(book_data['authors'])
+            """
+            authors = []
+            for author_data in book_data['authors']:
+                # While we have the author data, store that too.
+                author = save_author(author_data, titles=book_data['title'])
+                authors.append(author)
+            """
+
+        value = {
+            'id': book_data['id']['#text'],
+            'title': book_data['title'],
+            'link': book_data['link'],
+            'format': book_data['format'],
+            'year': book_data['publication_year'],
+            'isbn13': book_data['isbn13'],
+            'publisher': book_data['publisher'],
+            'num_pages': book_data['num_pages'],
+            'image_url': book_data['image_url'],
+            'authors': authors,
+        }
+
+    # If value is None, dumps and loads cancel out
+    print('saving book')
+    print(value)
+    print(book_data)
+    input('waiting')
     _client.set(key, json.dumps(value))
 
     # Return the dictionary being stored 

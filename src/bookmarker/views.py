@@ -1,6 +1,7 @@
 import collections
 import datetime
 import random
+from dateutil import parser
 
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -1634,7 +1635,7 @@ def search(request):
 
 def view_stats(request):
     user = goodreadstools.get_user()
-    shelves = user.get_shelves()
+    shelves = user.shelves()
     num_read = shelves[0].count  # assumes that read is first - confirm this
     remaining_shelf = shelves[2]  # assumes that to-read is third - confirm this
     num_remaining = remaining_shelf.count
@@ -1880,8 +1881,12 @@ def sync_goodreads(request):
                 book.details.shelves = review['shelves']
                 book.details.review = review['review']
                 book.details.rating = review['rating']
-                book.details.start_date = review['start_date']
-                book.details.end_date = review['end_date']
+                book.details.start_date = parser.parse(
+                    review['start_date']
+                ).date()
+                book.details.end_date = parser.parse(
+                    review['end_date']
+                ).date()
                 book.details.save()
 
                 for author_data in review['book']['authors']:

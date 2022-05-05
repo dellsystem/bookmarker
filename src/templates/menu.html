@@ -53,11 +53,12 @@
     </div>
     {% if request.user.is_staff %}
     <div class="ui dropdown item">
-        Goodreads
+        Data
         <i class="dropdown icon"></i>
         <div class="menu">    
             <a class="item" href="{% url 'view_stats' %}">Stats</a>
             <a class="item" href="{% url 'sync_goodreads' %}">Sync</a>
+            <a class="item" href="{% url 'manual_import' %}">Add</a>
         </div>
     </div>
     <div class="item">
