@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, Count
+from django.db.models import F, Q, Count
 from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -122,7 +122,10 @@ def view_books(request, book_type):
             completed_sections=True,
             is_processed=False,
         ),
-        'unread': all_books.filter(completed_read=False),
+        'unread': all_books.filter(completed_read=False).order_by(
+            F('details__due_date').asc(nulls_last=True),
+            F('details__priority').asc(nulls_last=True)
+        ),
         'publications': all_books.filter(
             details__isnull=True
         ),

@@ -56,6 +56,27 @@ class AuthorManager(models.Manager):
         return author
 
 
+class ReadingGoal(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class BookLocation(models.Model):
+    name = models.CharField(max_length=50)
+    is_physical = models.BooleanField()
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
     link = models.URLField(help_text='Only needed if no goodreads author')
@@ -182,6 +203,19 @@ class BookDetails(models.Model):
     default_authors = models.ManyToManyField(Author,
                                              blank=True,
                                              related_name='default_books')
+    # The fields below are relevant to my new method for tracking books to read
+    due_date = models.DateField(blank=True, null=True)
+    location = models.ForeignKey(
+        BookLocation,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='books')
+    goals = models.ManyToManyField(
+        ReadingGoal, blank=True, related_name='books'
+    )
+    priority = models.PositiveSmallIntegerField(blank=True, null=True,
+        help_text='Higher priority = should read first')
 
     class Meta:
         verbose_name_plural = 'Book details'

@@ -2,8 +2,8 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import mark_safe
 
-from .models import GoodreadsAuthor, Author, Book, BookDetails, Note, \
-                    TagCategory, Tag, Section
+from .models import GoodreadsAuthor, Author, Book, BookDetails, BookLocation, \
+                    Note, TagCategory, Tag, ReadingGoal, Section
 
 
 class GoodreadsAuthorInline(admin.TabularInline):
@@ -16,6 +16,18 @@ class AuthorAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',), }
     search_fields = ['name']
     inlines = [GoodreadsAuthorInline]
+
+
+@admin.register(ReadingGoal)
+class GoalAdminAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
+@admin.register(BookLocation)
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_physical']
+    search_fields = ['name']
 
 
 @admin.register(Section)

@@ -260,8 +260,17 @@ class BookDetailsForm(forms.ModelForm):
                     'multiple': '',
                 }
             ),
+            'goals': forms.widgets.SelectMultiple(
+                attrs={
+                    'class': 'ui fluid search dropdown',
+                    'multiple': '',
+                }
+            ),
             'shelves': forms.Textarea(attrs={'rows': 1}),
             'review': forms.Textarea(attrs={'rows': 1}),
+            'due_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),
+            'start_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),
+            'end_date': forms.TextInput(attrs={'placeholder': 'YYYY-MM-DD'}),
         }
 
     def save(self):

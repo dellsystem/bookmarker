@@ -1,19 +1,14 @@
 {% if details %}
-    <p>
-    {% if admin %}
-        {% if details.isbn %}
-        <code>ISBN: {{ details.isbn }}</code>
-        {% elif not details.verified %}
-        <span class="ui red label">ISBN?</span>
+    {% if not details.completed_read %}
+        {% if details.due_date %}
+        <span class="ui black label">Due in {{ details.due_date|timeuntil }}</span>
         {% endif %}
-        <br />
-        {% if details.goodreads_id %}
-        <code>ID: {{ details.goodreads_id }}</code>
-        {% elif not details.verified %}
-        <span class="ui red label">ID?</span>
+        {% if details.location %}
+        <span title="Location" class="ui basic label">{{ details.location }}</span>
         {% endif %}
-        <br />
+    <br />
     {% endif %}
+    <p>
     {% if details.publisher %}
     {{ details.publisher }},
     {% elif admin and not details.verified %}
@@ -34,13 +29,23 @@
     {% elif admin and not details.format %}
     <span class="ui red label">Format?</span>.
     {% endif %}
+    {% if details.isbn %}
+    <code title="ISBN">{{ details.isbn }}</code>
+    {% elif not details.verified %}
+    <span class="ui red label">ISBN?</span>
+    {% endif %}
 
     {% if admin %}
         <br />
-        {% if details.verified %}
-        <i class="checkmark icon" title="Publication details verified"></i>
-        {% else %}
+        {% if not details.verified %}
         <span class="ui red label">Unverified</span>
+        {% endif %}
+        {% if details.goals.count %}
+        <br />
+        {% for goal in details.goals.all %}
+
+        <span class="ui tag teal label">{{ goal.name }}</span>
+        {% endfor %}
         {% endif %}
     {% endif %}
     </p>
