@@ -233,6 +233,7 @@ class Book(models.Model):
     language = LanguageField(default='en')
     image_url = models.URLField()
     is_processed = models.BooleanField(default=False, db_index=True)  # terms, notes, sections
+    is_ignored = models.BooleanField(default=False)
     completed_sections = models.BooleanField(default=False)  # KEEP
     completed_read = models.BooleanField(default=True)
     summary = models.TextField(blank=True)

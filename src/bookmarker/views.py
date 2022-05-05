@@ -64,17 +64,26 @@ def home(request):
     ).prefetch_related('details__default_authors')
 
     books = {
-        'complete': all_books.filter(is_processed=True),
+        'complete': all_books.filter(
+            is_processed=True,
+            is_ignored=False,
+        ),
         'new': all_books.filter(
             is_processed=False,
             completed_sections=False,
             completed_read=True,
             details__isnull=False,
         ),
-        'unread': all_books.filter(completed_read=False),
+        'unread': all_books.filter(
+            completed_read=False,
+            is_ignored=False
+        ),
         'incomplete': all_books.filter(
             completed_sections=True,
             is_processed=False,
+        ),
+        'ignored': all_books.filter(
+            is_ignored=True,
         ),
         'publications': all_books.filter(
             details__isnull=True
@@ -123,14 +132,23 @@ def view_books(request, book_type):
             completed_sections=True,
             is_processed=False,
         ),
-        'unread': all_books.filter(completed_read=False).order_by(
+        'unread': all_books.filter(
+            completed_read=False,
+            is_ignored=False
+        ).order_by(
             F('details__due_date').asc(nulls_last=True),
             F('details__priority').asc(nulls_last=True)
         ),
         'publications': all_books.filter(
             details__isnull=True
         ),
-        'complete': all_books.filter(is_processed=True),
+        'complete': all_books.filter(
+            is_processed=True,
+            is_ignored=False,
+        ),
+        'ignored': all_books.filter(
+            is_ignored=True,
+        ),
     }
     if book_type not in books:
         book_type = 'complete'
