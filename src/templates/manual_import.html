@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load markdown_filter %}
+
+{% block title %}Manual import from Goodreads{% endblock %}
+
+{% block breadcrumbs %}
+<div class="active section">Manual import from Goodreads</div>
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% url 'add_author_from_id' %}">
+{% include 'add_author_field.html' %}
+</form>
+<form method="post" action="{% url 'add_book_from_id' %}">
+{% include 'add_book_field.html' with label='Book' %}
+</form>
+{% endblock %}

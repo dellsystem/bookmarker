@@ -1873,7 +1873,13 @@ def add_tag(request):
         'categories': TagCategory.objects.all(),
     }
     return render(request, 'add_tag.html', context)
-    
+
+
+@login_required
+def manual_import(request):
+    context = {}
+    return render(request, 'manual_import.html', context)
+
 
 @login_required
 def sync_goodreads(request):
