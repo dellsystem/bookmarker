@@ -572,6 +572,7 @@ class TagCategory(models.Model):
     description = models.TextField(blank=True)
 
     class Meta:
+        ordering = ['slug']
         verbose_name_plural = 'Tag categories'
 
     def __str__(self):
@@ -587,6 +588,10 @@ class Tag(models.Model):
     )
     category = models.ForeignKey(TagCategory, on_delete=models.CASCADE,
         blank=True, null=True)
+    hidden = models.BooleanField(
+        default=False,
+        help_text="Whether it's hidden from guests"
+    )
 
     class Meta:
         ordering = ['category__slug', 'slug']
