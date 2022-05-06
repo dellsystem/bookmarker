@@ -55,6 +55,11 @@ function fixOcr(elementId) {
     field.value = newValue;
 }
 
+function reformatSubject(elementId) {
+    var field = document.getElementById(elementId);
+    const subject = field.value.trim();
+    field.value = subject[0].toLowerCase() + subject.substring(1);
+}
 
 function reformatQuote(elementId) {
     var field = document.getElementById(elementId);

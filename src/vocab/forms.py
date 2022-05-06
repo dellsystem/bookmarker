@@ -22,6 +22,9 @@ class TermForm(forms.ModelForm):
             'highlights': forms.Textarea(attrs={'rows': 4}),
         }
 
+    def clean_quote(self):
+        return self.cleaned_data['quote'].strip()
+
     def clean(self):
         cleaned_data = super(TermForm, self).clean()
         term = cleaned_data.get('text')

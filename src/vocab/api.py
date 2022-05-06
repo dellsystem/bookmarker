@@ -14,7 +14,7 @@ def lookup_term(language, term):
         except WordNotFoundException as e:
             # If the word can't be found, use the suggestions as the
             # definition.
-            return e.message
+            return str(e)
 
         definitions = [
             u'({function}) {d}'.format(function=entry.function, d=d)

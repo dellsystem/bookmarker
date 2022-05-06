@@ -15,7 +15,9 @@
                 <div class="{% if book.has_pages %}eight{% else %}nine{% endif %} wide column">
                     {% with error=note_form.subject.errors %}
                     <div class="{% if error %}error{% endif %} field">
-                        <label>Subject{% if error %} (REQUIRED){% endif %}</label>
+                        <label>Subject{% if error %} (REQUIRED){% endif %}
+                            (<a href="#" onclick="reformatSubject('id_note-subject'); return false">reformat</a>)
+                        </label>
                         {{ note_form.subject }}
                     </div>
                     {% endwith %}
@@ -82,7 +84,9 @@
         </div>
         <div class="ui basic center aligned segment">
             <button type="submit" name="submit" value=""
-                    class="ui blue button">
+                    class="ui blue button keyboard-shortcut"
+                    data-label="Save note"
+                    data-shortcut="s">
                 Submit
             </button>
             {% if show_delete %}

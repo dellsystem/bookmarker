@@ -141,6 +141,12 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
             'comment': forms.Textarea(attrs={'rows': 5}),
         }
 
+    def clean_subject(self):
+        return self.cleaned_data['subject'].strip()
+
+    def clean_quote(self):
+        return self.cleaned_data['quote'].strip()
+
     def save(self, author_form, book=None):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
@@ -176,9 +182,14 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
 class SectionForm(forms.ModelForm, PageNumberForm):
     class Meta:
         model = Section
-        exclude = ['book', 'authors', 'related_to']
+        exclude = ['book', 'authors']
         widgets = {
             'title': forms.TextInput(attrs={'autofocus': 'autofocus'}),
+            'related_to': forms.widgets.Select(
+                attrs={
+                    'class': 'ui fluid search dropdown',
+                }
+            )
         }
 
     def __init__(self, book, *args, **kwargs):
@@ -189,6 +200,13 @@ class SectionForm(forms.ModelForm, PageNumberForm):
             self.fields.pop('number')
         else:
             self.fields.pop('date')
+        
+        # If this section has a title, then show the related_to field.
+        if self.instance and self.instance.title and self.instance.authors.exists():
+            self.fields['related_to'].queryset = Section.objects.filter(authors=self.instance.authors.first()).exclude(book=self.book)
+        else:
+            self.fields.pop('related_to')
+
 
     def save(self, author_form):
         """Convert the string 'page' input into an integer (and set in_preface

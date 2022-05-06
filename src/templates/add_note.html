@@ -17,9 +17,9 @@
         {% if not book.is_processed and not book.is_publication %}
         <form method="post" action="{% url 'mark_complete' book.id %}">
             {% csrf_token %}
-            <button class="ui fluid black icon button"
-                    title="Summaries can be omitted"
+            <button class="ui fluid black icon button keyboard-shortcut"
                     name="mode"
+                    data-shortcut="p" data-label="Mark as processed"
                     value="processed"
                     type="submit">
                <i class="check icon"></i> Mark as processed

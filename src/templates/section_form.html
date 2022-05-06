@@ -21,7 +21,7 @@
                 {% endwith %}
             </div>
             {% else %}
-            <div class="{% if section_form.number %}two{% else %}three{% endif %} wide collapsed column">
+            <div class="two wide collapsed column">
                 {% with error=section_form.date.errors %}
                 <div class="{% if error %}error{% endif %} field"
                      {% if error %}title="{{ error|join:"/" }}"{% endif %}>
@@ -85,6 +85,12 @@
             <label>Summary</label>
             {{ section_form.summary }}
         </div>
+        {% if section_form.related_to %}
+        <div class="field">
+            <label>Related section (in another book)</label>
+            {{ section_form.related_to }}
+        </div>
+        {% endif %}
         <div class="ui basic center aligned segment">
             <input type="hidden" name="section-rating"
                    id="rating-input" value="{{ section.rating }}" />
