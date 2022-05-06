@@ -201,7 +201,7 @@ $('.display-rating').rating({
     interactive: false,
 });
 
-$('.ui.dropdown').dropdown();
+$('.ui.dropdown').dropdown({fullTextSearch: 'exact'});
 $('.ui.checkbox').checkbox();
 $('#site-search').search({
     // change search endpoint to a custom endpoint by manipulating apiSettings
