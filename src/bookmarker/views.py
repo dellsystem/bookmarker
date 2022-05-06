@@ -180,6 +180,9 @@ def view_book(request, slug):
     # If it's a publication, order the articles alphabetically by name.
     if book.details is None:
         sections = sections.order_by('title')
+    else:
+        # We have to order again (repeating the default ordering) because it gets lost after calling annotate().
+        sections = sections.order_by('-in_preface', 'page_number')
 
     context = {
         'book': book,
