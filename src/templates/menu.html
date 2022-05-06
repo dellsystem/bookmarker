@@ -1,7 +1,7 @@
 <div class="ui large stackable menu" id="navbar">
-    <div class="active item">
+    <div class="item">
         <a href="{% url 'home' %}" class="keyboard-shortcut" data-shortcut="h" data-label="Home">
-            <img class="ui image" src="/static/bookmarker.png" alt="Bookmarker" />
+            <img class="ui image" src="/static/img/bookmarker.png" alt="Bookmarker" />
         </a>
     </div>
     <div class="ui dropdown item">
@@ -70,11 +70,7 @@
         </a>
     </div>
     {% endif %}
-    {% if request.user.is_authenticated %}
-    <div class="item">
-        <a href="{% url 'logout' %}">Log out ({{ request.user.username }})</a>
-    </div>
-    {% else %}
+    {% if not request.user.is_authenticated %}
     <div class="item">
         <a href="{% url 'login' %}">Log in</a>
     </div>
