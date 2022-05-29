@@ -1,0 +1,9 @@
+by
+{% for author in authors.all %}
+{{ author.name }}{% if not forloop.last %}, {% endif %}
+{% empty %}
+unknown
+{% endfor %}
+{% if is_edited %}
+(editor{{ authors.count|pluralize }})
+{% endif %}

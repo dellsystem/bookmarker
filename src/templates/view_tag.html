@@ -12,14 +12,21 @@
 {% endblock %}
 
 {% block content %}
-<h1>
-    <span class="ui big {{ tag.get_colour }} label">
-        {{ tag }}
-    </span>
-    {% if tag.faved %}
-    <i class="red heart icon" title="Faved"></i>
-    {% endif %}
-</h1>
+<div class="ui stackable grid">
+    <div class="fourteen wide column">
+        <h1>
+            <span class="ui big {{ tag.get_colour }} label">
+                {{ tag }}
+            </span>
+            {% if tag.faved %}
+            <i class="red heart icon" title="Faved"></i>
+            {% endif %}
+        </h1>
+    </div>
+    <div class="two wide column">
+        <a href="{% url 'print_tag' tag.slug %}" class="ui large fluid icon button"><i class="print icon"></i> Print</a>
+    </div>
+</div>
 {% if tag.hidden and not request.user.is_staff %}
 <div class="ui negative message ">
     <div class="header">You must log in to view this tag.</div>

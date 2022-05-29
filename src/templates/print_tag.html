@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load humanize %}
+{% load markdown_filter %}
+
+{% block title %}{{ tag.slug }} [tag]{% endblock %}
+
+{% block breadcrumbs %}
+<a class="section" href="{% url 'view_all_tags' %}">View tags</a>
+<i class="right angle icon divider"></i>
+<a class="section" href="{% url 'view_tag' tag.slug %}">View tag</a>
+<i class="right angle icon divider"></i>
+<div class="active section">Print</div>
+{% endblock %}
+
+{% block content %}
+<h1 class="ui header">
+    Bookmarker tag: {{ tag }} ({{ notes.count }} notes)
+</h1>
+
+{% if notes %}
+{% regroup notes by book as book_list %}
+{% for book in book_list %}
+    <div class="ui divider"></div>
+    <h2 class="ui header">
+        {{ book.grouper.title }}
+        {% if book.grouper.details %}
+        <div class="sub header">
+            {% include 'print_author_list.html' with authors=book.grouper.details.authors %}
+        </div>
+        {% endif %}
+    </h2>
+    {% for note in book.list %}
+        <h3 class="ui header">
+            {{ note.subject|markdownify_title }}
+            <div class="sub header">    
+                {% if note.authors.count %}
+                    {% include 'print_author_list.html' with authors=note.authors %}
+                {% else %}
+                (missing author)
+                {% endif %}
+            </div>
+        </h3>
+        
+        <div class="ui segments no-top-margin">
+            <div class="ui segment">
+                {{ note.quote|markdownify }}
+            </div>
+            {% if note.comment %}
+            <div class="ui secondary segment">
+                {{ note.comment|markdownify }}
+            </div>
+            {% endif %}
+        </div>
+                
+        {% if note.book.has_pages %}
+            &mdash;p.{{ note.get_page_display }} |
+        {% endif %}
+
+        {% if note.section %}
+            {{ note.section.title|markdownify_title }} |
+        {% endif %}
+
+        created {{ note.added|date:"M d, Y" }}
+
+        <br />
+    {% endfor %}
+<br />
+{% endfor %}
+    </div>
+{% else %}
+    <div class="ui warning message">No notes yet</div>
+{% endif %}
+{% endblock %}

@@ -120,3 +120,16 @@ a.keyboard-navigation:focus {
 .ui.modal {
     z-index: 1901 !important;
 }
+
+
+@media print {
+   #navbar,#breadcrumbs {
+       display: none;
+   }
+   .image {
+       display: none !important;
+    }
+    body, .ui.header {
+        font-family: serif !important;
+    }
+}

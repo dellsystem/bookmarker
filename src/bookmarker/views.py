@@ -162,6 +162,23 @@ def view_books(request, book_type):
     return render(request, 'view_books.html', context)
 
 
+def print_tag(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    if tag.hidden and not request.user.is_staff:
+        return redirect(tag)
+
+    notes = tag.notes.prefetch_related(
+        'authors', 'section__authors', 'tags', 'book', 'book__details__default_authors',
+    ).order_by('book', 'page_number')
+
+    context = {
+        'tag': tag,
+        'notes': notes,
+    }
+
+    return render(request, 'print_tag.html', context)
+
+
 def view_book(request, slug):
     book = get_object_or_404(Book, slug=slug)
 
@@ -551,6 +568,7 @@ def add_term(request, slug):
 
     return render(request, 'add_term.html', context)
 
+
 @require_POST
 @login_required
 def add_author_from_id(request):
@@ -586,6 +604,7 @@ def add_author_from_id(request):
     messages.success(request, 'Added author: {}'.format(author.name))
 
     return redirect(author)
+
 
 @login_required
 def add_author(request):

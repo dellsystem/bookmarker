@@ -33,6 +33,7 @@ urlpatterns = [
     re_path(r'^authors$', bookmarker.views.view_all_authors, name='view_all_authors'),
     re_path(r'^terms$', bookmarker.views.view_all_terms, name='view_all_terms'),
     re_path(r'^notes$', bookmarker.views.view_all_notes, name='view_all_notes'),
+    re_path(r'^print/tag/(?P<slug>[\w-]+)$', bookmarker.views.print_tag, name='print_tag'),
     re_path(r'^s/(?P<slug>[\w-]+)$', bookmarker.views.section_redirect, name='section_redirect'),
     re_path(r'^book/(?P<slug>[\w-]+)$', bookmarker.views.view_book,
         name='view_book'),
