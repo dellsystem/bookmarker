@@ -6,7 +6,7 @@ cffi==1.13.2
 chardet==3.0.4
 charset-normalizer==2.0.4
 cryptography==3.4.7
-Django==4.0.4
+Django==4.0.7
 django-debug-toolbar==3.2.2
 -e git+https://github.com/dellsystem/django-language-field@a7f23fb4547e5633c54f71914091f9f8cf6c34ba#egg=django_language_field
 djangorestframework==3.12.4
