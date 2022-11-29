@@ -188,6 +188,14 @@ function fetchDefinition() {
     });
 }
 
+function toggleIsReadFields(isRead) {
+    // toggleClass takes an optional second param, a boolean which adds if true
+    // and removes if not
+    // If the book is read, hide the due date and priority etc
+    $('.only-if-unread').toggleClass('disabled', isRead);
+    $('.only-if-read').toggleClass('disabled', !isRead);
+};
+
 $('.editable-rating').rating({
     maxRating: 5,
     interactive: true,
@@ -203,6 +211,18 @@ $('.display-rating').rating({
 
 $('.ui.dropdown').dropdown({fullTextSearch: 'exact'});
 $('.ui.checkbox').checkbox();
+
+// Enable or disable fields on the book form page acc to the is-read checkbox
+$('#is-read-checkbox input').change(function() {
+    toggleIsReadFields(this.checked);
+});
+// so ugly lol
+if ($('#is-read-checkbox').length) {
+    // making it variable in case I stop checking it by default
+    var isRead = $('#is-read-checkbox input').attr('checked');
+    toggleIsReadFields(isRead);
+}
+
 $('#site-search').search({
     // change search endpoint to a custom endpoint by manipulating apiSettings
     apiSettings: {

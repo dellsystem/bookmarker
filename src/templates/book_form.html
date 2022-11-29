@@ -71,26 +71,26 @@
         <div class="ui fields">
             <div class="two wide field">
                 <label>Read?</label>
-                    <div class="ui toggle checkbox">
+                    <div class="ui toggle checkbox" id="is-read-checkbox">
                         {{ book_form.completed_read }}
                     </div>
                 </label>
             </div>
-            <div class="four wide field">
+            <div class="four wide field only-if-unread">
                 <label>Due date</label>
                 {{ details_form.due_date }}
             </div>
-            <div class="four wide field">
+            <div class="two wide field only-if-unread">
+                <label>Priority</label>
+                {{ details_form.priority }}
+            </div>
+            <div class="four wide field only-if-read">
                 <label>Start date</label>
                 {{ details_form.start_date }}
             </div>
-            <div class="four wide field">
+            <div class="four wide field only-if-read">
                 <label>End date</label>
                 {{ details_form.end_date }}
-            </div>
-            <div class="two wide field">
-                <label>Priority</label>
-                {{ details_form.priority }}
             </div>
         </div>
         <div class="ui fields">
@@ -104,7 +104,7 @@
             </div>
         </div>
         <div class="ui fields">
-            <div class="four wide field">
+            <div class="four wide field only-if-read">
                 <label>Rating</label>
                 {% if book.details %}
                 <div class="ui heart rating editable-rating" data-rating="{{ details_form.rating.value }}">
@@ -118,7 +118,7 @@
             </div>
         </div>
         <div class="ui fields">
-            <div class="sixteen wide field">
+            <div class="sixteen wide field only-if-read">
                 <label>Review</label>
                 {{ details_form.review }}
             </div>

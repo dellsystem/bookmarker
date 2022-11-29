@@ -725,7 +725,8 @@ def add_book(request):
                 'Error with book form'
             )
     else:
-        book_form = BookForm()
+        # Just setting the completed read field to true by default for now
+        book_form = BookForm(initial={'completed_read': True})
         details_form = BookDetailsForm()
 
     context = {
