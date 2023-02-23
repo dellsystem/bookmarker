@@ -703,7 +703,6 @@ def add_book(request):
             )
 
             if details_form:
-                messages.error(request, 'Has details form')
                 if details_form.is_valid():
                     details = details_form.save()
                     book.details = details

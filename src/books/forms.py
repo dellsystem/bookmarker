@@ -295,7 +295,8 @@ class BookDetailsForm(forms.ModelForm):
         details = super(BookDetailsForm, self).save(commit=False)
         if details.rating is None:
             details.rating = 0
-            details.save()
+
+        details.save()
         self.save_m2m()
         return details
 
