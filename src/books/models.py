@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import collections
+from datetime import date
 from heapq import merge
 import operator
 import re
@@ -109,12 +110,16 @@ class BookManager(models.Manager):
             isbn=book_data['isbn13'],
             publisher=book_data['publisher'],
             num_pages=int(book_data['num_pages']) if book_data['num_pages'] else None,
+            shelves=book_data['shelves'],
+            review=book_data['review'],
+            format=book_data['format'],
+            end_date=book_data['end_date']
         )
 
         # Replace the SX98_.jpg at the end with SX475_.jpg
         image_url = book_data['image_url']
-        if image_url:
-            image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
+        #if image_url:
+        #    image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
 
         # If there's a :, strip out everything after it for the slug.
         title = book_data['title']
@@ -141,11 +146,13 @@ class BookManager(models.Manager):
                     slug = potential_slug
                     break
 
+        is_read = book_data['end_date'] is not None
         book = Book.objects.create(
             details=details,
             title=title,
             image_url=image_url,
             slug=slug,
+            completed_read=is_read
         )
 
         # Create the relevant action, too.
@@ -220,6 +227,10 @@ class BookDetails(models.Model):
     class Meta:
         verbose_name_plural = 'Book details'
     
+    @property
+    def is_overdue(self):
+        return date.today() > self.due_date
+
     def __str__(self):
         return self.link
 
@@ -235,7 +246,7 @@ class Book(models.Model):
     is_processed = models.BooleanField(default=False, db_index=True)  # terms, notes, sections
     is_ignored = models.BooleanField(default=False)
     completed_sections = models.BooleanField(default=False)  # KEEP
-    completed_read = models.BooleanField(default=True)
+    completed_read = models.BooleanField(default=False)
     summary = models.TextField(blank=True)
     comments = models.TextField(blank=True)  # temporary private notes
     source_url = models.URLField(blank=True)

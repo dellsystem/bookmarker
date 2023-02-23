@@ -1,7 +1,11 @@
 {% if details %}
-    {% if not details.completed_read %}
+    {% if not book.completed_read %}
         {% if details.due_date %}
-        <span class="ui black label">Due in {{ details.due_date|timeuntil }}</span>
+            {% if details.is_overdue %}
+            <span class="ui red label">Overdue</span>
+            {% else %}
+            <span class="ui black label">Due in {{ details.due_date|timeuntil }}</span>
+            {% endif %}
         {% endif %}
         {% if details.location %}
         <span title="Location" class="ui basic label">{{ details.location }}</span>

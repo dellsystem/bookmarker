@@ -27,7 +27,7 @@
             </h3>
             {% if book.details %}
             <p>
-            {% include 'book_details.html' with details=book.details admin=request.user.is_staff only %}
+            {% include 'book_details.html' with book=book details=book.details admin=request.user.is_staff only %}
             </p>
             {% endif %}
             {% if book.comments %}

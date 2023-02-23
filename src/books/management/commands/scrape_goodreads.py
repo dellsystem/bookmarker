@@ -1,4 +1,9 @@
-"""Inspired by https://github.com/rixx/goodreads-to-sqlite (just the scrape function)"""
+"""Inspired by https://github.com/rixx/goodreads-to-sqlite (just the scrape
+function).
+I don't know why the params dict isn't working (I just hardcoded the params in
+the URL
+This is only for updating dates of books that are already in the db
+"""
 import bs4
 from datetime import datetime
 import requests
@@ -9,23 +14,25 @@ from books import redistools, goodreadstools
 from books.models import Book, BookDetails
 
 
-USER_ID = '60292716'
+USER_ID = '60292716-wendy-liu'
 BASE_URL = "https://www.goodreads.com/"
-URL = BASE_URL + "review/list/{}".format(USER_ID)
+URL = BASE_URL + "review/list/{}?shelf=read&per_page=100&sort=date_updated".format(USER_ID)
 class Command(BaseCommand):
     def handle(self, **options):
+        """
         params = {
-            "utf8": "✓",
-            "shelf": "read",
+            #"utf8": "✓",
             "per_page": "100",  # Maximum allowed page size
             "sort": "date_updated",
             "page": 0,
         }
+        """
         date_counter = 0
         while True:
-            print("Page", params['page'])
-            params["page"] += 1
-            response = requests.get(URL, data=params)
+            #print("Page", params['page'])
+            #params["page"] += 1
+            #response = requests.get(URL, data=params)
+            response = requests.get(URL)
             response.raise_for_status()
             soup = bs4.BeautifulSoup(response.content.decode(), "html.parser")
 

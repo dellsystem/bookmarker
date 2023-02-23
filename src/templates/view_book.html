@@ -117,7 +117,7 @@
         </a>
         <br />
         <div style="text-align: center">
-            {% include 'book_details.html' with details=details admin=request.user.is_staff only %}
+            {% include 'book_details.html' with book=book details=details admin=request.user.is_staff only %}
             <a class="ui icon label" title="Terms" href="#terms">
                 <i class="flag icon"></i> {{ book.terms.count }}
             </a>

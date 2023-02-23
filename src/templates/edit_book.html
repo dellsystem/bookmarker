@@ -15,9 +15,14 @@
     </div>
     <div class="three wide center aligned column">
         <a href="{% url 'admin:books_book_change' book.pk %}"
-           class="ui fluid blue icon button">
+           class="ui blue icon button">
            <i class="edit icon"></i>
-           Edit in admin
+           Edit
+        </a>
+        <a href="{% url 'admin:books_bookdetails_delete' book.details.pk %}"
+           class="ui red icon button">
+           <i class="edit icon"></i>
+           Delete
         </a>
     </div>
 </div>
