@@ -44,13 +44,11 @@
         {% if not details.verified %}
         <span class="ui red label">Unverified</span>
         {% endif %}
-        {% if details.goals.count %}
-        <br />
         {% for goal in details.goals.all %}
+        {% if forloop.first %}<br />{% endif %}
 
         <span class="ui tag teal label">{{ goal.name }}</span>
         {% endfor %}
-        {% endif %}
     {% endif %}
     </p>
 {% endif %}
