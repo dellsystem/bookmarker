@@ -405,6 +405,8 @@ class Section(PageArtefact):
     slug = models.SlugField(blank=True)  # only for link-worthy sections
     skipped = models.BooleanField(default=False, help_text='Not yet read')
     date = models.DateField(blank=True, null=True)  # only publications
+    has_tab = models.BooleanField(default=False,
+        help_text='Does this section have one of those wide post-it tabs')
 
     class Meta:
         ordering = ['-in_preface', 'page_number']

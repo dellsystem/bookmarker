@@ -70,7 +70,7 @@
             {% endwith %}
         </div>
         <div class="ui fields">
-            <div class="fifteen wide field">
+            <div class="fourteen wide field">
                 <label>Source URL</label>
                 {{ section_form.source_url }}
             </div>
@@ -78,6 +78,12 @@
                 <label>Skipped?</label>
                 <div class="ui toggle checkbox">
                     {{ section_form.skipped }}
+                </div>
+            </div>
+            <div class="one wide field">
+                <label title="If this section has a post-it tab">Tab?</label>
+                <div class="ui toggle checkbox">
+                    {{ section_form.has_tab }}
                 </div>
             </div>
         </div>

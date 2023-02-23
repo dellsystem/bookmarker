@@ -41,6 +41,9 @@
                      data-rating="{{ section.rating }}">
                 </div>
                 {% endif %}
+                {% if section.has_tab %}
+                <span><i class="thumbtack icon" title="Post-it tab"></i></span>
+                {% endif %}
                 {% if request.user.is_staff %}
                 <a href="{% url 'edit_section' section.pk %}">
                     <i class="edit icon"></i>
