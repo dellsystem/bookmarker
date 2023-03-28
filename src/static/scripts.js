@@ -161,6 +161,7 @@ function fetchDefinition() {
     .then(function(data) {
         var definitionInput = document.getElementById('id_term-definition');
         var highlightsInput = document.getElementById('id_term-highlights');
+        var newCheckbox = document.getElementById('id_occurrence-is_new');
         definitionInput.value = data.definition;
         highlightsInput.value = data.highlights;
 
@@ -168,16 +169,20 @@ function fetchDefinition() {
         var occurrencesCount = document.getElementById('occurrences_count');
 
         // If the term already exists, disable the definition and highlights
-        // textareas and add a link to the page for viewing it.
+        // textareas, disable the 'new' checkbox, and add a link to the page
+        // for viewing it.
         if (data.view_link) {
             linkButton.className = 'ui blue button';
             linkButton.href = data.view_link;
+
+            newCheckbox.disabled = true;
 
             occurrencesCount.innerText = '(' + data.num_occurrences + ' occurrences)';
 
             // Also set the category to 'notable'.
             document.getElementById('id_occurrence-category').value = '1';
         } else {
+            newCheckbox.disabled = false;
             definitionInput.disabled = false;
             highlightsInput.disabled = false;
             linkButton.className = 'ui disabled button';
