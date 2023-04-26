@@ -11,7 +11,6 @@ django-debug-toolbar==3.2.2
 -e git+https://github.com/dellsystem/django-language-field@a7f23fb4547e5633c54f71914091f9f8cf6c34ba#egg=django_language_field
 djangorestframework==3.12.4
 Fabric3==1.14.post1
--e git+https://github.com/dellsystem/goodreads@23a693fe52c2f4fb6daf6e65b7277102de288943#egg=goodreads
 idna==2.8
 Markdown==3.0.1
 MarkdownSuperscript==2.1.1
