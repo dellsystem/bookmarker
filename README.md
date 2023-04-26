@@ -90,8 +90,8 @@ an environment variable), but don't worry about that for now.
 To set up the database initially (and create all the basic tables), run:
 
 ```
-python code/manage.py makemigrations activity books vocab
-python code/manage.py migrate
+python src/manage.py makemigrations activity books vocab
+python src/manage.py migrate
 ```
 
 (Again, this should be in the project directory, bookmarker/).
@@ -104,7 +104,7 @@ You'll want to create an admin account to access the admin tools &
 add/edit/delete data via the frontend. Run
 
 ```
-python code/manage.py createsuperuser
+python src/manage.py createsuperuser
 ```
 
 and set your desired username/password. Don't worry about the email address.
@@ -201,7 +201,7 @@ deactivate && source env/bin/activate
 Now you're all set to test it out! Run
 
 ```
-python code/manage.py runserver
+python src/manage.py runserver
 ```
 
 and navigate your browser to http://localhost:8000. It should show you an empty
@@ -246,7 +246,7 @@ If anything is confusing or buggy, feel free to contact me.
 If you want to deploy this in production, I'd recommend using nginx, gunicorn,
 systemd, and postgres. To enable postgres, set POSTGRES_PASSWORD.
 
-Unit tests (the few that exist) can be run with `python code/manage.py test`.
+Unit tests (the few that exist) can be run with `python src/manage.py test`.
 
 ## Contact
 
