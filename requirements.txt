@@ -1,4 +1,4 @@
-asgiref==3.5.0
+asgiref==3.6.0
 bcrypt==3.1.7
 beautifulsoup4==4.8.1
 certifi==2022.12.7
@@ -8,7 +8,7 @@ charset-normalizer==2.0.4
 cryptography==39.0.1
 Django==4.1.7
 django-debug-toolbar==3.2.2
--e git+https://github.com/dellsystem/django-language-field@a7f23fb4547e5633c54f71914091f9f8cf6c34ba#egg=django_language_field
+-e git+https://github.com/dellsystem/django-language-field@5410f69a78291eb36c0ad3d8b9d9a6e160619df9#egg=django_language_field
 djangorestframework==3.12.4
 Fabric3==1.14.post1
 idna==2.8
