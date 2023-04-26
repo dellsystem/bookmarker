@@ -86,10 +86,6 @@
             </button>
         {% endif %}
         </form>
-        {% else %}
-            {% if request.user.is_staff %}
-            {% include 'add_book_field.html' with label='Add more' %}
-            {% endif %}
         {% endif %}
     </div>
     {% endif %}

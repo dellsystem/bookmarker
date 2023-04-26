@@ -1,7 +1,6 @@
 import collections
 import datetime
 import random
-from dateutil import parser
 
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -13,10 +12,11 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
-from books import goodreadstools, redistools, highlighter
+from books import goodreadstools, highlighter
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm, \
                         MultipleSectionsForm
@@ -569,43 +569,6 @@ def add_term(request, slug):
     return render(request, 'add_term.html', context)
 
 
-@require_POST
-@login_required
-def add_author_from_id(request):
-    query = request.POST.get('q')
-
-    # If the query parameter is missing, show the form.
-    if not query:
-        return redirect('add_author')
-
-    # If there's a : in the goodreads ID, then it's being sent from the keyboard shortcut modal. 
-    if ':' in query:
-        # Extract the goodreads ID from the posted parameter.
-        goodreads_id = query.split(':')[0]
-    else:
-        goodreads_id = query
-
-    # See if author already exists.
-    gr_author = GoodreadsAuthor.objects.filter(goodreads_id=goodreads_id)
-    if gr_author.exists():
-        messages.error(request, 'Author for ID {} already exists'.format(goodreads_id))
-        return redirect(gr_author.first().author)
-
-    # Author doesn't exist - fetch from goodreads api
-    author_data = goodreadstools.get_author_by_id(goodreads_id)
-    author = Author.objects.create_from_goodreads(author_data)
-
-    Action.objects.create(
-        category='author',
-        primary_id=author.pk,
-        verb='added',
-        details=author.name,
-    )
-    messages.success(request, 'Added author: {}'.format(author.name))
-
-    return redirect(author)
-
-
 @login_required
 def add_author(request):
     if request.POST.get('submit'):
@@ -613,6 +576,15 @@ def add_author(request):
 
         if author_form.is_valid():
             author = author_form.save()
+
+            # If the link is a goodreads link, automatically add the
+            # goodreads_author object
+            goodreads_id = goodreadstools.get_author_id(author.link)
+            if goodreads_id is not None:
+                author.goodreadsauthor_set.create(
+                    goodreads_id=goodreads_id,
+                    goodreads_link=author.link
+                )
 
             Action.objects.create(
                 category='author',
@@ -628,58 +600,27 @@ def add_author(request):
                 'Error creating author'
             )
     else:
-        author_form = AuthorForm()
+        author_name = request.GET.get('name')
+        author_form = AuthorForm(initial={
+            'name': author_name,
+            'link': request.GET.get('link'),
+            'slug': slugify(author_name) if author_name else '',
+        })
+
+        # Check if the author in the QP already exists in our database
+        if author_name:
+            existing_authors = Author.objects.filter(
+                name__icontains=author_name.lower()
+            )
+        else:
+            existing_authors = None
 
     context = {
         'author_form': author_form,
+        'existing_authors': existing_authors,
     }
 
     return render(request, 'add_author.html', context)
-
-
-@require_POST
-@login_required
-def add_book_from_id(request):
-    query = request.POST.get('q')
-
-    # If the query parameter is missing, show the form.
-    if not query:
-        return redirect('add_book')
-
-    # If there's a : in the goodreads ID, then it's being sent from the keyboard shortcut modal. 
-    if ':' in query:
-        # Extract the goodreads ID from the posted parameter.
-        goodreads_id = query.split(':')[0]
-    else:
-        goodreads_id = query
-
-    # Check if book already exists.
-    book_qs = Book.objects.filter(details__goodreads_id=goodreads_id)
-    if book_qs.exists():
-        messages.error(request, 'Book for ID {} already exists'.format(goodreads_id))
-        return redirect(book_qs.first())
-
-    # Book doesn't exist, so get from goodreads api (or redis cache, if it exists).
-    book_data = goodreadstools.get_book_by_id(goodreads_id)
-    book = Book.objects.create_from_goodreads(book_data)
-
-    messages.success(request, 'Added book: {}'.format(book.title))
-
-    for author_data in book_data['authors']:
-        gr_author = GoodreadsAuthor.objects.filter(
-            goodreads_id=author_data['id']
-        )
-        if gr_author.exists():
-            author = gr_author.first().author
-        else:
-            # Author doesn't exist yet - must create.
-            author = Author.objects.create_from_goodreads(author_data)
-            messages.success(request, 'Added author: {}'.format(author.name))
-
-        book.details.authors.add(author)
-        book.details.default_authors.add(author)
-
-    return redirect(book)
 
 
 @login_required
@@ -724,13 +665,43 @@ def add_book(request):
                 'Error with book form'
             )
     else:
-        # Just setting the completed read field to true by default for now
-        book_form = BookForm(initial={'completed_read': True})
-        details_form = BookDetailsForm()
+        title = request.GET.get('title')
+        book_form = BookForm(initial={
+            # setting the completed read field to true by default for now
+            'completed_read': True,
+            # filling in query params if provided
+            'title': title,
+            'image_url': request.GET.get('image_url'),
+            'slug': slugify(title) if title else '',
+        })
+        details_form = BookDetailsForm(initial={
+            'goodreads_id': request.GET.get('id'),
+            'link': request.GET.get('link'),
+            'isbn': request.GET.get('isbn'),
+            'year': request.GET.get('year'),
+            'format': request.GET.get('format'),
+            'num_pages': request.GET.get('num_pages'),
+            'start_date': request.GET.get('start_date'),
+            'end_date': request.GET.get('end_date'),
+            'verified': True,
+        })
+        # Check if the book in the QP already exists in our database
+        if title:
+            existing_books = Book.objects.filter(
+                title__icontains=title.lower()
+            )
+        else:
+            existing_books = None
 
     context = {
         'book_form': book_form,
         'details_form': details_form,
+        # this is just for pre-populating forms with query param data
+        'author_name': request.GET.get('author_name'),
+        'author_url': request.GET.get('author_url'),
+        'author_slug': request.GET.get('author_slug'),
+        'goodreads_url': request.GET.get('link'),
+        'existing_books': existing_books,
     }
 
     return render(request, 'add_book.html', context)
@@ -1293,98 +1264,6 @@ def view_section(request, section_id):
     return render(request, 'view_section.html', context)
 
 
-# todo: this and author search should be part of a goodreads-connected app which caches intermediate results
-def book_search_json(request):
-    query = request.GET.get('q')
-    results = []
-
-    # Only search goodreads if there's no one with this name in our db
-    existing_books = Book.objects.filter(title__icontains=query)
-    if existing_books.exists():
-        for book in existing_books:
-            authors = []
-            if book.details:
-                for author in book.details.authors.all():
-                    authors.append(author.name)
-
-            authors.sort()
-            results.append({
-                'title': book.title,
-                'description': ', '.join(authors),
-                'image': '/static/img/bookmarker.png',
-                'url': book.get_absolute_url(),
-            })
-    else:
-        # Use the goodreads API
-        for book in goodreadstools.get_books_by_title(query):
-            description = []
-            if book['format']:
-                description.append(book['format'])
-            if book['publisher']:
-                description.append(book['publisher'])
-            if book['num_pages']:
-                description.append(book['num_pages'])
-
-            title = '{}: {}'.format(book['id'], book['title'])
-            authors = ', '.join(a['name']for a in book['authors'])
-            results.append({
-                'title': title,
-                'price': authors,
-                'description': ' / '.join(description),
-                'image': '/static/img/goodreads.png',
-            })
-
-    return JsonResponse({
-        'results': results
-    })
-
-
-def author_search_json(request):
-    query = request.GET.get('q')
-    results = []
-
-    # Put a ! at the end of the query to allow saving. I'm sorry
-    should_save = query.endswith('!')
-    query = query.strip('!')
-
-    # Only search goodreads if there's no one with this name in our db
-    existing_authors = Author.objects.filter(name__icontains=query)
-    if existing_authors.exists():
-        # todo: urgh
-        for author in existing_authors:
-            titles = []
-            books = set(author.books.values_list('book__title', flat=True))
-            for book in books:
-                if book:
-                    titles.append(book)
-
-            publications = set(author.sections.values_list('book__title', flat=True))
-            for publication in publications - books:
-                if publication:
-                    titles.append(publication)
-
-            titles.sort()
-            results.append({
-                'title': author.name,
-                'description': ', '.join(titles[:10]),
-                'image': '/static/img/bookmarker.png',
-                'url': author.get_absolute_url(),
-            })
-    else:
-        # Use the goodreads API
-        author = goodreadstools.get_author_by_name(query)
-        title = '{}: {}'.format(author['id'], author['name'])
-        results.append({
-            'title': title,
-            'description': author['titles'],
-            'image': '/static/img/goodreads.png',
-        })
-
-    return JsonResponse({
-        'results': results
-    })
-
-
 def within_book_search_json(request, book_id):
     """Suggest notes/sections/terms with that keyword"""
     query = request.GET.get('q')
@@ -1895,73 +1774,19 @@ def add_tag(request):
 
 
 @login_required
-def manual_import(request):
-    context = {}
-    return render(request, 'manual_import.html', context)
-
-
-@login_required
 def sync_goodreads(request):
-    if request.method == 'POST':
-        goodreads_id = request.POST.get('id')
-        action = request.POST.get('action')
-        review = redistools.get_review(goodreads_id)
-        
-        if review is None:
-            messages.error(request, "Invalid goodreads ID")
-        else:
-            # Delete it so it doesn't show up again.
-            redistools.ignore_review(goodreads_id)
-            if action == 'ignore':
-                messages.success(request, "Successfully ignored {}".format(review['book']['title']))
-            else:
-                # If there is one existing book, use that one instead.
-                existing_books = Book.objects.filter(title=review['book']['title'])
-                if existing_books.count() == 1:
-                    book = existing_books.first()
-                    messages.success(request, 'Updated existing book: {}'.format(book.title))
-                else:
-                    book = Book.objects.create_from_goodreads(review['book'])
-                    messages.success(request, 'Added book: {}'.format(book.title))
+    # Scrape the goodreads website and show the results (paginated)
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
 
-                book.details.shelves = review['shelves']
-                book.details.review = review['review']
-                book.details.rating = review['rating']
-                book.details.start_date = parser.parse(
-                    review['start_date']
-                ).date()
-                book.details.end_date = parser.parse(
-                    review['end_date']
-                ).date()
-                book.details.save()
-
-                for author_data in review['book']['authors']:
-                    gr_author = GoodreadsAuthor.objects.filter(
-                        goodreads_id=author_data['id']
-                    )
-                    if gr_author.exists():
-                        author = gr_author.first().author
-                    else:
-                        # Author doesn't exist yet - must create.
-                        author = Author.objects.create_from_goodreads(author_data)
-                        messages.success(request, 'Added author: {}'.format(author.name))
-
-                    book.details.authors.add(author)
-                    book.details.default_authors.add(author)
-
-    review = redistools.get_random_review()
-    if review:
-        # check if we already have a book with this title
-        existing_books = Book.objects.filter(
-            title=review['book']['title']
-        )
-    else:
-        existing_books = Book.objects.none()
-
+    books = goodreadstools.get_books(page)
     context = {
-        'review': review,
-        'existing_books': existing_books,
-        'total': redistools.count_reviews(),
+        'books': books,
+        'page': page,
+        'previous_page': page - 1,
+        'next_page': page + 1,
     }
 
     return render(request, 'sync_goodreads.html', context)

@@ -19,7 +19,12 @@
                 <label>ISBN</label>
                 {{ details_form.isbn }}
             </div>
-            <div class="four wide field">
+            {% comment %}
+            the error is just to draw attention to the fact that this field
+            doesn't get automatically populated from scraping goodreads
+            (because the page we're scraping doesn't include this data)
+            {% endcomment %}
+            <div class="four wide field{% if goodreads_url %} error{% endif %}">
                 <label>Publisher</label>
                 {{ details_form.publisher }}
             </div>
@@ -112,7 +117,7 @@
                 <input type="hidden" id="rating-input" name="rating" value="{{ book.details.rating }}" />
                 {% endif %}
             </div>
-            <div class="twelve wide field">
+            <div class="twelve wide field{% if goodreads_url %} error{% endif %}">
                 <label>GR shelves</label>
                 {{ details_form.shelves }}
             </div>

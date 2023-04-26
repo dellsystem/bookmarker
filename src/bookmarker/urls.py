@@ -26,9 +26,7 @@ urlpatterns = [
     path('login', bookmarker.views.LoginView.as_view(), name='login'),
     re_path(r'^logout$', bookmarker.views.LogoutView.as_view(), name='logout'),
     re_path(r'^addbook$', bookmarker.views.add_book, name='add_book'),
-    re_path(r'^addbook/id$', bookmarker.views.add_book_from_id, name='add_book_from_id'),
     re_path(r'^addauthor$', bookmarker.views.add_author, name='add_author'),
-    re_path(r'^addauthor/id$', bookmarker.views.add_author_from_id, name='add_author_from_id'),
     re_path(r'^books/(?P<book_type>\w+)$', bookmarker.views.view_books, name='view_books'),
     re_path(r'^authors$', bookmarker.views.view_all_authors, name='view_all_authors'),
     re_path(r'^terms$', bookmarker.views.view_all_terms, name='view_all_terms'),
@@ -87,10 +85,7 @@ urlpatterns = [
     re_path(r'^faves$', bookmarker.views.view_faves, name='view_faves'),
     re_path(r'^search$', bookmarker.views.search, name='search'),
     re_path(r'^sync$', bookmarker.views.sync_goodreads, name='sync_goodreads'),
-    re_path(r'^import$', bookmarker.views.manual_import, name='manual_import'),
     re_path(r'^search.json$', bookmarker.views.search_json, name='search_json'),
-    re_path(r'^author_search.json$', bookmarker.views.author_search_json, name='author_search_json'),
-    re_path(r'^book_search.json$', bookmarker.views.book_search_json, name='book_search_json'),
 ]
 
 

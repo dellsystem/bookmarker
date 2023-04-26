@@ -7,6 +7,50 @@
 {% endblock %}
 
 {% block content %}
+{% if existing_books %}
+<div class="ui error message">
+    <div class="header">
+        Book may already exist
+    </div>
+    <div class="ui bulleted list">
+    {% for b in existing_books %}
+    <div class="item">
+        <a href="{{ b.get_absolute_url }}">{{ b.title }}</a> ({{ b.slug}})
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if author_slug %}
+<div class="ui positive message">
+    <div class="header">
+        Author already exists
+        <p>
+            <a href="{% url 'view_author' author_slug %}">{{ author_name }}</a>
+        </p>
+    </div>
+</div>
+{% elif author_name %}
+<div class="ui icon error message">
+    <i class="warning icon"></i>
+    <div class="header">
+        Author does not exist yet
+        <p>
+            <a href="{{ author_url }}">{{ author_name }}</a>
+        </p>
+    </div>
+</div>
+{% endif %}
+{% if goodreads_url %}
+<div class="ui message">
+    <div class="header">
+        Pre-populated from scraping Goodreads
+        <p>{{ goodreads_url|urlize }}</p>
+    </div>
+</div>
+{% endif %}
+
 {% include 'book_form.html' %}
 {% endblock %}
 

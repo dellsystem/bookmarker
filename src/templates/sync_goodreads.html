@@ -10,102 +10,97 @@
 {% endblock %}
 
 {% block content %}
-
-{% if review %}
-<div class="ui centered grid">
-    <div class="ten wide column">
-        <h2 class="ui header">{{ total }} total</h2>
-        {% if existing_books %}
-        <h3 class="ui header">Found existing</h3>
-        <div class="ui bulleted list">
-            {% for book in existing_books %}
-            <div class="item">
-                <a href="{{ book.get_absolute_url }}">{{ book.title }}
-                {% include 'author_list.html' with authors=book.details.default_authors only %}
-                </a>
-            </div>
-            {% endfor %}
-        </div>
+<div class="ui center aligned basic segment">
+    <div class="ui right pagination menu">
+        {% if previous_page > 1 %}
+        <a class="item keyboard-shortcut"
+           title="First"
+           href="?page=1"
+           data-shortcut="^"
+           data-label="First page">
+        {% else %}
+        <a class="disabled item">
         {% endif %}
-        <div class="ui clearing segment book-card">
-            <a href="{{ review.book.link }}" target="_blank" class="keyboard-shortcut" data-shortcut="l" data-label="Open Goodreads link">
-                <img src="{{ review.book.image_url }}" class="ui rounded small left-floated image" />
-            </a>
-            <div class="ui grid">
-                <div class="row">
-                    <div class="sixteen wide column">
-                        <h3 class="ui header">
-                            {{ review.book.title }}
-                            <div class="sub header">
-                                {% for author in review.book.authors %}
-                                {{ author.name }}
-                                {% if not forloop.last %} / {% endif %}
-                                {% endfor %}
-                            </div>
-                        </h3>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="eight wide column">
-                        <strong>Publisher</strong>: {{ review.book.publisher }}
-                        <br />
-                        <strong>Year</strong>: {{ review.book.year }}
-                        <br />
-                        <strong>Format</strong>: {{ review.book.format }}
-                        <br />
-                        <strong>ISBN</strong>: {{ review.book.isbn13 }}
-                        <br />
-                        <strong>ID</strong>: {{ review.book.id }}
-                        <br />
-                    </div>
-                    <div class="eight wide column">
-                        <div class="ui labels">
-                            {% if review.rating %}
-                            <div class="ui label">
-                                <div class="ui heart rating display-rating"
-                                     data-rating="{{ review.rating }}">
-                                </div>
-                            </div>
-                            <br />
-                            {% endif %}
-                            {% if review.start_date and review.end_date %}
-                            <div class="ui label">
-                                {{ review.start_date }} - {{ review.end_date }}
-                            </div>
-                            <br />
-                            {% endif %}
-                            {% if review.shelves %}
-                            <div class="ui label">
-                                {{ review.shelves }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% if review.review %}
-                <div class="row">
-                    <div class="sixteen wide column">
-                        <div class="ui divider"></div>
-                        {{ review.review|safe }}
-                        <br />
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        <div class="ui center aligned basic segment">
-            <form class="ui form" method="post" action="">
-                {% csrf_token %}
-                <input type="hidden" name="id" value="{{ review.book.id }}" />
-                <div class="ui buttons">
-                    <button name="action" value="save" class="ui positive button keyboard-shortcut" data-shortcut="s" data-label="Save completed book">Save</button>
-                    <div class="or"></div>
-                    <button name="action" value="ignore" class="ui button keyboard-shortcut" data-shortcut="i" data-label="Ignore book">Ignore</button>
-                </div>
-            </form>
-        </div>
+           <i class="double left angle icon"></i>
+        </a>
+        {% if previous_page > 0 %}
+        <a class="item keyboard-shortcut"
+           title="Previous"
+           href="?page={{ previous_page }}"
+           data-shortcut="<"
+           data-label="Previous page">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+           <i class="left angle icon"></i>
+        </a>
+        <a class="active item">{{ page }}</a>
+        <a class="item keyboard-shortcut"
+           title="Next"
+           href="?page={{ next_page }}"
+           data-shortcut=">"
+           data-label="Next page">
+           <i class="right angle icon"></i>
+        </a>
     </div>
-{% else %}
-    <div class="ui warning message">Nothing to sync. Try reading some more books?</div>
-{% endif %}
+</div>
+
+<table class="ui celled table">
+  <thead>
+    <tr>
+      <th>Book ID</th>
+      <th>Book title (in BM?)</th>
+      <th>Author ID</th>
+      <th>Author name (in BM?)</th>
+      <th>Start date</th>
+      <th>End date</th>
+      <th>Processed?</th>
+      <th>Dates match?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for book in books %}
+    <tr>
+      <td><a href="{{ book.url }}" title="Goodreads URL">{{ book.id }}</a></td>
+      {% if book.slug %}
+      <td class="positive"><i class="checkmark icon"></i>
+        <a href="{% url 'view_book' book.slug %}" title="Bookmarker URL">{{ book.title }}</a>
+      </td>
+      {% else %}
+      <td class="negative"><i class="close icon"></i>
+        <a href="{% url 'add_book' %}?{{ book.book_params }}" title="Add book form">{{ book.title }}</a>
+      </td>
+      {% endif %}
+      <td><a href="{{ book.author_url }}" title="Goodreads URL">{{ book.author_id }}</a></td>
+      {% if book.author %}
+      <td class="positive">
+        <i class="checkmark icon"></i>
+        <a href="{% url 'view_author' book.author.slug %}" title="Bookmarker URL">{{ book.author_name }}</a></td>
+      {% else %}
+      <td class="negative">
+        <i class="close icon"></i>
+        <a href="{% url 'add_author' %}?{{ book.author_params }}" title="Add author form">{{ book.author_name }}</a></td>
+      {% endif %}
+      <td>{{ book.start_date }}</td>
+      <td>{{ book.end_date }}</td>
+      {% if book.is_processed %}
+      <td class="positive"><i class="icon checkmark"></i>
+      </td>
+      {% else %}
+      <td class="negative"><i class="icon close"></i></td>
+      {% endif %}
+
+      {% if book.dates_match %}
+      <td class="positive"><i class="icon checkmark"></i>
+      </td>
+      {% else %}
+      <td class="negative"><i class="icon close"></i>
+        {{ book.dates_comment }}
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
 {% endblock %}

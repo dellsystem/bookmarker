@@ -1,32 +1,38 @@
-from unittest.mock import patch, Mock
+import datetime
+
 from django.test import TestCase
 
 from books import goodreadstools
 
 
-class TestGoodreadstools(TestCase):
-    def setUp(self):
-        self.client = Mock()
-        self.redistools = Mock()
+class TestParseNumPages(TestCase):
+    def test_invalid_input(self):
+        self.assertEqual(None, goodreadstools._parse_num_pages('blah'))
 
-    def test_get_author_new(self):
-        with patch.multiple(
-            'books.goodreadstools',
-            _client=self.client,
-            redistools=self.redistools
-        ):
-            self.redistools.get_author.return_value = None
-            self.client.find_author.return_value = None
-            self.assertEqual(None, goodreadstools.get_author_by_name('new'))
-            self.client.find_author.assert_called_once_with('new')
+    def test_valid_input(self):
+        self.assertEqual(123, goodreadstools._parse_num_pages('123\np'))
 
-    def test_get_books_new(self):
-        with patch.multiple(
-            'books.goodreadstools',
-            _client=self.client,
-            redistools=self.redistools
-        ):
-            self.redistools.get_book.return_value = None
-            self.client.search_books.return_value = []
-            self.assertEqual([], goodreadstools.get_books_by_title('new'))
-            self.client.search_books.assert_called_once_with('new')
+
+class TestParseId(TestCase):
+    def test_with_hyphen(self):
+        self.assertEqual(
+            '37941942',
+            goodreadstools._parse_id('/book/show/37941942-the-flame')
+        )
+
+    def test_without_hyphen(self):
+        self.assertEqual(
+            '1188779',
+            goodreadstools._parse_id('/book/show/1188779.Money')
+        )
+
+
+class TestParseDate(TestCase):
+    def test_invalid_input(self):
+        self.assertEqual(None, goodreadstools._parse_date(''))
+
+    def test_valid_input(self):
+        self.assertEqual(
+            datetime.date(2023, 2, 7),
+            goodreadstools._parse_date('Feb 07, 2023')
+        )

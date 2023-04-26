@@ -16,47 +16,6 @@ from activity.models import Action
 from .utils import int_to_roman, roman_to_int
 
 
-class AuthorManager(models.Manager):
-    def create_from_goodreads(self, author_data):
-        """Only call this if you're sure the goodreads author doesn't already
-        exist."""
-        # Clean the name (get rid of extraneous whitespace).
-        name = ' '.join(author_data['name'].split())
-        slug = slugify(name)
-
-        # If the author already exists for this slug, assume it's different,
-        # and give this author a different slug.
-        existing_author = Author.objects.filter(slug=slug)
-        if existing_author.exists():
-            i = 2
-            while True:
-                potential_slug = "{}-{}".format(slug, i)
-                if Author.objects.filter(slug=potential_slug).exists():
-                    i += 1
-                else:
-                    slug = potential_slug
-                    name = "{} {}".format(name, i)
-                    break
-
-        # Create the author and the goodreads author.
-        author = Author.objects.create(
-            name=name,
-            link=author_data['link'],
-            slug=slug,
-        )
-        author.goodreadsauthor_set.create(
-            goodreads_id=author_data['id'],
-            goodreads_link=author_data['link'],
-        )
-        Action.objects.create(
-            category='author',
-            primary_id=author.pk,
-            details=name,
-            verb='added',
-        )
-        return author
-
-
 class ReadingGoal(models.Model):
     name = models.CharField(max_length=50)
 
@@ -80,9 +39,8 @@ class BookLocation(models.Model):
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
-    link = models.URLField(help_text='Only needed if no goodreads author')
+    link = models.URLField()
     slug = models.SlugField(unique=True)
-    objects = AuthorManager()
 
     class Meta:
         ordering = ['name']
@@ -99,71 +57,6 @@ class GoodreadsAuthor(models.Model):
     goodreads_id = models.CharField(max_length=20, unique=True)
     goodreads_link = models.URLField()
 
-
-GR_IMAGE_URL_RE = re.compile(r'_SX98_.jpg$')
-class BookManager(models.Manager):
-    def create_from_goodreads(self, book_data):
-        details = BookDetails.objects.create(
-            goodreads_id=book_data['id'],
-            link=book_data['link'],
-            year=int(book_data['year']) if book_data['year'] else None,
-            isbn=book_data['isbn13'],
-            publisher=book_data['publisher'],
-            num_pages=int(book_data['num_pages']) if book_data['num_pages'] else None,
-            shelves=book_data['shelves'],
-            review=book_data['review'],
-            format=book_data['format'],
-            end_date=book_data['end_date']
-        )
-
-        # Replace the SX98_.jpg at the end with SX475_.jpg
-        image_url = book_data['image_url']
-        #if image_url:
-        #    image_url = GR_IMAGE_URL_RE.sub('_SY475_.jpg', image_url)
-
-        # If there's a :, strip out everything after it for the slug.
-        title = book_data['title']
-        slug = slugify(title.split(':')[0])
-        # Make sure the slug is 50 characters or less
-        if len(slug) > 50:
-            # First try cutting it to the part before the last -
-            # as long as it's not obscenely short
-            slug = slug[:50]
-            last_dash = slug.rfind('-')
-            if last_dash > 10:
-                slug = slug[:last_dash]
-
-        # If the book already exists for this slug, give this book a number
-        # after the slug.
-        existing_book = Book.objects.filter(slug=slug)
-        if existing_book.exists():
-            i = 2
-            while True:
-                potential_slug = "{}-{}".format(slug, i)
-                if Book.objects.filter(slug=potential_slug).exists():
-                    i += 1
-                else:
-                    slug = potential_slug
-                    break
-
-        is_read = book_data['end_date'] is not None
-        book = Book.objects.create(
-            details=details,
-            title=title,
-            image_url=image_url,
-            slug=slug,
-            completed_read=is_read
-        )
-
-        # Create the relevant action, too.
-        Action.objects.create(
-            category='book',
-            primary_id=book.pk,
-            details=title,
-            verb='added',
-        )
-
-        return book
 
 class RatingField(models.IntegerField):
     def __init__(self, min_value=0, max_value=5, **kwargs):
@@ -237,7 +130,6 @@ class BookDetails(models.Model):
 
 class Book(models.Model):
     """If details are None, then it's a publication, not a book."""
-    objects = BookManager()
     details = models.OneToOneField(BookDetails, on_delete=models.CASCADE,
                                    blank=True, null=True)
     title = models.CharField(max_length=255)

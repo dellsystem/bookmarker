@@ -1,69 +1,176 @@
-import os
+import bs4
 from datetime import datetime
+import requests
+import urllib.parse
 
-from goodreads import client
-
-from books import redistools
-
-
-_client = client.GoodreadsClient(
-    os.environ.get('GOODREADS_KEY'),
-    os.environ.get('GOODREADS_SECRET'),
-)
-_client.authenticate(
-    access_token=os.environ.get('GOODREADS_ACCESS_TOKEN'),
-    access_token_secret=os.environ.get('GOODREADS_ACCESS_SECRET'),
-)
+from books.models import BookDetails, GoodreadsAuthor
 
 
-def get_author_by_name(name):
-    author = _client.find_author(name)
-    if author is not None:
-        return redistools.save_author2(author)
+def _parse_num_pages(field):
+    """Expect input like '123\n     p'"""
+    if field:
+        text = field.strip()
+        number = text.splitlines()[0].strip()
+        if number:
+            try:
+                return int(number)
+            except ValueError:
+                # Just return None, it's fine, whatever
+                pass
+
+def _parse_id(field):
+    """Input format: /book/show/12345.optionaltitle-morestuff"""
+    return field.split('/')[-1].split('-')[0].split('.')[0]
+
+def _parse_date(field):
+    if field:
+        text = field.strip()
+        if ',' in text:
+            format_string = '%b %d, %Y'
+        else:
+            format_string = '%b %Y'
+        return datetime.strptime(
+            text,
+            format_string
+        ).date()
 
 
-def get_author_by_id(goodreads_id):
-    cached_data = redistools.get_author(goodreads_id)
-    if cached_data:
-        return cached_data
+USER_ID = '60292716-wendy-liu'
+BASE_URL = "https://www.goodreads.com"
+READ_URL = BASE_URL + "/review/list/{}?shelf=read&per_page=100&sort=date_updated".format(USER_ID)
+def get_books(page):
+    url = '{}&page={}'.format(READ_URL, page)
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = bs4.BeautifulSoup(response.content.decode(), "html.parser")
+    rows = soup.select("table#books tbody tr")
 
-    return redistools.save_author2(_client.author(goodreads_id))
-
-
-def get_books_by_title(title):
     books = []
-    for book in _client.search_books(title):
-        books.append(redistools.save_book(book))
-    
+    goodreads_book_ids = set()
+    goodreads_author_ids = set()
+    for row in rows:
+        # I HATE GOODREADS
+        title_tag = row.select('.field.title .value a')[0]
+        goodreads_url = title_tag['href']
+        goodreads_id = _parse_id(goodreads_url)
+        title = title_tag.text.strip()
+
+        author_tag = row.select('.field.author .value a')[0]
+        author_url = author_tag['href']
+        author_id = _parse_id(author_url)
+        author_name = author_tag.text.strip()
+
+        # Doing this kind of annoying if/else statement just cus i want to make
+        # _parse_date feel better for testing [operating on strings, not bs4
+        # objects]
+        start_date = row.select('.date_started_value')
+        if start_date:
+            start_date = _parse_date(start_date[0].text)
+        else:
+            start_date = None
+        end_date = row.select('.date_read_value')
+        if end_date:
+            end_date = _parse_date(end_date[0].text)
+        else:
+            end_date = None
+
+        book_format = row.select('.format .value')[0].text.strip()
+        isbn = row.select('.isbn13 .value')[0].text.strip()
+        num_pages = _parse_num_pages(row.select('.num_pages .value')[0].text)
+        image_url = row.select('img')[0]['src']
+
+        # If the publication year is missing or weirdly formatted (sometimes it
+        # just is for whatever reason, see if it's present in the
+        # date_pub_edition field instead
+        year = row.select('.date_pub .value')[0].text.strip()
+        if year == 'unknown' or ',' in year:
+            pub_date = row.select('.date_pub_edition .value')[0].text.strip()
+            year = pub_date.split(',')[-1].strip()
+
+        book = {
+            'id': goodreads_id,
+            'url': BASE_URL + goodreads_url,
+            'title': title,
+            'start_date': start_date,
+            'end_date': end_date,
+            'format': book_format,
+            'isbn': isbn,
+            'num_pages': num_pages,
+            'image_url': image_url,
+            'year': year, # convert this to number? maybe
+            # TODO: author, publisher name
+            'author_url': BASE_URL + author_url,
+            'author_name': author_name,
+            'author_id': author_id,
+        }
+        goodreads_book_ids.add(goodreads_id)
+        goodreads_author_ids.add(author_id)
+        books.append(book)
+
+    # Figure out which of the books and authors are already in our DB
+    details_query = BookDetails.objects.filter(goodreads_id__in=goodreads_book_ids)
+    details_dict = {}
+    for d in details_query:
+        details_dict[d.goodreads_id] = d
+
+    author_query = GoodreadsAuthor.objects.filter(goodreads_id__in=goodreads_author_ids)
+    author_dict = {}
+    for a in author_query:
+        author_dict[a.goodreads_id] = a.author
+
+    # Now go back through the books list to update the status
+    for book in books:
+        a = author_dict.get(book['author_id'])
+        if a:
+            book['author'] = a
+        else:
+            # flip the author name around (last, first to first, last)
+            author_name = ' '.join(book['author_name'].split(', ')[::-1])
+            book['author_params'] = urllib.parse.urlencode({
+                'name': author_name,
+                'link': book['author_url'],
+            })
+
+        d = details_dict.get(book['id'])
+        if d:
+            b = d.book
+            book['is_processed'] = b.is_processed
+            book['slug'] = b.slug
+            book['dates_match'] = (
+                d.start_date == book['start_date'] and
+                d.end_date == book['end_date']
+            )
+            if d.start_date is None and d.end_date is None:
+                dates_comment = 'No BM dates'
+            else:
+                dates_comment = '{} - {}'.format(
+                    d.start_date, d.end_date
+                )
+            book['dates_comment'] = dates_comment
+        else:
+            # Create a URL to quickly create the book (query params)
+            book['book_params'] = urllib.parse.urlencode({
+                'id': book['id'],
+                'title': book['title'],
+                'link': book['url'],  # todo: url to link. also prepend site
+                'isbn': book['isbn'],
+                'year': book['year'],
+                'format': book['format'],
+                'num_pages': book['num_pages'],
+                'start_date': book['start_date'],
+                'end_date': book['end_date'],
+                'image_url': book['image_url'],
+                'author_name': book['author_name'],
+                'author_url': book['author_url'],
+                'author_slug': a.slug if a is not None else '',
+            })
+
     return books
 
 
-def get_book_by_id(goodreads_id):
-    cached_data = redistools.get_book(goodreads_id)
-    if cached_data:
-        return cached_data
-
-    return redistools.save_book2(_client.book(goodreads_id))
-
-
-def get_user():
-    return _client.user()
- 
-
-# todo: the dictionary should be in redistools
-def get_read_shelf(page=1):
-    reviews = []
-    for review in _client.user().reviews(page=page):
-        if 'read' not in review.shelves:
-            continue
-
-        reviews.append({
-            'book': redistools.save_book2(review.book),
-            'shelves': '/'.join(review.shelves),
-            'review': review.body or '',
-            'rating': int(review.rating),
-            'start_date': review.started_at,
-            'end_date': review.read_at,
-        })
-
-    return reviews
+AUTHOR_URL = BASE_URL + '/author/show/'
+def get_author_id(link):
+    """Given a URL, if it's a goodreads author url, return the goodreads ID.
+    else, return none"""
+    if link.startswith(AUTHOR_URL):
+        return link.lstrip(AUTHOR_URL).split('.')[0]

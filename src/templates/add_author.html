@@ -7,5 +7,20 @@
 {% endblock %}
 
 {% block content %}
+{% if existing_authors %}
+<div class="ui error message">
+    <div class="header">
+        Author may already exist
+    </div>
+    <div class="ui bulleted list">
+    {% for a in existing_authors %}
+    <div class="item">
+        <a href="{{ a.get_absolute_url }}">{{ a.name }}</a> ({{ a.slug}}):
+        {{ a.link|urlize }}
+    </div>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% include 'author_form.html' %}
 {% endblock %}
