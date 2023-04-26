@@ -14,7 +14,7 @@ is also a great way to creep on what books I'm reading.
 ## Setup
 
 If you're familiar with Django, you can skip this; it's a standard deployment
-with Django 3.11. Pip requirements can be found in requirements.txt.
+with Django 4.1. Pip requirements can be found in requirements.txt.
 
 Here's the step-by-step for how to set it up via the command line on a Linux
 machine that already has git, Python (v3), and virtualenv installed:
@@ -109,86 +109,6 @@ python src/manage.py createsuperuser
 
 and set your desired username/password. Don't worry about the email address.
 
-### Setting up the Goodreads integration
-
-For the moment, this app currently makes heavy use of the Goodreads API when
-adding books and authors. You'll need to get a Goodreads account, and then
-you'll have to set up a developer key to access the Goodreads API. This part
-is a little annoying, but I haven't figured out how to skip it yet, so in the
-meantime you'll need to do this or Bookmarker won't run.
-
-Using your browser, navigate to <https://www.goodreads.com/api/keys>, fill in
-the form (the details don't really matter - call it whatever you want, and
-leave the optional fields blank) and click "Apply for a Developer Key". Now,
-at the top of the page it should say something like
-
-```
-key: KEY
-secret: SECRET
-```
-
-We'll have to save both the key and the secret to our virtualenv. Open up
-env/bin/activate (it's a text file), and add this to the end of the file (replace
-KEY and SECRET with their respective values):
-
-```
-GOODREADS_KEY='KEY'
-export GOODREADS_KEY
-GOODREADS_SECRET='SECRET'
-export GOODREADS_SECRET
-```
-
-For that to take effect, you'll have to exit the virtualenv then activate it
-again. Run:
-
-```
-deactivate && source env/bin/activate
-```
-
-You'll also need to authorize the app to use your account. This is even more
-annoying and I will try to find a way to make this step optional, but again,
-for now it's mandatory. In the bookmarker directory, open up a Python shell
-(run `python`) and paste in the following:
-
-```python
-import os
-from goodreads import client
-
-CLIENT = client.GoodreadsClient(
-    os.environ.get('GOODREADS_KEY'),
-    os.environ.get('GOODREADS_SECRET'),
-)
-
-CLIENT.authenticate()
-
-```
-
-This _should_ pop up a window in your browser (if it doesn't, copy and paste
-the URL shown). Authorize the app in your browser, then return to your Python
-shell, and type 'y' in response to the prompt ("Have you authorized me?").
-
-Now you'll be able to get your token and secret. In your Python shell, type
-
-```python
-CLIENT.session.access_token, CLIENT.session.access_token_secret
-```
-
-This will output two strings in a tuple, looking something like this:
-
-```python
-('24o7htksgslilu5l3w5h', 'slektlyl3wy5wl3y53wskhgksdhgkldshgsdlg')
-```
-
-Open up env/bin/activate one last time and add those to the bottom:
-
-```
-GOODREADS_ACCESS_TOKEN='24o7htksgslilu5l3w5h'
-export GOODREADS_ACCESS_TOKEN
-GOODREADS_ACCESS_SECRET='slektlyl3wy5wl3y53wskhgksdhgkldshgsdlg'
-export GOODREADS_ACCESS_SECRET
-```
-
-(replacing the token and secret above with whatever was output in your shell)
 
 Almost done, I promise! Final step: reactivate the virtualenv one more time.
 
@@ -208,43 +128,16 @@ and navigate your browser to http://localhost:8000. It should show you an empty
 dashboard. To log in, click the "Log in" link in the menu and enter the
 username and password you set earlier.
 
-To confirm that the Goodreads API integration worked, visit
-<http://localhost:8000/stats> (or click "Stats" in the top menu). It should
-display your Goodreads profile picture as well as the number of books you have
-on your "read" and "to-read" shelves.
-
 ## Adding data
 
-To add a book, navigate to the book's page on Goodreads, then get the book's
-Goodreads ID from the URL. For example, if the URL is
+TODO [goodreads sync page]
 
-```
-https://www.goodreads.com/book/show/369873.A_Hacker_Manifesto
-```
-
-then the Goodreads ID is 369873. From the dashboard, paste that into the "Book"
-field in the top right, then press + or hit enter. You'll now be able to add
-chapters to the book if you like (optional). Click the green arrow button when
-done, and you'll be presented with the option to add notes (for quotes) and
-terms (for vocabulary). If the book details didn't quite get saved properly,
-click the edit icon next to the book title.
-
-**NEW**: You can now add books via the "b b" keyboard shortcut. This is
-recommended over the copy-and-paste the ID method above. To add an author, use
-"a a".
-
-To add an author, find the Goodreads ID for the author (same method), and use
-the Author field from the dashboard or the author page. If the author doesn't
-have a Goodreads page, just click the + button directly to add the author
-details manually. The rest should be fairly self-explanatory, though I make no
-guarantees when it comes to usability.
-
-If anything is confusing or buggy, feel free to contact me.
+note: it's currently hardcoded to my user id lol
 
 ## Advanced
 
 If you want to deploy this in production, I'd recommend using nginx, gunicorn,
-systemd, and postgres. To enable postgres, set POSTGRES_PASSWORD.
+systemd, and postgres. To enable postgres, set `POSTGRES_PASSWORD`.
 
 Unit tests (the few that exist) can be run with `python src/manage.py test`.
 
