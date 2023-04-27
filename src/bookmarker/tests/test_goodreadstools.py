@@ -5,6 +5,29 @@ from django.test import TestCase
 from books import goodreadstools
 
 
+class TestParseImageUrl(TestCase):
+    def test_75(self):
+        # Real data
+        self.assertEqual(
+            'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1665649420l/60644838._SY475_.jpg',
+            goodreadstools._parse_image_url('https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1665649420l/60644838._SY75_.jpg')
+        )
+
+    def test_475(self):
+        # Fake data - already done, doesn't need to change
+        self.assertEqual(
+            'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1599047628l/55155120._SY475_.jpg',
+            goodreadstools._parse_image_url('https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1599047628l/55155120._SY475_.jpg')
+        )
+
+    def test_50(self):
+        # Real data. idk why it's sometimes SX and sometimes SY.
+        self.assertEqual(
+            'https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1599047628l/55155120._SY475_.jpg',
+            goodreadstools._parse_image_url('https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1599047628l/55155120._SX50_.jpg')
+        )
+
+
 class TestParseNumPages(TestCase):
     def test_invalid_input(self):
         self.assertEqual(None, goodreadstools._parse_num_pages('blah'))

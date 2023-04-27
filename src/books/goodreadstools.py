@@ -6,6 +6,21 @@ import urllib.parse
 from books.models import BookDetails, GoodreadsAuthor
 
 
+RESOLUTION = '_SY475_'
+def _parse_image_url(field):
+    """We may need to replace the last few chars to get a high-res image URL"""
+    if field:
+        text = field.strip()
+        if text.endswith('_.jpg'):
+            segments = text.split('.')
+            resolution = segments[-2]
+            if resolution.startswith('_S') and resolution.endswith('_'):
+                segments[-2] = RESOLUTION
+                return '.'.join(segments)
+
+        return text
+
+
 def _parse_num_pages(field):
     """Expect input like '123\n     p'"""
     if field:
@@ -80,7 +95,7 @@ def get_books(page):
         book_format = row.select('.format .value')[0].text.strip()
         isbn = row.select('.isbn13 .value')[0].text.strip()
         num_pages = _parse_num_pages(row.select('.num_pages .value')[0].text)
-        image_url = row.select('img')[0]['src']
+        image_url = _parse_image_url(row.select('img')[0]['src'])
 
         # If the publication year is missing or weirdly formatted (sometimes it
         # just is for whatever reason, see if it's present in the
