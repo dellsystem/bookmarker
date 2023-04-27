@@ -21,28 +21,24 @@
                     {{ num_notes }}
                     <i class="sticky note icon"></i>
                 </a>
-                {% if request.user.is_staff %}
-                /
-                <a href="{% url 'admin:books_author_change' author.pk %}">
-                    <i class="edit icon"></i>
+                {% if author.goodreadsauthor_set.exists %}
+                {% for gr in author.goodreadsauthor_set.all %}
+                <a class="ui small tag label"
+                   href="{{ gr.goodreads_link }}"
+                   title="Goodreads author ID">
+                    {{ gr.goodreads_id }}
                 </a>
+                {% endfor %}
                 {% endif %}
             </div>
         </h2>
     </div>
     {% if request.user.is_staff %}
     <div class="four wide right aligned column">
-        <form method="post" action="{% url 'add_author' %}">
-            <div class="ui fluid labeled action input">
-                <div class="ui label">Author</div>
-                <input type="text" name="goodreads_id"
-                       placeholder="GoodReads ID" />
-                <button type="submit" class="ui icon green button">
-                    <i class="plus icon"></i>
-                </button>
-            </div>
-            {% csrf_token %}
-        </form>
+        <a class="ui fluid blue icon button" href="{% url 'admin:books_author_change' author.pk %}">
+            <i class="edit icon"></i>
+            Edit in admin
+        </a>
     </div>
     {% endif %}
 </div>
