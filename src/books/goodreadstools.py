@@ -59,6 +59,9 @@ def get_books(page):
         author_url = author_tag['href']
         author_id = _parse_id(author_url)
         author_name = author_tag.text.strip()
+        if author_name:
+            # Flip the author name around (last, first to first, last)
+            author_name = ' '.join(author_name.split(', ')[::-1])
 
         # Doing this kind of annoying if/else statement just cus i want to make
         # _parse_date feel better for testing [operating on strings, not bs4
@@ -124,10 +127,8 @@ def get_books(page):
         if a:
             book['author'] = a
         else:
-            # flip the author name around (last, first to first, last)
-            author_name = ' '.join(book['author_name'].split(', ')[::-1])
             book['author_params'] = urllib.parse.urlencode({
-                'name': author_name,
+                'name': book['author_name'],
                 'link': book['author_url'],
             })
 
