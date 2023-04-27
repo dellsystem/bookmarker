@@ -666,13 +666,18 @@ def add_book(request):
             )
     else:
         title = request.GET.get('title')
+        if title:
+            # Truncate the title to just the part before the :, if any
+            slug = slugify(title.split(':')[0])
+        else:
+            slug = None
         book_form = BookForm(initial={
             # setting the completed read field to true by default for now
             'completed_read': True,
             # filling in query params if provided
             'title': title,
             'image_url': request.GET.get('image_url'),
-            'slug': slugify(title) if title else '',
+            'slug': slug,
         })
         details_form = BookDetailsForm(initial={
             'goodreads_id': request.GET.get('id'),
