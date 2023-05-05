@@ -1275,7 +1275,7 @@ def within_book_search_json(request, book_id):
     term = query  # todo: meta options?
     book = Book.objects.get(pk=book_id)
 
-    if len(query) < 3:
+    if not query or len(query) < 3:
         return
 
     # todo: method on objectmanager to search by keyword
