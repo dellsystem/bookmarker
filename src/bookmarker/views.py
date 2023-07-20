@@ -1604,7 +1604,7 @@ def edit_note(request, note_id):
                 secondary_id=note.book.pk,
             )
             note.delete()
-            return redirect('home')
+            return redirect('view_notes', slug=note.book.slug)
 
         note_form = NoteForm(note.book, request.POST, instance=note, prefix='note')
         author_form = ArtefactAuthorForm(request.POST, prefix='author')
