@@ -93,9 +93,8 @@ class BookDetails(models.Model):
         default=False,
         help_text='If the authors are actually editors'
     )
-    # 'authors' is taken directly from GoodReads. Currently used for display
-    # purposes only (not when inferring the author for a Section, e.g.).
-    # Not currently editable via the web interface.
+    # 'authors' is taken from GoodReads but can be edited. Currently used for
+    # display purposes only (not when inferring the author for a Section, e.g.)
     authors = models.ManyToManyField(Author, blank=True, related_name='books')
     # The default authors set on a Section/Term/Note if they aren't specified.
     # If empty (e.g., if it's an edited collection), then it's assumed that

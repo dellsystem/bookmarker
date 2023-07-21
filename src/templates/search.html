@@ -187,7 +187,7 @@
                             <strong>{{ book.title }}</strong>
                         </a>
                         {% if book.details %}
-                        {% include 'author_list.html' with authors=book.details.default_authors only %}
+                        {% include 'author_list.html' with authors=book.details.authors only %}
                         {% else %}
                         (publication)
                         {% endif %}
