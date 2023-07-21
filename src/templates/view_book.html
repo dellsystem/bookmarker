@@ -31,7 +31,7 @@
             {% endif %}
             {% if book.details %}
             <div class="sub header">
-                {% include 'author_list.html' with authors=book.details.default_authors is_edited=book.details.is_edited only %}
+                {% include 'author_list.html' with authors=book.details.authors is_edited=book.details.is_edited only %}
                 {% if book.details.issue_number %}(#{{ book.details.issue_number }}){% endif %}
                 <div class="ui rating display-rating"
                      data-rating="{{ book.details.rating }}">
