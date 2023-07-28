@@ -625,6 +625,7 @@ def add_author(request):
 
 @login_required
 def add_book(request):
+    existing_books = None
     if request.POST.get('submit'):
         book_form = BookForm(request.POST)
 
@@ -695,8 +696,6 @@ def add_book(request):
             existing_books = Book.objects.filter(
                 title__icontains=title.lower()
             )
-        else:
-            existing_books = None
 
     context = {
         'book_form': book_form,
