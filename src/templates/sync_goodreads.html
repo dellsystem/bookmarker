@@ -103,4 +103,40 @@
   </tbody>
 </table>
 
+
+<div class="ui center aligned basic segment">
+    <div class="ui right pagination menu">
+        {% if previous_page > 1 %}
+        <a class="item keyboard-shortcut"
+           title="First"
+           href="?page=1"
+           data-shortcut="^"
+           data-label="First page">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+           <i class="double left angle icon"></i>
+        </a>
+        {% if previous_page > 0 %}
+        <a class="item keyboard-shortcut"
+           title="Previous"
+           href="?page={{ previous_page }}"
+           data-shortcut="<"
+           data-label="Previous page">
+        {% else %}
+        <a class="disabled item">
+        {% endif %}
+           <i class="left angle icon"></i>
+        </a>
+        <a class="active item">{{ page }}</a>
+        <a class="item keyboard-shortcut"
+           title="Next"
+           href="?page={{ next_page }}"
+           data-shortcut=">"
+           data-label="Next page">
+           <i class="right angle icon"></i>
+        </a>
+    </div>
+</div>
+
 {% endblock %}
