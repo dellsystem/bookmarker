@@ -65,13 +65,19 @@
                         {{ note_form.comment }}
                     </div>
                     <div class="field">
-                        <label>Tags</label>
-                        {{ note_form.tags }}
+                        <label>Hide comment when logged out?</label>
+                            <div class="ui toggle checkbox">
+                                {{ note_form.hide_comment }}
+                            </div>
                     </div>
                 </div>
             </div>
-            {% if book.sections.count %}
             <div class="sixteen wide column">
+                <div class="field">
+                    <label>Tags</label>
+                    {{ note_form.tags }}
+                </div>
+                {% if book.sections.count %}
                 {% with error=note_form.section.errors %}
                 <div class="{% if error %}error{% endif %} field"
                      {% if error %}title="{{ error|join:"/" }}"{% endif %}>
@@ -79,8 +85,8 @@
                     {{ note_form.section }}
                 </div>
                 {% endwith %}
-            </div>
             {% endif %}
+            </div>
         </div>
         <div class="ui basic center aligned segment">
             <button type="submit" name="submit" value=""

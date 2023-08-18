@@ -16,14 +16,14 @@
     </div>
     {% if note.comment and not truncate %}
     <div class="ui secondary segment">
-        {% if request.user.is_staff %}
-        {% if highlight %}
-        {{ note.comment|markdownify|highlight_term:highlight }}
+        {% if note.hide_comment and not request.user.is_staff %}
+        <p>You must be logged in to see this comment.</p>
         {% else %}
-        {{ note.comment|markdownify }}
-        {% endif %}
-        {% else %}
-        <p>You must be logged in to see the comments.</p>
+            {% if highlight %}
+            {{ note.comment|markdownify|highlight_term:highlight }}
+            {% else %}
+            {{ note.comment|markdownify }}
+            {% endif %}
         {% endif %}
     </div>
     {% endif %}

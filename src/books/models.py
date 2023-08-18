@@ -568,6 +568,7 @@ class Note(SectionArtefact):
     subject = models.CharField(max_length=100)
     quote = models.TextField()
     comment = models.TextField(blank=True)
+    hide_comment = models.BooleanField(default=False)
     section = models.ForeignKey(Section, on_delete=models.CASCADE,
         blank=True, null=True, related_name='notes')
     # Should only be empty if the original author isn't in our database.
