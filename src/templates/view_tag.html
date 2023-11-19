@@ -5,6 +5,11 @@
 
 {% block title %}{{ tag.slug }} [tag]{% endblock %}
 
+{% block meta %}
+<meta property="og:title" content="Bookmarker tag: {{ tag.slug }}">
+<meta property="og:description" content="{{ tag.description }}">
+{% endblock %}
+
 {% block breadcrumbs %}
 <a class="section" href="{% url 'view_all_tags' %}">View tags</a>
 <i class="right angle icon divider"></i>

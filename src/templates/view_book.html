@@ -4,6 +4,11 @@
 
 {% block title %}{{ book.title }}{% endblock %}
 
+{% block meta %}
+<meta property="og:title" content="{{ book.title }}">
+<meta property="og:description" content="Wendy's saved passages in this book">
+{% endblock %}
+
 {% block modals %}{% include 'book_search_modal.html' with book=book only %}{% endblock %}
 
 {% block breadcrumbs %}

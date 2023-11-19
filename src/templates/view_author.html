@@ -2,6 +2,11 @@
 
 {% block title %}{{ author.name }}{% endblock %}
 
+{% block meta %}
+<meta property="og:title" content="{{ author.name }}">
+<meta property="og:description" content="Wendy's saved passages by this author">
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="active section">View author</div>
 {% endblock %}

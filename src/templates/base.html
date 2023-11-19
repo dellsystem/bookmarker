@@ -11,6 +11,14 @@
     <link rel="apple-touch-icon-precomposed" href="/static/favicon-152.png">
     <link rel="icon" href="/static/favicon-32.png" sizes="32x32">
     <link rel="icon" href="/static/favicon-16.png" sizes="32x32">
+
+    <!-- opengraph tags below, including page-specific ones -->
+    <meta property="og:url" content="http://bookmarker.dellsystem.me">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bookmarker" />
+    <meta property="og:image" content="http://bookmarker.dellsystem.me/static/favicon-152.png" />
+    {% block meta %}
+    {% endblock %}
 </head>
 <body>
     <div class="ui container">

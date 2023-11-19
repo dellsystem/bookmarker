@@ -5,6 +5,12 @@
 
 {% block title %}{{ note.subject }}{% endblock %}
 
+{% block meta %}
+<meta property="og:title" content="{{ note.subject }}">
+<meta property="og:description" content="A saved passage from {{ note.book.title }}">
+{% endblock %}
+
+
 {% block breadcrumbs %}
 <a class="section" href="{{ book.get_absolute_url }}">View book</a>
 <i class="right angle icon divider"></i>
