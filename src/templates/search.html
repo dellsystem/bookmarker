@@ -203,45 +203,31 @@
     </div>
 </div>
 
-{% if mode == 'notes' %}
-    {% if results.notes %}
-        {% include 'note_list_with_books.html' with notes=results.notes highlight=query %}
-    {% else %}
-        <div class="ui message">
-            No notes found
-        </div>
-    {% endif %}
-{% elif mode == 'terms' %}
-    {% if results.terms %}
-        {% regroup results.terms by term as term_list %}
+{% if paged_results %}
+    {% include "pagination.html" with items=paged_results mode=mode query=query only %}
+    {% if mode == 'notes' %}
+        {% include 'note_list_with_books.html' with notes=paged_results.object_list highlight=query %}
+    {% elif mode == 'terms' %}
+        {% regroup paged_results.object_list by term as term_list %}
 
         {% for term in term_list %}
             {% include 'term_header.html' with term=term.grouper highlight=query only %}
 
             {% include 'term_list_with_books.html' with occurrences=term.list query=query only %}
         {% endfor %}
-    {% else %}
-        <div class="ui message">
-            No terms found
-        </div>
+    {% elif mode == 'sections' %}
+        <br />
+        {% include 'section_list.html' with sections=paged_results.object_list highlight=query show_book=True %}
+    {% elif mode == 'books' %}
+        {% for book in paged_results.object_list %}
+            {% include 'book_header.html' with book=book highlight=query only %}
+        {% endfor %}
     {% endif %}
-{% elif mode == 'sections' %}
-    {% if results.sections %}
-    <br />
-        {% include 'section_list.html' with sections=results.sections highlight=query show_book=True %}
-    {% else %}
-        <div class="ui message">
-            No sections found
-        </div>
-    {% endif %}
-{% elif mode == 'books' %}
-    {% for book in results.books %}
-        {% include 'book_header.html' with book=book highlight=query only %}
-    {% empty %}
+    {% include "pagination.html" with items=paged_results mode=mode query=query only %}
+{% else %}
     <div class="ui message">
-        No books found
+        No {{ mode }} found
     </div>
-    {% endfor %}
 {% endif %}
 
 {% endblock %}

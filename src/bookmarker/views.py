@@ -1382,7 +1382,10 @@ def search_json(request):
 
 
 def search(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
+    if len(query) < 3:
+        messages.error(request, 'Query must be at least 3 characters')
+        return redirect('home')
 
     MODES = ('notes', 'terms', 'sections', 'books')
     mode = request.GET.get('mode')
@@ -1483,7 +1486,6 @@ def search(request):
                 'details__default_authors',
             ],
         }
-
         results[mode] = results[mode].prefetch_related(*to_prefetch[mode])
 
         author_field_name = 'authors'
@@ -1542,10 +1544,28 @@ def search(request):
     for key in results:
         results[key] = results[key].order_by(ordering[key]).distinct()
 
+    paged_results = None
+    page_number = None
+    if mode:
+        # Do pagination for the expanded results. Only if there are any.
+        if results[mode].count() > 0:
+            paginator = Paginator(results[mode], 10)
+            # If the page number is wrong, fail silently.
+            page_number = request.GET.get('page', '1')
+            try:
+                page_number = int(page_number)
+            except ValueError:
+                page_number = 1
+            if page_number not in paginator.page_range:
+                page_number = 1
+            paged_results = paginator.get_page(page_number)
+
     context = {
         'sort': ordering.get(mode),  # use the implied sort, not the input
         'sort_options': SORTS.get(mode),
         'results': results,
+        'paged_results': paged_results,
+        'page_number': page_number,
         'query': query,
         'mode': mode,
         'modes': MODES,

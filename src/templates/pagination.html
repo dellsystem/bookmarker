@@ -15,7 +15,7 @@
         {% if items.has_previous %}
         <a class="item keyboard-shortcut"
            title="First"
-           href="?page=1{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}"
+           href="?page=1{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}{% if query %}&={{ query }}{% endif %}"
            data-shortcut="^" data-label="First page">
         {% else %}
         <a class="disabled item">
@@ -25,7 +25,7 @@
         {% if items.has_previous %}
         <a class="item keyboard-shortcut"
            title="Previous"
-           href="?page={{ items.previous_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}"
+           href="?page={{ items.previous_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}{% if query %}&q={{ query }}{% endif %}"
            data-shortcut="<"
            data-label="Previous page">
         {% else %}
@@ -40,7 +40,7 @@
         {% if items.has_next %}
         <a class="item keyboard-shortcut"
            title="Next"
-           href="?page={{ items.next_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}"
+           href="?page={{ items.next_page_number }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}{% if query %}&q={{ query }}{% endif %}"
            data-shortcut=">"
            data-label="Next page">
         {% else %}
@@ -51,7 +51,7 @@
         {% if items.has_next %}
         <a class="item keyboard-shortcut"
            title="Last"
-           href="?page={{ items.paginator.num_pages }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}"
+           href="?page={{ items.paginator.num_pages }}{% if mode %}&mode={{ mode }}{% endif %}{% if author %}&author={{ author.pk }}{% endif %}{% if flagged %}&flagged=1{% endif %}{% if query %}&q={{ query }}{% endif %}"
            data-shortcut="$" data-label="Last page">
         {% else %}
         <a class="disabled item">
