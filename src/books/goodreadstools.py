@@ -52,7 +52,7 @@ def _parse_date(field):
 
 USER_ID = '60292716-wendy-liu'
 BASE_URL = "https://www.goodreads.com"
-READ_URL = BASE_URL + "/review/list/{}?shelf=read&per_page=100&sort=date_updated".format(USER_ID)
+READ_URL = BASE_URL + "/review/list/{}?shelf=read&sort=date_read".format(USER_ID)
 def get_books(page):
     url = '{}&page={}'.format(READ_URL, page)
     response = requests.get(url)
