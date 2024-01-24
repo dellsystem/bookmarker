@@ -27,6 +27,8 @@ class TermOccurrenceAdmin(admin.ModelAdmin):
     list_filter = ('book', 'authors')
     list_display = ('term', 'get_page_display', 'book', 'is_new',
                     'is_defined', '_get_category')
+    # we need to hide the section from the admin page otherwise it 502's
+    exclude = ('section',)
 
     def _get_category(self, obj):
         alpha = '%.2f' % (obj.category.confidence / 100.)
