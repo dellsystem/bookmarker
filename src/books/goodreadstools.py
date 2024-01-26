@@ -137,6 +137,9 @@ def get_books(page):
         author_dict[a.goodreads_id] = a.author
 
     # Now go back through the books list to update the status
+    # We only need to return books that are either not in the db or that have
+    # some sort of mistake to be corrected.
+    filtered_books = []
     for book in books:
         a = author_dict.get(book['author_id'])
         if a:
@@ -163,6 +166,9 @@ def get_books(page):
                     d.start_date, d.end_date
                 )
             book['dates_comment'] = dates_comment
+
+            if book['is_processed'] and book['dates_match']:
+                continue
         else:
             # Create a URL to quickly create the book (query params)
             book['book_params'] = urllib.parse.urlencode({
@@ -181,7 +187,9 @@ def get_books(page):
                 'author_slug': a.slug if a is not None else '',
             })
 
-    return books
+        filtered_books.append(book)
+
+    return filtered_books
 
 
 AUTHOR_URL = BASE_URL + '/author/show/'
