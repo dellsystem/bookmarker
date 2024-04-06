@@ -583,6 +583,13 @@ class Note(SectionArtefact):
     def display_template(self):
         return 'note_display.html'
 
+    # For OpenGraph description meta tag in view_note.html
+    def get_opengraph_description(self):
+        authors = ''
+        if self.authors.exists():
+            authors = ' by {}'.format(', '.join(a.name for a in self.authors.all()))
+        return 'A quote from ' + self.book.title + authors
+
     def get_absolute_url(self):
         return reverse('view_note', args=[str(self.id)])
 
