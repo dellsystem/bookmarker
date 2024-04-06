@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,7 +18,7 @@
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bookmarker" />
-    <meta property="og:image" content="http://bookmarker.dellsystem.me/static/favicon-152.png" />
+    <meta property="og:image" content="{% static 'img/bookmarker.png' %}" />
     {% block meta %}
     {% endblock %}
 </head>

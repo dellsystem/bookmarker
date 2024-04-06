@@ -7,6 +7,7 @@
 {% block meta %}
 <meta property="og:title" content="{{ book.title }}">
 <meta property="og:description" content="Wendy's saved passages in this book">
+<meta property="og:image" content="{{ book.image_url }}" />
 {% endblock %}
 
 {% block modals %}{% include 'book_search_modal.html' with book=book only %}{% endblock %}
