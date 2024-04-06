@@ -6,7 +6,7 @@
 {% block title %}{{ note.subject }}{% endblock %}
 
 {% block meta %}
-<meta property="og:title" content="{{ note.subject }}">
+<meta property="og:title" content="{{ note.subject }} | Bookmarker">
 <meta property="og:description" content="{{ note.get_opengraph_description }}">
 <meta property="og:image" content="{{ note.book.image_url }}" />
 {% endblock %}

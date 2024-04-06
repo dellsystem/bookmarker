@@ -4,9 +4,16 @@
 
 {% block title %}{{ book.title }}{% endblock %}
 
+{% comment %}
+super annoying but because we can't repeat blocks in a django template,
+i think the best solution for defining og:title is to define it separately
+on each page that we want to support og tags for. in an ideal world we'd
+just have it echo the <title> tag.
+{% endcomment %}
+
 {% block meta %}
-<meta property="og:title" content="{{ book.title }}">
-<meta property="og:description" content="Wendy's saved passages in this book">
+<meta property="og:title" content="{{ book.title }} | Bookmarker">
+<meta property="og:description" content="Wendy's saved passages">
 <meta property="og:image" content="{{ book.image_url }}" />
 {% endblock %}
 
