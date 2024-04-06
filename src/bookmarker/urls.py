@@ -79,7 +79,7 @@ urlpatterns = [
         name='cite_tag'),
     re_path(r'^tags$', bookmarker.views.view_all_tags, name='view_all_tags'),
     re_path(r'^tags/add$', bookmarker.views.add_tag, name='add_tag'),
-    re_path(r'^stats$', bookmarker.views.view_stats, name='view_stats'),
+    re_path(r'^manage$', bookmarker.views.manage_data, name='manage_data'),
     re_path(r'^api/suggest.json$', bookmarker.views.suggest_terms),
     re_path(r'^api/define.json$', bookmarker.views.get_definition),
     re_path(r'^faves$', bookmarker.views.view_faves, name='view_faves'),

@@ -1576,37 +1576,6 @@ def search(request):
     return render(request, 'search.html', context)
 
 
-def view_stats(request):
-    user = goodreadstools.get_user()
-    shelves = user.shelves()
-    num_read = shelves[0].count  # assumes that read is first - confirm this
-    remaining_shelf = shelves[2]  # assumes that to-read is third - confirm this
-    num_remaining = remaining_shelf.count
-
-    # Estimate the end date based on various reading paces.
-    pace_per_year = {
-        'one_per_month': 12,
-        'two_per_month': 24,
-        'one_per_week': 52,
-        'two_per_week': 104,
-        'one_per_day': 365,
-    }
-    dates = {}
-    for pace, count in pace_per_year.items():
-        days_left = num_remaining / float(count) * 365
-        end_date = datetime.datetime.today() + datetime.timedelta(days=days_left)
-        dates[pace] = end_date
-
-    context = {
-        'user': user,
-        'num_read': num_read,
-        'num_remaining': num_remaining,
-        'dates': dates,
-    }
-
-    return render(request, 'view_stats.html', context)
-
-
 @login_required
 def edit_note(request, note_id):
     note = get_object_or_404(Note, pk=note_id)
@@ -1814,3 +1783,19 @@ def sync_goodreads(request):
     }
 
     return render(request, 'sync_goodreads.html', context)
+
+
+@login_required
+def manage_data(request):
+    # To help me find books that are missing read dates. Limit it to books that
+    # have been 'processed'.
+    books = Book.objects.filter(
+        completed_read=True,
+        is_processed=True
+    ).filter(
+        Q(details__start_date=None) | Q(details__end_date=None)
+    ).select_related('details').order_by('-pk')
+    context = {
+        'books': books,
+    }
+    return render(request, 'manage_data.html', context)

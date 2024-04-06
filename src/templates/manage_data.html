@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Manage data{% endblock %}
+
+{% block breadcrumbs %}Manage data{% endblock %}
+
+{% block content %}
+<h1>Manage data</h1>
+<h2>Missing read dates</h2>
+<div class="ui bulleted list">
+{% for book in books %}
+    <div class="item">
+    <a href="{{ book.get_absolute_url }}">
+        <strong>{{ book }}</strong>
+    </a>
+     ({{ book.details.start_date }} - {{ book.details.end_date }})
+     <br />
+     <a href="{% url 'edit_book' book.slug %}">Edit</a> |
+     <a href="{{ book.details.link }}">Goodreads</a>
+    </div>
+{% endfor %}
+{% endblock %}
+
