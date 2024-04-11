@@ -10,7 +10,7 @@ Django==5.0.4
 django-debug-toolbar==3.2.2
 -e git+https://github.com/dellsystem/django-language-field@5410f69a78291eb36c0ad3d8b9d9a6e160619df9#egg=django_language_field
 djangorestframework==3.14.0
-idna==2.8
+idna==3.7
 Markdown==3.0.1
 MarkdownSuperscript==2.1.1
 -e git+https://github.com/dellsystem/merriam-webster-api@d49a108bb0e6c7d1e0a068e56055c7a372115431#egg=Merriam_Webster_API
