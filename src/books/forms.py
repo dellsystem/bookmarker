@@ -13,30 +13,40 @@ class MultipleSectionsForm(forms.Form):
     def clean_sections(self):
         data = self.cleaned_data['sections']
         sections = []
+        last_group_name = None
         for line in data.splitlines():
             words = line.strip().split()
             if not words:
-                # Skip empty lines and whitespace-only lines
+                # Skip empty lines and whitespace-only lines ...
+                # UNLESS we're trying to reset the group name
+                # Basically treat an empty line (once a group name is set)
+                # as the reset token for the following sections.
+                if last_group_name is not None:
+                    last_group_name = None
+
                 continue
 
             title = ' '.join(words[:-1])
             if not title:
-                raise forms.ValidationError(
-                    "Invalid line: {}".format(line)
-                )
+                raise forms.ValidationError("Invalid line: {}".format(line))
 
             try:
                 page_number, in_preface = get_page_details(words[-1])
             except ValueError:
-                raise forms.ValidationError(
-                    "Invalid number: {}".format(words[-1])
-            )
+                # Assume this is the group name for the following sections,
+                # until a new one resets it.
+                # Note that this expects multiple consecutive sections per
+                # group name. For group names that are fragmented, we'll have
+                # to enter those in one by one.
+                last_group_name = ' '.join(words)
+                continue
 
             sections.append({
                 'title': title,
                 'page_number': page_number,
                 'in_preface': in_preface,
                 'number': None,
+                'group_name': last_group_name,
             })
 
         # Check if any of the titles should be converted into section numbers.
