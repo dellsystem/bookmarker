@@ -285,6 +285,11 @@ class Section(PageArtefact):
         related_name='sections')
     number = models.PositiveSmallIntegerField(blank=True, null=True,
         help_text='Chapter number (if relevant')
+    group_name = models.CharField(
+        max_length=100,
+        help_text="When sections are grouped together, consecutively or not",
+        blank=True
+    )
     authors = models.ManyToManyField(Author, related_name='sections', blank=True)
     title = models.CharField(max_length=255)
     subtitle = models.CharField(max_length=255, blank=True)

@@ -56,19 +56,23 @@
             </div>
             {% endif %}
             <div class="seven wide field">
+                <label>Group name or section type</label>
+                {{ section_form.group_name }}
+            </div>
+            <div class="seven wide field">
                 <label>Subtitle</label>
                 {{ section_form.subtitle }}
             </div>
-            {% with error=section_form.slug.errors %}
-            <div class="seven wide {% if error %}error{% endif %} field"
-                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                <label>Slug
-                    (<a href="#" onclick="fillSlugFromInput('title', 'section-'); return false">fill from title</a>)
-                </label>
-                {{ section_form.slug }}
-            </div>
-            {% endwith %}
         </div>
+        {% with error=section_form.slug.errors %}
+        <div class="{% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+            <label>Slug
+                (<a href="#" onclick="fillSlugFromInput('title', 'section-'); return false">fill from title</a>)
+            </label>
+            {{ section_form.slug }}
+        </div>
+        {% endwith %}
         <div class="ui fields">
             <div class="fourteen wide field">
                 <label>Source URL</label>

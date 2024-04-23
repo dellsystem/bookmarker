@@ -35,6 +35,7 @@
         <div class="eleven wide column">
         {% endif %}
             <h3 class="ui header">
+                {% if section.group_name %}{{ section.group_name }}:{% endif %}
                 {{ section.title|markdownify_title }}
                 {% if section.rating %}
                 <div class="ui heart rating display-rating"
