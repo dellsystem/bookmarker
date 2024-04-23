@@ -288,7 +288,8 @@ class Section(PageArtefact):
     group_name = models.CharField(
         max_length=100,
         help_text="When sections are grouped together, consecutively or not",
-        blank=True
+        blank=True,
+        null=True
     )
     authors = models.ManyToManyField(Author, related_name='sections', blank=True)
     title = models.CharField(max_length=255)
