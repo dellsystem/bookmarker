@@ -382,6 +382,7 @@ def add_sections(request, slug):
                     book=book,
                     number=s['number'],
                     page_number=s['page_number'],
+                    group_name=s['group_name'],
                     in_preface=s['in_preface'],
                     title=s['title'],
                 )
