@@ -10,7 +10,7 @@ class TestMultipleSectionsForm(TestCase):
     def test_without_section_numbers(self):
         text = """
         Preface x
-        PART ONE
+        PARTONE
         Introduction 1
         One 7
         PART TWO
@@ -24,8 +24,8 @@ class TestMultipleSectionsForm(TestCase):
         self.assertEqual(
             [
                 {'title': 'Preface', 'page_number': 10, 'in_preface': True, 'number': None, 'group_name': None},
-                {'title': 'Introduction', 'page_number': 1, 'in_preface': False, 'number': None, 'group_name': 'PART ONE'},
-                {'title': 'One', 'page_number': 7, 'in_preface': False, 'number': None, 'group_name': 'PART ONE'},
+                {'title': 'Introduction', 'page_number': 1, 'in_preface': False, 'number': None, 'group_name': 'PARTONE'},
+                {'title': 'One', 'page_number': 7, 'in_preface': False, 'number': None, 'group_name': 'PARTONE'},
                 {'title': 'Two Two', 'page_number': 25, 'in_preface': False, 'number': None, 'group_name': 'PART TWO'},
                 {'title': 'Three Three Three', 'page_number': 35, 'in_preface': False, 'number': None, 'group_name': 'PART TWO'},
                 {'title': 'Conclusion', 'page_number': 50, 'in_preface': False, 'number': None, 'group_name': None},

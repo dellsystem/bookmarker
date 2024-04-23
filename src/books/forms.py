@@ -15,7 +15,8 @@ class MultipleSectionsForm(forms.Form):
         sections = []
         last_group_name = None
         for line in data.splitlines():
-            words = line.strip().split()
+            stripped_line = line.strip()
+            words = stripped_line.split()
             if not words:
                 # Skip empty lines and whitespace-only lines ...
                 # UNLESS we're trying to reset the group name
@@ -27,18 +28,20 @@ class MultipleSectionsForm(forms.Form):
                 continue
 
             title = ' '.join(words[:-1])
-            if not title:
-                raise forms.ValidationError("Invalid line: {}".format(line))
-
-            try:
-                page_number, in_preface = get_page_details(words[-1])
-            except ValueError:
-                # Assume this is the group name for the following sections,
-                # until a new one resets it.
-                # Note that this expects multiple consecutive sections per
-                # group name. For group names that are fragmented, we'll have
-                # to enter those in one by one.
-                last_group_name = ' '.join(words)
+            if title:
+                try:
+                    page_number, in_preface = get_page_details(words[-1])
+                except ValueError:
+                    # Assume this is the group name for the following sections,
+                    # until a new one resets it.
+                    # Note that this expects multiple consecutive sections per
+                    # group name. For group names that are fragmented, we'll have
+                    # to enter those in one by one.
+                    last_group_name = stripped_line
+                    continue
+            else:
+                # I don't like this repetition
+                last_group_name = stripped_line
                 continue
 
             sections.append({
