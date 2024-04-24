@@ -247,22 +247,11 @@ class PageArtefact(models.Model):
         abstract = True
 
     def get_author_data(self):
-        """Returns the mode and authors list (needed for
+        """Returns the is_custom toggle status and authors list (needed for
         populating ArtefactAuthorForm)"""
-        authors = []
-
-        if self.authors.count():
-            if self.has_default_authors():
-                mode = 'default'
-            else:
-                mode = 'custom'
-                authors = self.authors.all()
-        else:
-            mode = 'none'
-
         return {
-            'mode': mode,
-            'authors': authors,
+            'is_custom': not self.has_default_authors(),
+            'authors': self.authors.all(),
         }
 
     @property

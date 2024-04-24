@@ -123,21 +123,23 @@
                     </div>
                 </div>
             </div>
-            <div class="two wide column">
-                {% with error=author_form.mode.errors %}
-                <div class="{% if error %}error{% endif %} field"
-                     {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                    <label>Author mode</label>
-                    {{ author_form.mode }}
-                </div>
-                {% endwith %}
-            </div>
             <div class="six wide column">
                 <div class="field">
                     <label>Author(s)</label>
                     {{ author_form.authors }}
                 </div>
             </div>
+            {% with error=author_form.is_custom.errors %}
+            <div class="two wide column">
+                <div class="{% if error %}error{% endif %} field"
+                 {% if error %}title="{{ error|join:"/" }}"{% endif %}>
+                    <label title="If false, the book's default authors will be inherited.">Custom author?</label>
+                    <div class="ui toggle checkbox">
+                        {{ author_form.is_custom }}
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
             {% if book.sections.count %}
             <div class="sixteen wide column">
                 {% with error=note_form.section.errors %}

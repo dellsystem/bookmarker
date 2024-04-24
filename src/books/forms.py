@@ -184,10 +184,10 @@ class NoteForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         note.save()
         self.save_m2m()
 
-        if author_form.cleaned_data['mode'] == 'default':
-            note.set_default_authors()
-        elif author_form.cleaned_data['mode'] == 'custom':
+        if author_form.cleaned_data['is_custom']:
             note.authors.add(*author_form.cleaned_data['authors'])
+        else:
+            note.set_default_authors()
 
         return note
 
@@ -220,7 +220,6 @@ class SectionForm(forms.ModelForm, PageNumberForm):
         else:
             self.fields.pop('related_to')
 
-
     def save(self, author_form):
         """Convert the string 'page' input into an integer (and set in_preface
         accordingly)."""
@@ -243,26 +242,18 @@ class SectionForm(forms.ModelForm, PageNumberForm):
         section.save()
         self.save_m2m()
 
-        # Set the authors according to author_form. If the mode is 'none', we
-        # don't need to do anything since the section has no authors by
-        # default.
-        if author_form.cleaned_data['mode'] == 'default' and section.book.details:
-            section.authors.add(*section.book.details.default_authors.all())
-        elif author_form.cleaned_data['mode'] == 'custom':
+        # Set the authors according to author_form. If not custom, default to
+        # the book's default authors (if any).
+        if author_form.cleaned_data['is_custom']:
             section.authors.add(*author_form.cleaned_data['authors'])
+        elif section.book.details:
+            section.authors.add(*section.book.details.default_authors.all())
 
         return section
 
 
 class ArtefactAuthorForm(forms.Form):
-    mode = forms.ChoiceField(
-        choices=(
-            ('default', 'Default'),
-            ('custom', 'Custom'),
-            ('none', 'None'),
-        ),
-        widget=forms.Select,
-    )
+    is_custom = forms.BooleanField(required=False)
     authors = forms.ModelMultipleChoiceField(
         Author.objects.all(),
         required=False,

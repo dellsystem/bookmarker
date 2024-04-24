@@ -101,9 +101,9 @@ class TermOccurrenceForm(forms.ModelForm, SectionChoiceForm, PageNumberForm):
         occurrence.save()
         self.save_m2m()
 
-        if author_form.cleaned_data['mode'] == 'default':
-            occurrence.set_default_authors()
-        elif author_form.cleaned_data['mode'] == 'custom':
+        if author_form.cleaned_data['is_custom']:
             occurrence.authors.add(*author_form.cleaned_data['authors'])
+        else:
+            occurrence.set_default_authors()
 
         return occurrence

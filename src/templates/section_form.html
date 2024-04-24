@@ -37,12 +37,14 @@
                     {{ author_form.authors }}
                 </div>
             </div>
-            {% with error=author_form.mode.errors %}
+            {% with error=author_form.is_custom.errors %}
             <div class="two wide column">
                 <div class="{% if error %}error{% endif %} field"
                  {% if error %}title="{{ error|join:"/" }}"{% endif %}>
-                    <label>Author mode</label>
-                    {{ author_form.mode }}
+                    <label title="If false, the book's default authors will be inherited.">Custom author?</label>
+                    <div class="ui toggle checkbox">
+                        {{ author_form.is_custom }}
+                    </div>
                 </div>
             </div>
             {% endwith %}

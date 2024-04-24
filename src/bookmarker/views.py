@@ -346,10 +346,12 @@ def add_section(request, slug):
         )
 
         # If the book is an edited collection, set the author mode to custom.
-        author_initial = {}
+        is_custom_author = False
         if book.details and book.details.is_edited or not book.details:
-            author_initial['mode'] = 'custom'
-        author_form = ArtefactAuthorForm(prefix='author', initial=author_initial)
+            is_custom_author = True
+        author_form = ArtefactAuthorForm(prefix='author', initial={
+            'is_custom': is_custom_author
+        })
 
     sections = book.sections.prefetch_related(
         'authors', 'book__details__default_authors',
@@ -465,6 +467,9 @@ def edit_occurrence(request, occurrence_id):
             instance=occurrence.term,
             prefix='term',
         )
+
+        # The is_custom toggle field will be true only if the term has different
+        # authors from the book default.
         author_form = ArtefactAuthorForm(
             prefix='author',
             initial=occurrence.get_author_data(),
@@ -1208,7 +1213,7 @@ def edit_section(request, section_id):
             section.book, request.POST, instance=section, prefix='section'
         )
         author_form = ArtefactAuthorForm(
-            request.POST, prefix='author',
+            request.POST, prefix='author'
         )
         if section_form.is_valid() and author_form.is_valid():
             section = section_form.save(author_form)
@@ -1238,6 +1243,8 @@ def edit_section(request, section_id):
             }
         )
 
+        # The is_custom toggle field will be true only if the section has different
+        # authors from the book default.
         author_form = ArtefactAuthorForm(
             prefix='author',
             initial=section.get_author_data(),
@@ -1621,7 +1628,8 @@ def edit_note(request, note_id):
                 'page_number': note.get_page_display(),
             }
         )
-
+        # The is_custom toggle field will be true only if the note has different
+        # authors from the book default.
         author_form = ArtefactAuthorForm(
             prefix='author',
             initial=note.get_author_data(),
