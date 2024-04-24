@@ -224,7 +224,7 @@
         {% endfor %}
     {% endif %}
     {% include "pagination.html" with items=paged_results mode=mode query=query only %}
-{% else %}
+{% elif mode %}
     <div class="ui message">
         No {{ mode }} found
     </div>
