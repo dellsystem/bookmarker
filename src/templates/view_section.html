@@ -128,6 +128,13 @@
     </div>
 </div>
 
+{% if section.related_to %}
+<h4 class="ui header">
+Related section: <a href="{{ section.related_to.get_absolute_url }}">{{ section.related_to }}</a>
+</h4>
+{% endif %}
+
+
 {% if section.summary %}
     <div class="ui message">
         {{ section.summary|markdownify|safe }}

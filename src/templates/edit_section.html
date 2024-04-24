@@ -27,7 +27,9 @@
 <div class="ui divider"></div>
 
 {% if section.related_to %}
-{{ section.related_to }}
+<h3 class="ui header">
+Related section: <a href="{{ section.related_to.get_absolute_url }}">{{ section.related_to }}</a>
+</h3>
 {% endif %}
 
 {% include 'section_form.html' with show_delete=1 %}
