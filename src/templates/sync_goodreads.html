@@ -56,6 +56,7 @@
       <th>End date</th>
       <th>Processed?</th>
       <th>Dates match?</th>
+      <th>Ignore?<th>
     </tr>
   </thead>
   <tbody>
@@ -98,6 +99,10 @@
         {{ book.dates_comment }}
       </td>
       {% endif %}
+
+      <td>
+        <a href="{% url 'admin:books_ignoredbook_add' %}?{{ book.ignore_link_params }}">Ignore</a>
+      </td>
     </tr>
     {% endfor %}
   </tbody>

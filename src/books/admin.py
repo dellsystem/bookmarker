@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.html import mark_safe
 
 from .models import GoodreadsAuthor, Author, Book, BookDetails, BookLocation, \
-                    Note, TagCategory, Tag, ReadingGoal, Section
+                    Note, TagCategory, Tag, ReadingGoal, Section, IgnoredBook
 
 
 class GoodreadsAuthorInline(admin.TabularInline):
@@ -74,3 +74,8 @@ class TagAdmin(admin.ModelAdmin):
                 s=obj,
             )
         )
+
+
+@admin.register(IgnoredBook)
+class IgnoredBookAdmin(admin.ModelAdmin):
+    list_display = ['description', 'reason']

@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 import urllib.parse
 
-from books.models import BookDetails, GoodreadsAuthor
+from books.models import BookDetails, GoodreadsAuthor, IgnoredBook
 
 
 RESOLUTION = '_SY475_'
@@ -108,6 +108,11 @@ def get_books(page):
             pub_date = row.select('.date_pub_edition .value')[0].text.strip()
             year = pub_date.split(',')[-1].strip()
 
+        ignore_link_params = urllib.parse.urlencode({
+            'goodreads_id': goodreads_id,
+            'description': title,
+        })
+
         book = {
             'id': goodreads_id,
             'url': BASE_URL + goodreads_url,
@@ -123,6 +128,7 @@ def get_books(page):
             'author_url': BASE_URL + author_url,
             'author_name': author_name,
             'author_id': author_id,
+            'ignore_link_params': ignore_link_params,
         }
         goodreads_book_ids.add(goodreads_id)
         goodreads_author_ids.add(author_id)
@@ -139,11 +145,17 @@ def get_books(page):
     for a in author_query:
         author_dict[a.goodreads_id] = a.author
 
+    # Figure out which books need to be ignored
+    ignored_book_ids = set(IgnoredBook.objects.values_list('goodreads_id', flat=True))
+
     # Now go back through the books list to update the status
     # We only need to return books that are either not in the db or that have
     # some sort of mistake to be corrected.
     filtered_books = []
     for book in books:
+        if book['id'] in ignored_book_ids:
+            continue
+
         a = author_dict.get(book['author_id'])
         if a:
             book['author'] = a

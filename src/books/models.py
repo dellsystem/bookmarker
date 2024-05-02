@@ -626,3 +626,12 @@ class Note(SectionArtefact):
             subject=self.subject,
             book=self.book.title
         )
+
+
+class IgnoredBook(models.Model):
+    goodreads_id = models.CharField(max_length=20, db_index=True)
+    description = models.CharField(max_length=255)
+    reason = models.CharField(max_length=20, blank=True)  # eg 'audiobook'
+
+    def __str__(self):
+        return self.description
