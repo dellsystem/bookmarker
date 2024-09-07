@@ -1,6 +1,12 @@
+{% if details_form.errors or book_form.errors %}
+<div class="ui error message">
+    {{ details_form.errors }}
+    {{ book_form.errors }}
+</div>
+{% endif %}
+
 <form class="ui form" method="post">
     {% csrf_token %}
-    {{ details_form.errors }}
 
     {% if details_form %}
     <div class="ui segment">
@@ -130,8 +136,6 @@
         </div>
     </div>
     {% endif %}
-
-    {{ book_form.errors }}
 
     <div class="ui segment">
         {% with error=book_form.title.errors %}
