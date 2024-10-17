@@ -199,6 +199,7 @@ def get_books(page):
                 'image_url': book['image_url'],
                 'author_name': book['author_name'],
                 'author_url': book['author_url'],
+                'author_id': a.pk if a is not None else '',
                 'author_slug': a.slug if a is not None else '',
             })
 

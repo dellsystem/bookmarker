@@ -686,7 +686,10 @@ def add_book(request):
             'image_url': request.GET.get('image_url'),
             'slug': slug,
         })
+
         details_form = BookDetailsForm(initial={
+            'default_authors': request.GET.get('author_id'),
+            'authors': request.GET.get('author_id'),
             'goodreads_id': request.GET.get('id'),
             'link': request.GET.get('link'),
             'isbn': request.GET.get('isbn'),
