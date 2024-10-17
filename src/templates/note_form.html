@@ -4,7 +4,7 @@
 </div>
 {% endif %}
 <div class="ui segment">
-    <form class="ui form" method="post">
+    <form class="ui form" method="post" autocomplete="off">
         {% csrf_token %}
         {% if not book.has_pages %}
             <input type="hidden" name="note-page_number" value="1" />

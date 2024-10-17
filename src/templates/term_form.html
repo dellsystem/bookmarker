@@ -5,7 +5,7 @@
 </div>
 {% endif %}
 
-<form class="ui form" method="post">
+<form class="ui form" method="post" autocomplete="off">
     <div class="ui segment">
         {% csrf_token %}
         {% if term %}
