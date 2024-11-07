@@ -38,9 +38,10 @@ class TestMultipleSectionsForm(TestCase):
         text = """
         Preface x
         Introduction 1
-        1.One 7
-        2.Two Two 25
-        3.Three Three Three 35
+        1. One 7
+        2. Two Two 25
+        3. Three Three Three 35
+        4.1 Blah 45
         Conclusion 50
         """
         form = MultipleSectionsForm(data={'sections': text})
@@ -52,6 +53,7 @@ class TestMultipleSectionsForm(TestCase):
                 {'title': 'One', 'page_number': 7, 'in_preface': False, 'number': 1, 'group_name': None},
                 {'title': 'Two Two', 'page_number': 25, 'in_preface': False, 'number': 2, 'group_name': None},
                 {'title': 'Three Three Three', 'page_number': 35, 'in_preface': False, 'number': 3, 'group_name': None},
+                {'title': '4.1 Blah', 'page_number': 45, 'in_preface': False, 'number': None, 'group_name': None},
                 {'title': 'Conclusion', 'page_number': 50, 'in_preface': False, 'number': None, 'group_name': None},
             ],
             form.cleaned_data['sections'],

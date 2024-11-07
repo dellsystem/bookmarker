@@ -59,7 +59,7 @@ class MultipleSectionsForm(forms.Form):
             if number == 1 and i == 3:
                 break
 
-            number_string = '{}.'.format(number)
+            number_string = '{}. '.format(number)
             if section['title'].startswith(number_string):
                 section['title'] = section['title'][len(number_string):]
                 section['number'] = number
