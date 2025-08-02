@@ -6,7 +6,7 @@ cffi==1.15.1
 chardet==3.0.4
 charset-normalizer==2.0.4
 cryptography==43.0.1
-Django==5.1.1
+Django==5.2.4
 django-debug-toolbar==4.4.6
 -e git+https://github.com/dellsystem/django-language-field@5410f69a78291eb36c0ad3d8b9d9a6e160619df9#egg=django_language_field
 djangorestframework==3.15.2
@@ -22,6 +22,7 @@ python-dateutil==2.8.1
 pytz==2019.3
 rauth==0.7.3
 requests==2.32.3
+setuptools==75.2.0
 six==1.13.0
 sortedcontainers==2.4.0
 soupsieve==1.9.5
