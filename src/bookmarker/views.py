@@ -119,7 +119,7 @@ def view_books(request, book_type):
     ).annotate(
         num_terms=Count('terms', distinct=True),
         num_notes=Count('notes', distinct=True),
-    ).prefetch_related('details__default_authors', 'details__goals')
+    ).prefetch_related('details__authors', 'details__goals')
 
     books = {
         'new': all_books.filter(
