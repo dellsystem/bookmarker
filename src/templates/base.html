@@ -12,6 +12,16 @@
     <link rel="icon" href="/static/favicon-32.png" sizes="32x32">
     <link rel="icon" href="/static/favicon-16.png" sizes="32x32">
 
+    <!-- for fixing the site name in google search results -->
+    <script type="application/ld+json">
+    {
+      "@context" : "https://schema.org",
+      "@type" : "WebSite",
+      "name" : "Bookmarker",
+      "url" : "https://bookmarker.dellsystem.me/"
+    }
+    </script>
+
     <!-- opengraph tags below, including page-specific ones -->
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="website" />
