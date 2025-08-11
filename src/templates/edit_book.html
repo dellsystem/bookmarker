@@ -19,11 +19,19 @@
            <i class="edit icon"></i>
            Edit
         </a>
+        {% if book.details %}
         <a href="{% url 'admin:books_bookdetails_delete' book.details.pk %}"
            class="ui red icon button">
            <i class="edit icon"></i>
            Delete
         </a>
+        {% else %}
+        <a href="{% url 'admin:books_book_delete' book.pk %}"
+           class="ui red icon button">
+           <i class="edit icon"></i>
+           Delete
+        </a>
+        {% endif %}
     </div>
 </div>
 
