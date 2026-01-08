@@ -30,5 +30,5 @@ sqlparse==0.5.0
 terminaltables==3.1.0
 -e git+https://github.com/dellsystem/translate-term.git@e1a585826d64cb16c83d783a16b0e84d848bfc44#egg=translate_term
 typing_extensions==4.9.0
-urllib3==2.2.2
+urllib3==2.6.3
 xmltodict==0.12.0
