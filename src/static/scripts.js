@@ -103,7 +103,9 @@ function fixOcr(elementId) {
 function reformatSubject(elementId) {
     var field = document.getElementById(elementId);
     const subject = field.value.trim();
-    field.value = subject[0].toLowerCase() + subject.substring(1);
+    if (subject) {
+        field.value = subject[0].toLowerCase() + subject.substring(1);
+    }
 }
 
 function reformatQuote(elementId) {
