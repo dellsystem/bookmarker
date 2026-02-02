@@ -5,7 +5,7 @@ certifi==2024.8.30
 cffi==2.0.0
 chardet==3.0.4
 charset-normalizer==2.0.4
-cryptography==43.0.1
+cryptography==44.0.1
 Django==6.0.1
 django-debug-toolbar==4.4.6
 -e git+https://github.com/dellsystem/django-language-field@5410f69a78291eb36c0ad3d8b9d9a6e160619df9#egg=django_language_field
