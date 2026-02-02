@@ -1210,7 +1210,7 @@ def edit_section(request, section_id):
                 secondary_id=section.book.pk,
             )
             section.delete()
-            return redirect('home')
+            return redirect(section.book)
 
         section_form = SectionForm(
             section.book, request.POST, instance=section, prefix='section'
