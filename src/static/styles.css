@@ -136,7 +136,8 @@ a.keyboard-navigation:focus {
 
 /* when the viewport is small enough that tags stack vertically, there is a
  * tiny bug (in semantic) where there is no vertical spacing between tags.
- * we can fix this by adding a small margin (NOT padding) */
-.ui.label + .ui.label {
-    margin-top: 5px
+ * we can fix this by adding a small margin (NOT padding).
+ * we have to do it this way and not by adding a top margin to fix #246. */
+.ui.label {
+    margin-bottom: 5px;
 }
