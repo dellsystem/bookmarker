@@ -108,7 +108,7 @@ class BookDetails(models.Model):
         BookLocation,
         blank=True,
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='books')
     goals = models.ManyToManyField(
         ReadingGoal, blank=True, related_name='books'
