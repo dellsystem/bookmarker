@@ -2,22 +2,15 @@
 
 
 {% with count=results|lookup:key|length %}
-<div class="ui two column grid">
-    <div class="column">
-        <h3>{{ key|title }} ({{ count }})</h3>
-    </div>
-    {% if count %}
-    <div class="right aligned column">
-        {% if mode == key %}
-        <a href="{{ qs }}" class="ui blue icon button">
-            <i class="large minus icon"></i>
-        </a>
-        {% else %}
-        <a href="{{ qs }}&mode={{ key }}" class="ui basic blue icon button">
-            <i class="large plus icon"></i>
-        </a>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
+  {% if mode == key %}
+  <a href="{{ qs }}" class="ui fluid blue right labeled icon button">
+    {{ key|title }} ({{ count }})
+    <i class="minus icon"></i>
+  </a>
+{% else %}
+  <a href="{{ qs }}&mode={{ key }}" class="ui fluid basic blue right labeled icon button">
+    {{ key|title }} ({{ count }})
+    <i class="plus icon"></i>
+  </a>
+  {% endif %}
 {% endwith %}
