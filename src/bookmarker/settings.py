@@ -191,3 +191,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField' # needed in 3.2
 CSRF_TRUSTED_ORIGINS = ['https://bookmarker.dellsystem.me'] # needed for https
 CSRF_ALLOWED_ORIGINS = ['https://bookmarker.dellsystem.me']
 CSRF_ORIGINS_WHITELIST = ['https://bookmarker.dellsystem.me']
+
+# For simulating an authenticated request to goodreads
+GOODREADS_AT_COOKIE = os.environ.get('GOODREADS_AT_COOKIE')
+GOODREADS_UBID_COOKIE = os.environ.get('GOODREADS_UBID_COOKIE')

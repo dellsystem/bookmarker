@@ -3,6 +3,8 @@ from datetime import datetime
 import requests
 import urllib.parse
 
+from django.conf import settings
+
 from books.models import BookDetails, GoodreadsAuthor, IgnoredBook
 
 
@@ -55,10 +57,17 @@ BASE_URL = "https://www.goodreads.com"
 READ_URL = BASE_URL + "/review/list/{}?shelf=read&sort=date_read".format(USER_ID)
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
 def get_books(page):
+    """This is a horrible and obviously temporary workaround but I guess Goodreads just changed their website to require auth for the review list page. So we fake it by sending some cookies to simulate being logged in. I just downloaded some subset from my current active session which seems to work. I think the earliest one expires Oct 24 2026. Whatever, I'll deal with it then.
+    Not checked into source control for obvious reasons. Must be added as an environment variable.
+    """
+    cookies = {
+        'at-main': settings.GOODREADS_AT_COOKIE,
+        'ubid-main': settings.GOODREADS_UBID_COOKIE,
+    }
     url = '{}&page={}'.format(READ_URL, page)
     response = requests.get(url, headers={
         'User-Agent': USER_AGENT  # we just need a fake user agent or it 403s
-    })
+    }, cookies=cookies)
     response.raise_for_status()
     soup = bs4.BeautifulSoup(response.content.decode(), "html.parser")
     rows = soup.select("table#books tbody tr")
