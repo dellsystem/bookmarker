@@ -22,7 +22,7 @@ python-dateutil==2.8.1
 pytz==2019.3
 rauth==0.7.3
 requests==2.32.3
-setuptools==75.2.0
+setuptools==78.1.1
 six==1.13.0
 sortedcontainers==2.4.0
 soupsieve==1.9.5
