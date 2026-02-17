@@ -641,17 +641,16 @@ def add_book(request):
             details_form = None
 
         if book_form.is_valid():
-            book = book_form.save()
-
-            Action.objects.create(
-                category='book',
-                primary_id=book.pk,
-                details=book.title,
-                verb='added',
-            )
-
             if details_form:
                 if details_form.is_valid():
+                    book = book_form.save()
+
+                    Action.objects.create(
+                        category='book',
+                        primary_id=book.pk,
+                        details=book.title,
+                        verb='added',
+                    )
                     details = details_form.save()
                     book.details = details
                     book.save()
@@ -663,6 +662,16 @@ def add_book(request):
                         'Error with details form'
                     )
             else:
+                # I don't love that this is repeated but it's the easiest way
+                # to make the operation atomic (in case of detail error)
+                book = book_form.save()
+
+                Action.objects.create(
+                    category='book',
+                    primary_id=book.pk,
+                    details=book.title,
+                    verb='added',
+                )
                 messages.error(request, 'Does not have details form')
                 messages.success(request, 'Added book')
                 return redirect(book)
