@@ -117,9 +117,9 @@
         <div class="ui fields">
             <div class="four wide field only-if-read">
                 <label>Rating</label>
-                {% if book.details %}
                 <div class="ui heart rating editable-rating" data-rating="{{ details_form.rating.value }}">
                 </div>
+                {% if book.details %}
                 <input type="hidden" id="rating-input" name="rating" value="{{ book.details.rating }}" />
                 {% endif %}
             </div>

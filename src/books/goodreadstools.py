@@ -122,6 +122,12 @@ def get_books(page):
             'description': title,
         })
 
+        rating = row.select('.rating .stars')[0]
+        if rating:
+            rating = rating.get('data-rating')
+        else:
+            rating = None
+
         book = {
             'id': goodreads_id,
             'url': BASE_URL + goodreads_url,
@@ -133,6 +139,7 @@ def get_books(page):
             'num_pages': num_pages,
             'image_url': image_url,
             'year': year, # convert this to number? maybe
+            'rating': rating,
             # TODO: author, publisher name
             'author_url': BASE_URL + author_url,
             'author_name': author_name,
@@ -201,6 +208,7 @@ def get_books(page):
                 'link': book['url'],  # todo: url to link. also prepend site
                 'isbn': book['isbn'],
                 'year': book['year'],
+                'rating': book['rating'],
                 'format': book['format'],
                 'num_pages': book['num_pages'],
                 'start_date': book['start_date'],

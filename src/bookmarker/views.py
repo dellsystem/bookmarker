@@ -703,6 +703,7 @@ def add_book(request):
             'link': request.GET.get('link'),
             'isbn': request.GET.get('isbn'),
             'year': request.GET.get('year'),
+            'rating': request.GET.get('rating'),
             'format': request.GET.get('format'),
             'num_pages': request.GET.get('num_pages'),
             'start_date': request.GET.get('start_date'),
