@@ -78,11 +78,14 @@
     {% endif %}
     <div class="right item">
         <form action="{% url 'search' %}">
+            {% if book %}
+            <input type="hidden" name="book" value="{{ book.id }}" />
+            {% endif %}
             <div class="ui search" id="site-search">
                 <div class="ui icon input">
                     <input name="q" type="text" placeholder="Search..."
                            class="prompt"
-                           value="{% if query %}{{ query }}{% endif %}">
+                           value="{% if q %}{{ q }}{% endif %}">
                     <i class="search icon"></i>
                 </div>
             </div>

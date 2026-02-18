@@ -1403,15 +1403,30 @@ def search_json(request):
 
 
 def search(request):
-    query = request.GET.get('q', '')
+    q = request.GET.get('q', '')
+
+    MODES = ('notes', 'terms', 'sections', 'books')
+    # If the query starts with any of the modes, followed by :, use that.
+    # If one of the modes is specified by the query, and the mode is not 'book',
+    # get the book PK (from a hidden input) if there is one.
+    if ':' in q:
+        split_query = q.split(':')
+        query_mode = split_query[0]
+        query = ''.join(split_query[1:])
+        if query_mode in MODES:
+            mode = query_mode
+        else:
+            # TODO: better error handling? show error, or fail silently?
+            mode = None
+    else:
+        query = q  # no advanced search operators
+        mode = request.GET.get('mode')
+        if mode not in MODES:
+            mode = None
+
     if len(query) < 3:
         messages.error(request, 'Query must be at least 3 characters')
         return redirect('home')
-
-    MODES = ('notes', 'terms', 'sections', 'books')
-    mode = request.GET.get('mode')
-    if mode not in MODES:
-        mode = None
 
     ordering = {
         'notes': 'subject',
@@ -1588,6 +1603,7 @@ def search(request):
         'paged_results': paged_results,
         'page_number': page_number,
         'query': query,
+        'q': q,
         'mode': mode,
         'modes': MODES,
         'qs': '?' + urlencode({'q': query}),
