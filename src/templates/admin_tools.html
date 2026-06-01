@@ -1,69 +1,81 @@
 <div class="ui segment">
-    <div class="ui six mini statistics">
-        <div class="statistic">
-            <div class="value">
-                {{ books.new.count }}
-            </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'new' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b n"
-                    data-label="View new books">New</a>
-            </div>
-        </div>
-        <div class="statistic">
-            <div class="value">
-                {{ books.incomplete.count }}
-            </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'incomplete' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b i"
-                    data-label="View incomplete books">Incomplete</a>
+    <div class="ui six column grid center aligned doubling">
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.new.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'new' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b n"
+                        data-label="View new books">New</a>
+                </div>
             </div>
         </div>
-        <div class="statistic">
-            <div class="value">
-                {{ books.unread.count }}
-            </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'unread' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b u"
-                    data-label="View unread books">Unread</a>
-            </div>
-        </div>
-        <div class="statistic">
-            <div class="value">
-                {{ books.publications.count }}
-            </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'publications' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b p"
-                    data-label="View publications">Publications</a>
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.incomplete.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'incomplete' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b i"
+                        data-label="View incomplete books">Incomplete</a>
+              </div>
             </div>
         </div>
-        <div class="statistic">
-            <div class="value">
-                {{ books.complete.count }}
-            </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'complete' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b c"
-                    data-label="View complete books">Complete</a>
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.unread.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'unread' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b u"
+                        data-label="View unread books">Unread</a>
+                </div>
             </div>
         </div>
-        <div class="statistic">
-            <div class="value">
-                {{ books.ignored.count }}
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.publications.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'publications' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b p"
+                        data-label="View publications">Publications</a>
+                </div>
             </div>
-            <div class="label">
-                <a href="{% url 'view_books' 'ignored' %}"
-                    class="keyboard-shortcut"
-                    data-shortcut="b g"
-                    data-label="View ignored books">Ignored</a>
+        </div>
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.complete.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'complete' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b c"
+                        data-label="View complete books">Complete</a>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="ui mini statistic">
+                <div class="value">
+                    {{ books.ignored.count }}
+                </div>
+                <div class="label">
+                    <a href="{% url 'view_books' 'ignored' %}"
+                        class="keyboard-shortcut"
+                        data-shortcut="b g"
+                        data-label="View ignored books">Ignored</a>
+                </div>
             </div>
         </div>
     </div>
