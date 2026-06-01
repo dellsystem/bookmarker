@@ -30,8 +30,15 @@ just have it echo the <title> tag.
 {% endblock %}
 
 {% block content %}
+{% comment %}
+This is ugly, but we're only using the grid if buttons need to be shown on the right
+(for unprocessed books, where the user is logged in). Otherwise no grid.
+{% endcomment %}
+
+{% if request.user.is_staff and not book.is_processed %}
 <div class="ui stackable grid">
     <div class="twelve wide column">
+{% endif %}
         <h2 class="ui header">
             {{ book.title }}
             {% if request.user.is_staff %}
@@ -58,10 +65,10 @@ just have it echo the <title> tag.
             </div>
             {% endif %}
         </h2>
+
+    {% if request.user.is_staff and not book.is_processed %}
     </div>
-    {% if request.user.is_staff %}
     <div class="four wide center aligned column">
-        {% if not book.is_processed %}
         <form method="post" action="{% url 'mark_complete' book.id %}">
         {% csrf_token %}
         {% if not book.completed_sections %}
@@ -99,10 +106,10 @@ just have it echo the <title> tag.
             </button>
         {% endif %}
         </form>
-        {% endif %}
     </div>
-    {% endif %}
 </div>
+{% endif %}
+
 <div class="ui divider"></div>
 {% if book.summary %}
     <div class="ui message">
