@@ -72,10 +72,15 @@ $('.modal-keyboard-shortcut').each(function () {
     bindModalShortcut(shortcut, label, this);
 });
 
-$('.keyboard-shortcut').each(function () {
-    const label = $(this).data('label');
-    const shortcut = $(this).data('shortcut');
-    if (bindClickShortcut(shortcut, label, this)) {
-        $(this).popup({title: shortcut}).popup('show');
-    }
-});
+/* Only show the keyboard shortcut popups if it's NOT a mobile browser.
+   It doesn't seem like there's a good way to detect this so as a proxy
+   we're checking the width of the screen. */
+if (screen.width > 1000) {
+    $('.keyboard-shortcut').each(function () {
+        const label = $(this).data('label');
+        const shortcut = $(this).data('shortcut');
+        if (bindClickShortcut(shortcut, label, this)) {
+            $(this).popup({title: shortcut}).popup('show');
+        }
+    });
+}
