@@ -54,7 +54,7 @@ def _parse_date(field):
 
 USER_ID = '60292716-wendy-liu'
 BASE_URL = "https://www.goodreads.com"
-READ_URL = BASE_URL + "/review/list/{}?shelf=read&sort=date_read".format(USER_ID)
+READ_URL = BASE_URL + "/review/list/{}?shelf=read&sort=date_read&order=d".format(USER_ID)
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
 def get_books(page):
     """This is a horrible and obviously temporary workaround but I guess Goodreads just changed their website to require auth for the review list page. So we fake it by sending some cookies to simulate being logged in. I just downloaded some subset from my current active session which seems to work. I think the earliest one expires Oct 24 2026. Whatever, I'll deal with it then.
@@ -105,6 +105,9 @@ def get_books(page):
             end_date = None
 
         book_format = row.select('.format .value')[0].text.strip()
+        # Strip the '[edit]' which appears to be showing up
+        if book_format.endswith('[edit]'):
+            book_format = book_format[:-6].strip()
         isbn = row.select('.isbn13 .value')[0].text.strip()
         num_pages = _parse_num_pages(row.select('.num_pages .value')[0].text)
         image_url = _parse_image_url(row.select('img')[0]['src'])
