@@ -83,7 +83,7 @@
             {% endif %}
             <div class="ui search" id="site-search">
                 <div class="ui icon input">
-                    <input name="q" type="text" placeholder="Search..."
+                    <input name="q" type="text" placeholder="{% if book %}notes: terms: sections:{% else %}Search{% endif %}"
                            class="prompt"
                            value="{% if q %}{{ q }}{% endif %}">
                     <i class="search icon"></i>
