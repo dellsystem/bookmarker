@@ -92,5 +92,4 @@ class TermOccurrence(SectionArtefact):
                 # Only need to highlight on one term.
                 break
 
-        return markdown.markdown(q, extensions=['superscript'],
-            smart_emphasis=False)
+        return markdown.markdown(q, smart_emphasis=False)
