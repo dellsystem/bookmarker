@@ -5,24 +5,44 @@ this horrific app because I know I will forget something important at a
 crucial juncture. You do not need to read this if you're merely curious about
 how this app works. Please do not read this.
 
-_New deployment as of April 26, 2023_
+_New deployment as of May 31, 2026_
 
 Source material:
 
 * https://daveceddia.com/deploy-git-repo-to-server/
 * https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-22-04#creating-the-postgresql-database-and-user
 
+Amendments:
+
+* Make sure to run `ALTER DATABASE bookmarker OWNER TO bookmarker` in postgres before doing migrations
+* Add `source /root/bookmarker/env/bin/activate` to bash_login
+* In addition to the pip packages to install, run `pip install -r requirements.txt` from within /var/www/bookmarker
+* `apt install rclone postfix` (for backups and mail; install postfix locally)
+
+## Migrating data
+
+Get the data on the old server via the following commands
+```
+python src/manage.py dumpdata admin auth contenttypes --natural-foreign -o backups/admin-auth-contenttypes.json.gz
+python src/manage.py dumpdata activity books vocab --natural-foreign -o backups/activity-books-vocab.json.gz
+```
+
+Transfer them over to the new server. Before loading them, make sure to delete the contenttypes to avoid a clash:
+
+```
+from django.contrib.contenttypes.models import ContentType
+ContentType.objects.all().delete()
+```
+
 ## Server details
 
-Running on a $12/month Digital Ocean droplet named 'bookmarker'. 2GB RAM,
-50GB disk. Probably overkill.
+Running on a $12/month Digital Ocean droplet named 'bookmarker'. 2GB RAM, 50GB disk. Probably overkill.
 
 Logging in as root. Using .ssh/config to simplify (IP address).
 
 ### Nginx
 
-conf file in /etc/nginx/sites-enabled/bookmarker [soft linked from
-sites-available]
+conf file in /etc/nginx/sites-enabled/bookmarker (soft linked from sites-available)
 
 ```
 server {
@@ -90,6 +110,8 @@ I added the following files to env/bin/activate:
 . variables
 export POSTGRES_PASSWORD
 export DJANGO_SECRET_KEY
+export GOODREADS_AT_COOKIE
+export GOODREADS_UBID_COOKIE
 ```
 
 and then env/bin/variables looks like this:
@@ -97,6 +119,8 @@ and then env/bin/variables looks like this:
 ```
 POSTGRES_PASSWORD='omitted'
 DJANGO_SECRET_KEY='omitted'
+GOODREADS_AT_COOKIE='omitted'
+GOODREADS_UBID_COOKIE='omitted'
 ```
 
 ### Postgres
@@ -123,6 +147,7 @@ Then I set up the rclone config file, located at ~/.config/rclone/rclone.conf:
 ```
 [digitalocean]
 type = s3
+provider = DigitalOcean
 env_auth = false
 access_key_id = [omitted]
 secret_access_key = [omitted]
@@ -141,7 +166,7 @@ Then I edited the crontab to say:
 
 ### Troubleshooting
 
-I installed postfix [local] for debugging cronjob errors:
+I installed postfix (local) for debugging cronjob errors:
 
 ```
 tail -f /var/mail/root
