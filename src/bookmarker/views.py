@@ -889,12 +889,17 @@ def view_all_notes(request):
         'authors', 'tags', 'section', 'section__authors', 'book__details__default_authors'
     ).order_by('book', 'added')
 
+    # Build the query string dict here
+    qs_dict = {}
+
     commented = request.GET.get('commented')
     if commented:
         notes = notes.exclude(comment='')
+        qs_dict['commented'] = '1'
     untagged = request.GET.get('untagged')
     if untagged:
         notes = notes.filter(tags=None)
+        qs_dict['untagged'] = 1
 
     author_pk = request.GET.get('author')
     try:
@@ -904,9 +909,7 @@ def view_all_notes(request):
 
     if author:
         notes = notes.filter(authors=author)
-        qs = '?' + urlencode({'author': author_pk})
-    else:
-        qs = ''
+        qs_dict['author'] = author_pk
 
     paginator = Paginator(notes, 10)
     page = request.GET.get('page')
@@ -922,7 +925,7 @@ def view_all_notes(request):
     context = {
         'notes': notes,
         'author': author,
-        'qs': qs,
+        'qs': '?' + urlencode(qs_dict) if qs_dict else '',
     }
 
     return render(request, 'view_all_notes.html', context)
