@@ -15,32 +15,40 @@
 
 {% block content %}
 <div class="ui grid">
-    <div class="thirteen wide column">
+    <div class="ten wide column">
         <h2>View all terms</h2>
     </div>
-    <div class="three wide column">
-        {% if flagged %}
-        <a href="{% if author %}?author={{ author }}{{% else %}?flagged{% endif %}"
-           class="ui fluid basic blue button">
-            Show all
-        </a>
-        {% else %}
-        <a href="?flagged=1{% if author %}&author={{ author }}{% endif %}"
-           class="ui fluid blue button">
-            Show flagged
-        </a>
-        {% endif %}
+    <div class="six wide column">
+        <div class="ui fluid buttons">
+          <a href="?mode=all{{ author_qs }}"
+             class="ui {%if not mode %}black{% endif %} button">
+              Show all
+          </a>
+          <a href="?mode=unsure{{ author_qs }}"
+             class="ui {% if mode == 'unsure' %}black{% endif %} button"
+             title="Only terms where the latest occurrence is not 'notable'">
+              Show unsure
+          </a>
+          <a href="?mode=flagged{{ author_qs }}"
+             class="ui {% if mode == 'flagged' %}black{% endif %} button">
+              Show flagged
+          </a>
+        </div>
     </div>
 </div>
 
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=terms author=author flagged=flagged only %}
+{% if author %}
+{% include "filter_banner.html" with obj=author %}
+{% endif %}
+
+{% include "pagination.html" with items=terms qs=pagination_qs only %}
 
 {% for term in terms %}
     {% include 'term_header.html' with term=term %}
 {% endfor %}
 
-{% include "pagination.html" with items=terms author=author flagged=flagged only %}
+{% include "pagination.html" with items=terms qs=qs only %}
 
 {% endblock %}

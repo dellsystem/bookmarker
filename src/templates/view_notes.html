@@ -30,7 +30,11 @@
 </div>
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=notes author=author only %}
+{% if author %}
+{% include "filter_banner.html" with obj=author %}
+{% endif %}
+
+{% include "pagination.html" with items=notes qs=qs only %}
 
 <div class="ui grid">
     {% for note in notes %}
@@ -38,6 +42,6 @@
     {% endfor %}
 </div>
 
-{% include "pagination.html" with items=notes author=author only %}
+{% include "pagination.html" with items=notes qs=qs only %}
 
 {% endblock %}

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import F, Q, Count
+from django.db.models import F, Q, Count, Max
 from django.db.models.functions import Lower
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -25,7 +25,7 @@ from books.models import Book, Author, Note, Tag, Section, \
 from bookmarker.forms import SearchFilterForm
 from vocab.api import lookup_term
 from vocab.forms import TermForm, TermOccurrenceForm
-from vocab.models import Term, TermOccurrence
+from vocab.models import Term, TermOccurrence, TermCategory
 
 
 class LoginView(auth_views.LoginView):
@@ -104,6 +104,7 @@ def home(request):
         (c, CATEGORIES[c]['icon']) for c in FILTER_CATEGORIES
     ]
     context = {
+        'qs': '?' + urlencode({'mode': mode}),
         'books': books,
         'actions': actions,
         'paged_actions': paged_actions,
@@ -903,6 +904,9 @@ def view_all_notes(request):
 
     if author:
         notes = notes.filter(authors=author)
+        qs = '?' + urlencode({'author': author_pk})
+    else:
+        qs = ''
 
     paginator = Paginator(notes, 10)
     page = request.GET.get('page')
@@ -918,6 +922,7 @@ def view_all_notes(request):
     context = {
         'notes': notes,
         'author': author,
+        'qs': qs,
     }
 
     return render(request, 'view_all_notes.html', context)
@@ -938,6 +943,9 @@ def view_notes(request, slug):
 
     if author:
         notes = notes.filter(authors=author)
+        qs = '?' + urlencode({'author': author_pk})
+    else:
+        qs = ''
 
     paginator = Paginator(notes, 10)
     page = request.GET.get('page')
@@ -954,6 +962,7 @@ def view_notes(request, slug):
         'book': book,
         'notes': notes,
         'author': author,
+        'qs': qs,
     }
 
     return render(request, 'view_notes.html', context)
@@ -1154,9 +1163,24 @@ def view_all_terms(request):
         if author:
             terms = terms.filter(occurrences__authors=author)
 
-    flagged = request.GET.get('flagged')
-    if flagged:
+    MODES = ('flagged', 'unsure')
+    mode = request.GET.get('mode', '')
+    if mode not in MODES:
+        mode = ''
+
+    if mode == 'flagged':
         terms = terms.filter(flagged=True)
+    elif mode == 'unsure':
+        # Show only terms where the most recent usage is not 'notable'
+        # Annoying that Django makes this so difficult w/o adding a field
+        notable_category = TermCategory.objects.get(name='notable')
+        terms = terms.annotate(
+            latest_occurrence_timestamp=Max('occurrences__added')
+        ).filter(
+            occurrences__added=F('latest_occurrence_timestamp')
+        ).exclude(
+            occurrences__category=notable_category,
+        )
 
     paginator = Paginator(terms, 25)
     page = request.GET.get('page')
@@ -1169,8 +1193,13 @@ def view_all_terms(request):
         # If page is out of range (e.g. 9999), deliver last page of results.
         terms = paginator.page(paginator.num_pages)
 
+    # kinda ugly ... ought to standardize this somehow
+    mode_qs = '?' + urlencode({'mode': mode})
+    author_qs = '&' + urlencode({'author': author_pk}) if author_pk else ''
     context = {
-        'flagged': flagged,
+        'author_qs': author_qs,
+        'pagination_qs': mode_qs + author_qs,
+        'mode': mode,
         'terms': terms,
         'author': author,
     }
@@ -1417,12 +1446,12 @@ def search(request):
             mode = query_mode
         else:
             # TODO: better error handling? show error, or fail silently?
-            mode = None
+            mode = ''
     else:
         query = q  # no advanced search operators
-        mode = request.GET.get('mode')
+        mode = request.GET.get('mode', '')
         if mode not in MODES:
-            mode = None
+            mode = ''
 
     if len(query) < 3:
         messages.error(request, 'Query must be at least 3 characters')
@@ -1440,9 +1469,9 @@ def search(request):
         'notes': ('added', 'subject', 'book', 'section'),
         'terms': ('added', 'term', 'book'),
         'sections': ('title', 'book'),
-        'books': ('title', 'pk'),
+        'books': ('title', 'id'),
     }
-    sort = request.GET.get('sort')
+    sort = request.GET.get('sort', '')
     if mode and sort in SORTS[mode]:
         ordering[mode] = sort
 
@@ -1494,6 +1523,8 @@ def search(request):
         'terms': ('author', 'book', 'section', 'category'),
         'sections': ('author', 'book', 'min_rating', 'max_rating'),
     }
+    # To simplify the process of matching names to fields. Annoyingly, some fields
+    # on the Book model are different so we have to hardcode them below.
     filter_fields = {
         'author': 'authors',
         'book': 'book',
@@ -1502,6 +1533,13 @@ def search(request):
         'min_rating': 'rating__gte',
         'max_rating': 'rating__lte',
     }
+    book_filter_fields = {
+        'author': 'details__default_authors',
+        'min_rating': 'details__rating__gte',
+        'max_rating': 'details__rating__lte',
+    }
+    filters_dict = {}  # the key-value pairs, needed for building the query string
+    filters = {}  # the filter objects
 
     if mode:
         # Now do the prefetching (only for expansion mode).
@@ -1559,11 +1597,14 @@ def search(request):
 
         # Apply the filters.
         if filter_form.is_valid():
-            filters = {}
             for filter_key in mode_filters[mode]:
                 if filter_form.cleaned_data[filter_key]:
                     filter_field = filter_fields[filter_key]
+                    # The Book model uses some different field names.
+                    if mode == 'books' and filter_key in book_filter_fields:
+                        filter_field = book_filter_fields[filter_key]
                     filters[filter_field] = filter_form.cleaned_data[filter_key]
+                    filters_dict[filter_key] = filter_form.data[filter_key]
 
             if filters:
                 # Make sure to prefetch again for the filtered queryset.
@@ -1596,6 +1637,13 @@ def search(request):
                 page_number = 1
             paged_results = paginator.get_page(page_number)
 
+    # Prepare some query strings to make linking easier. Kinda ugly but works for now.
+    qs = '?' + urlencode({'q': query})  # the basic one, plus for highlighting on linked pages
+    mode_qs = '&' + urlencode({'mode': mode}) if mode else ''
+    sort_qs = '&' + urlencode({'sort': sort}) if sort else ''
+    page_qs = '&' + urlencode({'page': sort})
+    filters_qs = '&' + urlencode(filters_dict) if filters_dict else ''
+
     context = {
         'sort': ordering.get(mode),  # use the implied sort, not the input
         'sort_options': SORTS.get(mode),
@@ -1606,8 +1654,13 @@ def search(request):
         'q': q,
         'mode': mode,
         'modes': MODES,
-        'qs': '?' + urlencode({'q': query}),
         'filter_form': filter_form,
+        'qs': qs,
+        'mode_qs': mode_qs,
+        'sort_qs': sort_qs,
+        'filters_qs': filters_qs,
+        'page_qs': page_qs,
+        'pagination_qs': qs + mode_qs + sort_qs + filters_qs,  # all sans page
     }
 
     return render(request, 'search.html', context)

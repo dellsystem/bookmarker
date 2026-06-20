@@ -57,5 +57,6 @@ class SearchFilterForm(forms.Form):
     )
     category = forms.ModelChoiceField(
         TermCategory.objects.all(),
-        required=False
+        required=False,
+        widget=DynamicSelect(),
     )

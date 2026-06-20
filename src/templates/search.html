@@ -18,7 +18,7 @@
         <div class="ui compact menu">
             <div class="header item">Sort by</div>
             {% for sort_option in sort_options %}
-            <a href="{{ qs }}&mode={{ mode }}&sort={{ sort_option }}"
+            <a href="search{{ qs }}{{ mode_qs }}{{ filters_qs }}{{ page_qs }}&sort={{ sort_option }}"
                class="{% if sort_option == sort %}active {% endif %}item">
                 {{ sort_option }}
             </a>
@@ -204,7 +204,7 @@
 </div>
 
 {% if paged_results %}
-    {% include "pagination.html" with items=paged_results mode=mode query=query only %}
+    {% include "pagination.html" with items=paged_results mode=mode query=query filter_objects=filter_objects qs=pagination_qs only %}
     {% if mode == 'notes' %}
         {% include 'note_list_with_books.html' with notes=paged_results.object_list highlight=query %}
     {% elif mode == 'terms' %}
@@ -223,7 +223,7 @@
             {% include 'book_header.html' with book=book highlight=query only %}
         {% endfor %}
     {% endif %}
-    {% include "pagination.html" with items=paged_results mode=mode query=query only %}
+    {% include "pagination.html" with items=paged_results mode=mode query=query filter_objects=filter_objects qs=pagination_qs only %}
 {% elif mode %}
     <div class="ui message">
         No {{ mode }} found

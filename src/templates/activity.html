@@ -32,7 +32,7 @@
     </div>
 </div>
 
-{% include "pagination.html" with items=paged_actions mode=mode only %}
+{% include "pagination.html" with items=paged_actions qs=qs only %}
 <div class="ui large feed">
     {% for action, show_book in actions %}
     <div class="event">
@@ -56,5 +56,5 @@
     </div>
     {% endfor %}
 </div>
-{% include "pagination.html" with items=paged_actions mode=mode only %}
+{% include "pagination.html" with items=paged_actions qs=qs only %}
 {% endblock %}

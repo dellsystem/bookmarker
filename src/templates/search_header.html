@@ -3,12 +3,12 @@
 
 {% with count=results|lookup:key|length %}
   {% if mode == key %}
-  <a href="{{ qs }}" class="ui fluid blue right labeled icon button">
+  <a href="search{{ qs }}" class="ui fluid blue right labeled icon button">
     {{ key|title }} ({{ count }})
     <i class="minus icon"></i>
   </a>
 {% else %}
-  <a href="{{ qs }}&mode={{ key }}" class="ui fluid basic blue right labeled icon button">
+  <a href="search{{ qs }}&mode={{ key }}" class="ui fluid basic blue right labeled icon button">
     {{ key|title }} ({{ count }})
     <i class="plus icon"></i>
   </a>

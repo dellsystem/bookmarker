@@ -17,10 +17,14 @@
 
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=notes author=author only %}
+{% if author %}
+{% include "filter_banner.html" with obj=author %}
+{% endif %}
+
+{% include "pagination.html" with items=notes qs=qs only %}
 
 {% include 'note_list_with_books.html' with notes=notes %}
 
-{% include "pagination.html" with items=notes author=author only %}
+{% include "pagination.html" with items=notes qs=qs only %}
 
 {% endblock %}

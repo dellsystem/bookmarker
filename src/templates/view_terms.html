@@ -22,7 +22,11 @@
 </div>
 <div class="ui divider"></div>
 
-{% include "pagination.html" with items=terms author=author only %}
+{% if author %}
+{% include "filter_banner.html" with obj=author %}
+{% endif %}
+
+{% include "pagination.html" with items=terms only %}
 
 <div class="ui grid">
     {% for term in terms %}
@@ -30,6 +34,6 @@
     {% endfor %}
 </div>
 
-{% include "pagination.html" with items=terms author=author only %}
+{% include "pagination.html" with items=terms only %}
 
 {% endblock %}

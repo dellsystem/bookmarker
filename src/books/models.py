@@ -118,7 +118,7 @@ class BookDetails(models.Model):
 
     class Meta:
         verbose_name_plural = 'Book details'
-    
+
     @property
     def is_overdue(self):
         return date.today() > self.due_date
@@ -142,6 +142,9 @@ class Book(models.Model):
     comments = models.TextField(blank=True)  # temporary private notes
     source_url = models.URLField(blank=True)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -295,7 +298,7 @@ class Section(PageArtefact):
         help_text='Does this section have one of those wide post-it tabs')
 
     class Meta:
-        ordering = ['-in_preface', 'page_number']
+        ordering = ['book__title', '-in_preface', 'page_number']
 
     def __str__(self):
         return "{book} - {title}".format(
