@@ -1,6 +1,7 @@
 import collections
 import datetime
 import random
+import re
 
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
@@ -1479,28 +1480,32 @@ def search(request):
         ordering[mode] = sort
 
     # Split out the meta options. TODO
-    term = query
+    term = re.escape(query)
+    # If the whole term is in quotation marks, assume word boundaries.
+    if term.startswith('"') and term.endswith('"'):
+        query = term.strip('"')
+        term = r'\b{}\b'.format(query)
 
     notes = Note.objects.filter(
-        Q(subject__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(comment__icontains=term)
+        Q(subject__iregex=term) |
+        Q(quote__iregex=term) |
+        Q(comment__iregex=term)
     )
     terms = TermOccurrence.objects.filter(
-        Q(term__text__icontains=term) |
-        Q(term__definition__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(quote__icontains=term)
+        Q(term__text__iregex=term) |
+        Q(term__definition__iregex=term) |
+        Q(quote__iregex=term) |
+        Q(quote__iregex=term)
     )
     sections = Section.objects.filter(
-        Q(title__icontains=term) |
-        Q(subtitle__icontains=term) |
-        Q(summary__icontains=term)
+        Q(title__iregex=term) |
+        Q(subtitle__iregex=term) |
+        Q(summary__iregex=term)
     )
     books = Book.objects.filter(
-        Q(title__icontains=term) |
-        Q(summary__icontains=term) |
-        Q(details__authors__name__icontains=term)
+        Q(title__iregex=term) |
+        Q(summary__iregex=term) |
+        Q(details__authors__name__iregex=term)
     )
 
     # Add the sections where the author name matches BUT the associated books
