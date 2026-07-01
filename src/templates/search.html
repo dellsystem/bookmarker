@@ -206,21 +206,21 @@
 {% if paged_results %}
     {% include "pagination.html" with items=paged_results mode=mode query=query filter_objects=filter_objects qs=pagination_qs only %}
     {% if mode == 'notes' %}
-        {% include 'note_list_with_books.html' with notes=paged_results.object_list highlight=query %}
+        {% include 'note_list_with_books.html' with notes=paged_results.object_list highlight=highlight_query %}
     {% elif mode == 'terms' %}
         {% regroup paged_results.object_list by term as term_list %}
 
         {% for term in term_list %}
-            {% include 'term_header.html' with term=term.grouper highlight=query only %}
+            {% include 'term_header.html' with term=term.grouper highlight=highlight_query only %}
 
             {% include 'term_list_with_books.html' with occurrences=term.list query=query only %}
         {% endfor %}
     {% elif mode == 'sections' %}
         <br />
-        {% include 'section_list.html' with sections=paged_results.object_list highlight=query show_book=True %}
+        {% include 'section_list.html' with sections=paged_results.object_list highlight=highlight_query show_book=True %}
     {% elif mode == 'books' %}
         {% for book in paged_results.object_list %}
-            {% include 'book_header.html' with book=book highlight=query only %}
+            {% include 'book_header.html' with book=book highlight=highlight_query only %}
         {% endfor %}
     {% endif %}
     {% include "pagination.html" with items=paged_results mode=mode query=query filter_objects=filter_objects qs=pagination_qs only %}

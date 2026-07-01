@@ -17,7 +17,7 @@ from django.utils.text import slugify
 from django.views.decorators.http import require_POST
 
 from activity.models import Action, CATEGORIES, FILTER_CATEGORIES
-from books import goodreadstools, highlighter
+from books import goodreadstools, searchtools
 from books.forms import NoteForm, SectionForm, ArtefactAuthorForm, BookForm, \
                         BookDetailsForm, AuthorForm, TagForm, \
                         MultipleSectionsForm
@@ -1325,56 +1325,11 @@ def view_section(request, section_id):
 def within_book_search_json(request, book_id):
     """Suggest notes/sections/terms with that keyword"""
     query = request.GET.get('q')
-    term = query  # todo: meta options?
-    book = Book.objects.get(pk=book_id)
-
-    if not query or len(query) < 3:
+    
+    try:
+        results = searchtools.search_within_book(query, book_id)
+    except searchtools.BadQueryException:
         return
-
-    # todo: method on objectmanager to search by keyword
-    notes = book.notes.filter(
-        Q(subject__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(comment__icontains=term)
-    )
-    terms = book.terms.filter(
-        Q(term__text__icontains=term) |
-        Q(term__definition__icontains=term) |
-        Q(quote__icontains=term) |
-        Q(quote__icontains=term)
-    )
-    sections = book.sections.filter(
-        Q(title__icontains=term) |
-        Q(authors__name__icontains=term) |
-        Q(subtitle__icontains=term) |
-        Q(summary__icontains=term)
-    )
-
-    results = {'notes': [], 'terms': [], 'sections': []}
-    for note in notes:
-        results['notes'].append({
-            'title': highlighter.highlight(note.subject, query),
-            'description': highlighter.highlight(note.quote, query, 200),
-            'price': note.get_page_display(),
-            'url': note.get_absolute_url(),
-        })
-
-    for term in terms:
-        results['terms'].append({
-            'title': highlighter.highlight(term.term.text, query),
-            'description': highlighter.highlight(term.quote, query, 200),
-            'price': term.get_page_display(),
-            'url': term.get_absolute_url(),
-        })
-
-    for section in sections:
-        authors = ', '.join(a.name for a in section.authors.all())
-        results['sections'].append({
-            'title': highlighter.highlight(section.title, query),
-            'description': highlighter.highlight(authors, query),
-            'price': section.get_page_display(),
-            'url': section.get_absolute_url(),
-        })
 
     return JsonResponse({
         'results': {
@@ -1438,7 +1393,6 @@ def search_json(request):
 def search(request):
     q = request.GET.get('q', '')
 
-    MODES = ('notes', 'terms', 'sections', 'books')
     # If the query starts with any of the modes, followed by :, use that.
     # If one of the modes is specified by the query, and the mode is not 'book',
     # get the book PK (from a hidden input) if there is one.
@@ -1446,7 +1400,7 @@ def search(request):
         split_query = q.split(':')
         query_mode = split_query[0]
         query = ''.join(split_query[1:])
-        if query_mode in MODES:
+        if query_mode in searchtools.MODES:
             mode = query_mode
         else:
             # TODO: better error handling? show error, or fail silently?
@@ -1454,180 +1408,31 @@ def search(request):
     else:
         query = q  # no advanced search operators
         mode = request.GET.get('mode', '')
-        if mode not in MODES:
+        if mode not in searchtools.MODES:
             mode = ''
 
-    if len(query) < 3:
+    filter_form = SearchFilterForm(request.GET)
+    sort = request.GET.get('sort', '')
+
+    try:
+        # This is terrible but we kind of have to give it the filter_form ...
+        # The list of filter options has to be updated during the query :(
+        results, filters_dict = searchtools.get_search_results(
+            query=query,
+            mode=mode,
+            sort=sort,
+            filter_form=filter_form
+        )
+    except searchtools.BadQueryException:
         messages.error(request, 'Query must be at least 3 characters')
         return redirect('home')
 
-    ordering = {
-        'notes': 'subject',
-        'terms': 'term',
-        'sections': 'title',
-        'books': 'title',
-    }
-
-    # If we're sorting by a custom field, and we're in the right mode.
-    SORTS = {
-        'notes': ('added', 'subject', 'book', 'section'),
-        'terms': ('added', 'term', 'book'),
-        'sections': ('title', 'book'),
-        'books': ('title', 'id'),
-    }
-    sort = request.GET.get('sort', '')
-    if mode and sort in SORTS[mode]:
-        ordering[mode] = sort
-
-    # Split out the meta options. TODO
-    term = re.escape(query)
-    # If the whole term is in quotation marks, assume word boundaries.
-    if term.startswith('"') and term.endswith('"'):
-        query = term.strip('"')
-        term = r'\b{}\b'.format(query)
-
-    notes = Note.objects.filter(
-        Q(subject__iregex=term) |
-        Q(quote__iregex=term) |
-        Q(comment__iregex=term)
-    )
-    terms = TermOccurrence.objects.filter(
-        Q(term__text__iregex=term) |
-        Q(term__definition__iregex=term) |
-        Q(quote__iregex=term) |
-        Q(quote__iregex=term)
-    )
-    sections = Section.objects.filter(
-        Q(title__iregex=term) |
-        Q(subtitle__iregex=term) |
-        Q(summary__iregex=term)
-    )
-    books = Book.objects.filter(
-        Q(title__iregex=term) |
-        Q(summary__iregex=term) |
-        Q(details__authors__name__iregex=term)
-    )
-
-    # Add the sections where the author name matches BUT the associated books
-    # not already in the books queryset above.
-    book_pks = books.values_list('pk', flat=True)
-    authors = Author.objects.filter(name__icontains=term)
-    for author in authors:
-        author_sections = author.sections.exclude(book_id__in=book_pks)
-        if author_sections.exists():
-            sections |= author_sections
-
-    results = {
-        'notes': notes,
-        'terms': terms,
-        'sections': sections,
-        'books': books,
-    }
-
-    filter_form = SearchFilterForm(request.GET)
-    mode_filters = {
-        'books': ('author', 'min_rating', 'max_rating'),
-        'notes': ('author', 'book' ,'section'),
-        'terms': ('author', 'book', 'section', 'category'),
-        'sections': ('author', 'book', 'min_rating', 'max_rating'),
-    }
-    # To simplify the process of matching names to fields. Annoyingly, some fields
-    # on the Book model are different so we have to hardcode them below.
-    filter_fields = {
-        'author': 'authors',
-        'book': 'book',
-        'section': 'section',
-        'category': 'category',
-        'min_rating': 'rating__gte',
-        'max_rating': 'rating__lte',
-    }
-    book_filter_fields = {
-        'author': 'details__default_authors',
-        'min_rating': 'details__rating__gte',
-        'max_rating': 'details__rating__lte',
-    }
-    filters_dict = {}  # the key-value pairs, needed for building the query string
-    filters = {}  # the filter objects
-
-    if mode:
-        # Now do the prefetching (only for expansion mode).
-        to_prefetch = {
-            'notes': [
-                'book', 'section',
-                'section__authors', 'book__details__default_authors', 'authors', 'tags',
-            ],
-            'terms': [
-                'book', 'term', 'category', 'section',
-                'section__authors', 'book__details__default_authors', 'authors',
-            ],
-            'sections': [
-                'book',
-                'authors', 'book__details__default_authors',
-            ],
-            'books': [
-                'details__default_authors',
-            ],
-        }
-        results[mode] = results[mode].prefetch_related(*to_prefetch[mode])
-
-        author_field_name = 'authors'
-        if mode == 'books':
-            author_field_name = 'details__authors'
-        author_pks = [
-            i for l in results[mode].values_list(author_field_name) for i in l if i
-        ]
-
-        filter_form.fields['author'].queryset = Author.objects.filter(
-            pk__in=author_pks
-        )
-
-        # Only show the books dropdown if the mode is not books.
-        if mode != 'books':
-            book_pks = [i['book_id'] for i in results[mode].values('book_id')]
-            filter_form.fields['book'].queryset = Book.objects.filter(
-                pk__in=book_pks
-            )
-
-        # Only show section if the mode is not books or sections.
-        if mode not in ('books', 'sections'):
-            section_pks = [i['section_id'] for i in results[mode].values('section_id')]
-
-            filter_form.fields['section'].queryset = Section.objects.filter(
-                pk__in=section_pks
-            ).select_related('book')
-
-        # If sections, show the term/note counts.
-        if mode == 'sections':
-            results[mode] = results[mode].annotate(
-                num_terms=Count('terms', distinct=True),
-                num_notes=Count('notes', distinct=True),
-            )
-
-        # Apply the filters.
-        if filter_form.is_valid():
-            for filter_key in mode_filters[mode]:
-                if filter_form.cleaned_data[filter_key]:
-                    filter_field = filter_fields[filter_key]
-                    # The Book model uses some different field names.
-                    if mode == 'books' and filter_key in book_filter_fields:
-                        filter_field = book_filter_fields[filter_key]
-                    filters[filter_field] = filter_form.cleaned_data[filter_key]
-                    filters_dict[filter_key] = filter_form.data[filter_key]
-
-            if filters:
-                # Make sure to prefetch again for the filtered queryset.
-                results[mode] = results[mode].filter(
-                    **filters
-                ).prefetch_related(
-                    *to_prefetch[mode]
-                )
-    else:
-        results['terms'] = results['terms'].select_related('book', 'term')
-        results['notes'] = results['notes'].select_related('book')
-        results['sections'] = results['sections'].select_related('book')
-
-    for key in results:
-        results[key] = results[key].order_by(ordering[key]).distinct()
+    # Prepare some query strings to make linking easier. Kinda ugly but works for now.
+    qs = '?' + urlencode({'q': query})  # the basic one, plus for highlighting on linked pages
+    mode_qs = '&' + urlencode({'mode': mode}) if mode else ''
+    sort_qs = '&' + urlencode({'sort': sort}) if sort else ''
+    page_qs = '&' + urlencode({'page': sort})
+    filters_qs = '&' + urlencode(filters_dict) if filters_dict else ''
 
     paged_results = None
     page_number = None
@@ -1644,24 +1449,24 @@ def search(request):
             if page_number not in paginator.page_range:
                 page_number = 1
             paged_results = paginator.get_page(page_number)
-
-    # Prepare some query strings to make linking easier. Kinda ugly but works for now.
-    qs = '?' + urlencode({'q': query})  # the basic one, plus for highlighting on linked pages
-    mode_qs = '&' + urlencode({'mode': mode}) if mode else ''
-    sort_qs = '&' + urlencode({'sort': sort}) if sort else ''
-    page_qs = '&' + urlencode({'page': sort})
-    filters_qs = '&' + urlencode(filters_dict) if filters_dict else ''
+    
+    # Strip the quotation marks (if present) for the highlight query.
+    # Annoying that it's duplicated after searchtools but, context :/
+    highlight_query = query
+    if query.startswith('"') and query.endswith('"'):
+        highlight_query = query.strip('"')
 
     context = {
-        'sort': ordering.get(mode),  # use the implied sort, not the input
-        'sort_options': SORTS.get(mode),
+        'sort': searchtools.ORDERING.get(mode),  # use the implied sort, not the input
+        'sort_options': searchtools.SORTS.get(mode),
         'results': results,
         'paged_results': paged_results,
         'page_number': page_number,
         'query': query,
+        'highlight_query': highlight_query,
         'q': q,
         'mode': mode,
-        'modes': MODES,
+        'modes': searchtools.MODES,
         'filter_form': filter_form,
         'qs': qs,
         'mode_qs': mode_qs,

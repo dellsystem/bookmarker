@@ -109,6 +109,7 @@ if postgres_password:
         'HOST': 'localhost',
         'PORT': '',
     }
+    INSTALLED_APPS.append('django.contrib.postgres')
 else:
     db = {
         'ENGINE': 'django.db.backends.sqlite3',

@@ -243,7 +243,7 @@ class PageNumberField(models.PositiveSmallIntegerField):
 
 class PageArtefact(models.Model):
     """Inherited by Note, TermOccurrence, and Section."""
-    in_preface = models.BooleanField()
+    in_preface = models.BooleanField(default=False)
     page_number = PageNumberField(default=1)
 
     class Meta:
