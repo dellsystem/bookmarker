@@ -48,7 +48,7 @@
                 <label>Count</label>
                 {{ details_form.num_pages }}
             </div>
-            <div class="two wide field">
+            <div class="two wide field{% if goodreads_url %} error{% endif %}">
                 <label>Format</label>
                 {{ details_form.format }}
             </div>
@@ -95,11 +95,11 @@
                 <label>Priority</label>
                 {{ details_form.priority }}
             </div>
-            <div class="four wide field only-if-read">
+            <div class="four wide field only-if-read{% if goodreads_url %} error{% endif %}">
                 <label>Start date</label>
                 {{ details_form.start_date }}
             </div>
-            <div class="four wide field only-if-read">
+            <div class="four wide field only-if-read{% if goodreads_url %} error{% endif %}">
                 <label>End date</label>
                 {{ details_form.end_date }}
             </div>
@@ -123,7 +123,7 @@
                 <input type="hidden" id="rating-input" name="rating" value="{{ book.details.rating }}" />
                 {% endif %}
             </div>
-            <div class="twelve wide field{% if goodreads_url %} error{% endif %}">
+            <div class="twelve wide field">
                 <label>GR shelves</label>
                 {{ details_form.shelves }}
             </div>

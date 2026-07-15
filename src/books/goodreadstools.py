@@ -1,4 +1,7 @@
 import bs4
+import collections
+# hacking bs4 support for latest Python
+collections.Callable = collections.abc.Callable
 from datetime import datetime
 import requests
 import urllib.parse
@@ -8,19 +11,11 @@ from django.conf import settings
 from books.models import BookDetails, GoodreadsAuthor, IgnoredBook
 
 
-RESOLUTION = '_SY475_'
-def _parse_image_url(field):
-    """We may need to replace the last few chars to get a high-res image URL"""
-    if field:
-        text = field.strip()
-        if text.endswith('_.jpg'):
-            segments = text.split('.')
-            resolution = segments[-2]
-            if resolution.startswith('_S') and resolution.endswith('_'):
-                segments[-2] = RESOLUTION
-                return '.'.join(segments)
-
-        return text
+USER_ID = '60292716-wendy-liu'
+BASE_URL = "https://www.goodreads.com"
+BOOK_URL = BASE_URL + '/book/show/'
+READ_URL = BASE_URL + "/review/list_rss/{}?shelf=read&sort=date_read&order=d".format(USER_ID)
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
 
 
 def _parse_num_pages(field):
@@ -39,118 +34,55 @@ def _parse_id(field):
     """Input format: /book/show/12345.optionaltitle-morestuff"""
     return field.split('/')[-1].split('-')[0].split('.')[0]
 
-def _parse_date(field):
-    if field:
-        text = field.strip()
-        if ',' in text:
-            format_string = '%b %d, %Y'
-        else:
-            format_string = '%b %Y'
-        return datetime.strptime(
-            text,
-            format_string
-        ).date()
+
+def _strip_cdata(text):
+    # Some of the fields are like this
+    if text and text.startswith('[CDATA[') and text.endswith(']]'):
+        return text[7:-2].strip()
+    return text
 
 
-USER_ID = '60292716-wendy-liu'
-BASE_URL = "https://www.goodreads.com"
-READ_URL = BASE_URL + "/review/list/{}?shelf=read&sort=date_read&order=d".format(USER_ID)
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
-def get_books(page):
-    """This is a horrible and obviously temporary workaround but I guess Goodreads just changed their website to require auth for the review list page. So we fake it by sending some cookies to simulate being logged in. I just downloaded some subset from my current active session which seems to work. I think the earliest one expires Oct 24 2026. Whatever, I'll deal with it then.
-    Not checked into source control for obvious reasons. Must be added as an environment variable.
-    """
-    cookies = {
-        'at-main': settings.GOODREADS_AT_COOKIE,
-        'ubid-main': settings.GOODREADS_UBID_COOKIE,
-    }
-    url = '{}&page={}'.format(READ_URL, page)
-    response = requests.get(url, headers={
-        'User-Agent': USER_AGENT  # we just need a fake user agent or it 403s
-    }, cookies=cookies)
-    response.raise_for_status()
-    soup = bs4.BeautifulSoup(response.content.decode(), "html.parser")
-    rows = soup.select("table#books tbody tr")
-
+def _parse_rss(content):
+    soup = bs4.BeautifulSoup(content, "xml")
+    rows = soup.select("rss item")
     books = []
     goodreads_book_ids = set()
-    goodreads_author_ids = set()
+    goodreads_author_names = set()
     for row in rows:
         # I HATE GOODREADS
-        title_tag = row.select('.field.title .value a')[0]
-        goodreads_url = title_tag['href']
-        goodreads_id = _parse_id(goodreads_url)
-        title = title_tag.text.strip()
-
-        author_tag = row.select('.field.author .value a')[0]
-        author_url = author_tag['href']
-        author_id = _parse_id(author_url)
-        author_name = author_tag.text.strip()
-        if author_name:
-            # Flip the author name around (last, first to first, last)
-            author_name = ' '.join(author_name.split(', ')[::-1])
-
-        # Doing this kind of annoying if/else statement just cus i want to make
-        # _parse_date feel better for testing [operating on strings, not bs4
-        # objects]
-        start_date = row.select('.date_started_value')
-        if start_date:
-            start_date = _parse_date(start_date[0].text)
-        else:
-            start_date = None
-        end_date = row.select('.date_read_value')
-        if end_date:
-            end_date = _parse_date(end_date[0].text)
-        else:
-            end_date = None
-
-        book_format = row.select('.format .value')[0].text.strip()
-        # Strip the '[edit]' which appears to be showing up
-        if book_format.endswith('[edit]'):
-            book_format = book_format[:-6].strip()
-        isbn = row.select('.isbn13 .value')[0].text.strip()
-        num_pages = _parse_num_pages(row.select('.num_pages .value')[0].text)
-        image_url = _parse_image_url(row.select('img')[0]['src'])
-
-        # If the publication year is missing or weirdly formatted (sometimes it
-        # just is for whatever reason, see if it's present in the
-        # date_pub_edition field instead
-        year = row.select('.date_pub .value')[0].text.strip()
-        if year == 'unknown' or ',' in year:
-            pub_date = row.select('.date_pub_edition .value')[0].text.strip()
-            year = pub_date.split(',')[-1].strip()
+        title = _strip_cdata(row.select_one('title').string)
+        goodreads_id = row.select_one('book_id').text.strip()
+        goodreads_url = BOOK_URL + goodreads_id
+        shelves = _strip_cdata(row.select_one('user_shelves').string)
+        review = _strip_cdata(row.select_one('user_review').string)
+        year = row.select_one('book_published').text.strip()
+        isbn = row.select_one('isbn').text.strip()
+        num_pages = _parse_num_pages(row.select_one('num_pages').text)
+        image_url = _strip_cdata(row.select_one('book_large_image_url').string)
+        rating = int(row.select_one('user_rating').text.strip())
+        author_name = row.select_one('author_name').text.strip()
 
         ignore_link_params = urllib.parse.urlencode({
             'goodreads_id': goodreads_id,
             'description': title,
         })
 
-        rating = row.select('.rating .stars')[0]
-        if rating:
-            rating = rating.get('data-rating')
-        else:
-            rating = None
-
         book = {
-            'id': goodreads_id,
-            'url': BASE_URL + goodreads_url,
             'title': title,
-            'start_date': start_date,
-            'end_date': end_date,
-            'format': book_format,
+            'id': goodreads_id,
+            'link': goodreads_url,
+            'shelves': shelves,
+            'review': review,
+            'year': year,
             'isbn': isbn,
             'num_pages': num_pages,
             'image_url': image_url,
-            'year': year, # convert this to number? maybe
             'rating': rating,
-            # TODO: author, publisher name
-            'author_url': BASE_URL + author_url,
             'author_name': author_name,
-            'author_id': author_id,
             'ignore_link_params': ignore_link_params,
         }
         goodreads_book_ids.add(goodreads_id)
-        goodreads_author_ids.add(author_id)
+        goodreads_author_names.add(author_name)
         books.append(book)
 
     # Figure out which of the books and authors are already in our DB
@@ -159,10 +91,10 @@ def get_books(page):
     for d in details_query:
         details_dict[d.goodreads_id] = d
 
-    author_query = GoodreadsAuthor.objects.filter(goodreads_id__in=goodreads_author_ids)
+    author_query = GoodreadsAuthor.objects.filter(author__name__in=goodreads_author_names)
     author_dict = {}
     for a in author_query:
-        author_dict[a.goodreads_id] = a.author
+        author_dict[a.author.name] = a.author
 
     # Figure out which books need to be ignored
     ignored_book_ids = set(IgnoredBook.objects.values_list('goodreads_id', flat=True))
@@ -175,52 +107,36 @@ def get_books(page):
         if book['id'] in ignored_book_ids:
             continue
 
-        a = author_dict.get(book['author_id'])
-        if a:
-            book['author'] = a
-        else:
-            book['author_params'] = urllib.parse.urlencode({
-                'name': book['author_name'],
-                'link': book['author_url'],
-            })
+        a = author_dict.get(book['author_name'])
+        author_id = a.pk if a is not None else ''
+        author_slug = a.slug if a is not None else ''
+        book['author_id'] = author_id
+        book['author_slug'] = author_slug
 
         d = details_dict.get(book['id'])
         if d:
             b = d.book
             book['is_processed'] = b.is_processed
             book['slug'] = b.slug
-            book['dates_match'] = (
-                d.start_date == book['start_date'] and
-                d.end_date == book['end_date']
-            )
-            if d.start_date is None and d.end_date is None:
-                dates_comment = 'No BM dates'
-            else:
-                dates_comment = '{} - {}'.format(
-                    d.start_date, d.end_date
-                )
-            book['dates_comment'] = dates_comment
 
-            if book['is_processed'] and book['dates_match']:
+            if book['is_processed']:
                 continue
         else:
             # Create a URL to quickly create the book (query params)
             book['book_params'] = urllib.parse.urlencode({
-                'id': book['id'],
                 'title': book['title'],
-                'link': book['url'],  # todo: url to link. also prepend site
-                'isbn': book['isbn'],
+                'id': book['id'],
+                'link': book['link'],
+                'shelves': book['shelves'],
+                'review': book['review'],
                 'year': book['year'],
+                'isbn': book['isbn'],
                 'rating': book['rating'],
-                'format': book['format'],
                 'num_pages': book['num_pages'],
-                'start_date': book['start_date'],
-                'end_date': book['end_date'],
                 'image_url': book['image_url'],
                 'author_name': book['author_name'],
-                'author_url': book['author_url'],
-                'author_id': a.pk if a is not None else '',
-                'author_slug': a.slug if a is not None else '',
+                'author_id': author_id,
+                'author_slug': author_slug,
             })
 
         filtered_books.append(book)
@@ -228,9 +144,19 @@ def get_books(page):
     return filtered_books
 
 
-AUTHOR_URL = BASE_URL + '/author/show/'
-def get_author_id(link):
-    """Given a URL, if it's a goodreads author url, return the goodreads ID.
-    else, return none"""
-    if link.startswith(AUTHOR_URL):
-        return link.lstrip(AUTHOR_URL).split('.')[0]
+def get_books(page):
+    """This is a horrible and obviously temporary workaround but I guess Goodreads just changed their website to require auth for the review list page. So we fake it by sending some cookies to simulate being logged in. I just downloaded some subset from my current active session which seems to work. I think the earliest one expires Oct 24 2026. Whatever, I'll deal with it then.
+    Not checked into source control for obvious reasons. Must be added as an environment variable.
+    NEW AS OF JUL 14 2026: The previous URL returns a 202 so I guess I'd better switch to the RSS link.
+    """
+    cookies = {
+        'at-main': settings.GOODREADS_AT_COOKIE,
+        'ubid-main': settings.GOODREADS_UBID_COOKIE,
+    }
+    url = '{}&page={}'.format(READ_URL, page)
+    response = requests.get(url, headers={
+        'User-Agent': USER_AGENT  # we just need a fake user agent or it 403s
+    }, cookies=cookies)
+    response.raise_for_status()
+    # TODO: collections.abc.Callable
+    return _parse_rss(response.content.decode())

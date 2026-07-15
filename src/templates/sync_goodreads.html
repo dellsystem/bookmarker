@@ -50,12 +50,8 @@
     <tr>
       <th>Book ID</th>
       <th>Book title (in BM?)</th>
-      <th>Author ID</th>
       <th>Author name (in BM?)</th>
-      <th>Start date</th>
-      <th>End date</th>
       <th>Processed?</th>
-      <th>Dates match?</th>
       <th>Ignore?<th>
     </tr>
   </thead>
@@ -72,32 +68,20 @@
         <a href="{% url 'add_book' %}?{{ book.book_params }}" title="Add book form">{{ book.title }}</a>
       </td>
       {% endif %}
-      <td><a href="{{ book.author_url }}" title="Goodreads URL">{{ book.author_id }}</a></td>
-      {% if book.author %}
+      {% if book.author_id %}
       <td class="positive">
         <i class="checkmark icon"></i>
-        <a href="{% url 'view_author' book.author.slug %}" title="Bookmarker URL">{{ book.author_name }}</a></td>
+        <a href="{% url 'view_author' book.author_slug %}" title="Bookmarker URL">{{ book.author_name }}</a></td>
       {% else %}
       <td class="negative">
         <i class="close icon"></i>
         <a href="{% url 'add_author' %}?{{ book.author_params }}" title="Add author form">{{ book.author_name }}</a></td>
       {% endif %}
-      <td>{{ book.start_date }}</td>
-      <td>{{ book.end_date }}</td>
       {% if book.is_processed %}
       <td class="positive"><i class="icon checkmark"></i>
       </td>
       {% else %}
       <td class="negative"><i class="icon close"></i></td>
-      {% endif %}
-
-      {% if book.dates_match %}
-      <td class="positive"><i class="icon checkmark"></i>
-      </td>
-      {% else %}
-      <td class="negative"><i class="icon close"></i>
-        {{ book.dates_comment }}
-      </td>
       {% endif %}
 
       <td>

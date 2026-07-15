@@ -706,10 +706,8 @@ def add_book(request):
             'isbn': request.GET.get('isbn'),
             'year': request.GET.get('year'),
             'rating': request.GET.get('rating'),
-            'format': request.GET.get('format'),
+            'shelves': request.GET.get('shelves'),
             'num_pages': request.GET.get('num_pages'),
-            'start_date': request.GET.get('start_date'),
-            'end_date': request.GET.get('end_date'),
             'verified': True,
         })
         # Check if the book in the QP already exists in our database
