@@ -112,6 +112,10 @@ def _parse_rss(content):
         author_slug = a.slug if a is not None else ''
         book['author_id'] = author_id
         book['author_slug'] = author_slug
+        if not a:
+            book['author_params'] = urllib.parse.urlencode({
+                'name': book['author_name'],
+            })
 
         d = details_dict.get(book['id'])
         if d:

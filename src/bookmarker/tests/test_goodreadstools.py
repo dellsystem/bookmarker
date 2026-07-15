@@ -36,6 +36,7 @@ class TestRssParser(TestCase):
         self.assertEqual(books, [{
             'author_id': '',
             'author_slug': '',
+            'author_params': 'name=Simone+de+Beauvoir',
             'title': 'The Mandarins',
             'author_name': 'Simone de Beauvoir',
             'id': '528763',
@@ -65,6 +66,7 @@ class TestRssParser(TestCase):
             'review': 'hell yeah',
             'shelves': 'class-struggle',
             'title': 'Shift Patterns: Experiments in Hospitality Organising',
-            'year': ''
+            'year': '',
+            'author_params': 'name=Notes+from+Below',
         }
     ])
