@@ -16,6 +16,7 @@ BASE_URL = "https://www.goodreads.com"
 BOOK_URL = BASE_URL + '/book/show/'
 READ_URL = BASE_URL + "/review/list_rss/{}?shelf=read&sort=date_read&order=d".format(USER_ID)
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
+AUTHOR_URL = BASE_URL + '/author/show/'
 
 
 def _parse_num_pages(field):
@@ -162,5 +163,11 @@ def get_books(page):
         'User-Agent': USER_AGENT  # we just need a fake user agent or it 403s
     }, cookies=cookies)
     response.raise_for_status()
-    # TODO: collections.abc.Callable
     return _parse_rss(response.content.decode())
+
+
+def get_author_id(link):
+    """Given a URL, if it's a goodreads author url, return the goodreads ID.
+    else, return none"""
+    if link.startswith(AUTHOR_URL):
+        return link.lstrip(AUTHOR_URL).split('.')[0]

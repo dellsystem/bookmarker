@@ -70,3 +70,17 @@ class TestRssParser(TestCase):
             'author_params': 'name=Notes+from+Below',
         }
     ])
+
+
+class TestGetAuthorId(TestCase):
+    def test_goodreads_link(self):
+        self.assertEqual(
+            '197543',
+            goodreadstools._parse_id('https://www.goodreads.com/author/show/197543.Robert_W_Cherny')
+        )
+
+    def test_empty_link(self):
+        self.assertEqual(
+            '',
+            goodreadstools._parse_id('')
+        )

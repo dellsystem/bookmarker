@@ -579,6 +579,7 @@ def add_term(request, slug):
 
 @login_required
 def add_author(request):
+    existing_authors = None
     if request.POST.get('submit'):
         author_form = AuthorForm(request.POST)
 
@@ -620,8 +621,6 @@ def add_author(request):
             existing_authors = Author.objects.filter(
                 name__icontains=author_name.lower()
             )
-        else:
-            existing_authors = None
 
     context = {
         'author_form': author_form,
