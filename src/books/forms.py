@@ -14,6 +14,7 @@ class MultipleSectionsForm(forms.Form):
         data = self.cleaned_data['sections']
         sections = []
         last_group_name = None
+        author_names = set()
         for line in data.splitlines():
             stripped_line = line.strip()
             words = stripped_line.split()
@@ -27,7 +28,15 @@ class MultipleSectionsForm(forms.Form):
 
                 continue
 
+            # Interpret \a as the beginning of the author name, before the number. Only if there's 1
             title = ' '.join(words[:-1])
+            if title.count(r'\a') == 1:
+                split_title = title.split(r'\a')
+                title = split_title[0].strip()
+                author = split_title[1].strip()
+            else:
+                author = None
+
             if title:
                 try:
                     page_number, in_preface = get_page_details(words[-1])
@@ -44,13 +53,25 @@ class MultipleSectionsForm(forms.Form):
                 last_group_name = stripped_line
                 continue
 
+            # We may have to truncate the title since the max length is 255 for now
+            if len(title) > 255:
+                title = title[:254] + '…'
+
+            # May have to truncate the group name too, max length 100
+            if last_group_name and len(last_group_name) > 100:
+                last_group_name = last_group_name[:99] + '…'
+
             sections.append({
                 'title': title,
                 'page_number': page_number,
                 'in_preface': in_preface,
                 'number': None,
                 'group_name': last_group_name,
+                'author_name': author,
             })
+            author_names.add(author)
+
+        author_ids = dict((a.name, a.id) for a in Author.objects.filter(name__in=author_names))
 
         # Check if any of the titles should be converted into section numbers.
         number = 1
@@ -64,6 +85,17 @@ class MultipleSectionsForm(forms.Form):
                 section['title'] = section['title'][len(number_string):]
                 section['number'] = number
                 number += 1
+
+        # One last loop to find the authors IDs (if they exist). Otherwise,
+        # we use the author name for subtitles.
+        for section in sections:
+            # Put in the author ID if it exists.
+            if section['author_name']:
+                author_id = author_ids.get(section['author_name'])
+            else:
+                author_id = None
+
+            section['author_id'] = author_id
 
         return sections
 

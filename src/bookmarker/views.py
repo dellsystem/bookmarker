@@ -382,6 +382,11 @@ def add_sections(request, slug):
         if form.is_valid():
             section_data = form.cleaned_data['sections']
             for s in section_data:
+                # Only fill in the subtitle if we can't find the author.
+                subtitle = ''
+                if s['author_name'] and not s['author_id']:
+                    subtitle = 'by {}'.format(s['author_name'])
+
                 section = Section.objects.create(
                     book=book,
                     number=s['number'],
@@ -389,8 +394,13 @@ def add_sections(request, slug):
                     group_name=s['group_name'],
                     in_preface=s['in_preface'],
                     title=s['title'],
+                    subtitle=subtitle,
                 )
-                if book.details:
+
+                # Only put in the default authors if no author is specified.
+                if s['author_id']:
+                    section.authors.add(s['author_id'])
+                elif book.details:
                     section.authors.add(*book.details.default_authors.all())
 
                 Action.objects.create(
