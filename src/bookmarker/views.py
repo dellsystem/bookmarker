@@ -716,7 +716,10 @@ def add_book(request):
             'year': request.GET.get('year'),
             'rating': request.GET.get('rating'),
             'shelves': request.GET.get('shelves'),
+            'format': request.GET.get('format'),
             'num_pages': request.GET.get('num_pages'),
+            'start_date': request.GET.get('start_date'),
+            'end_date': request.GET.get('end_date'),
             'verified': True,
         })
         # Check if the book in the QP already exists in our database

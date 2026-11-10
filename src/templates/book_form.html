@@ -48,7 +48,7 @@
                 <label>Count</label>
                 {{ details_form.num_pages }}
             </div>
-            <div class="two wide field{% if goodreads_url %} error{% endif %}">
+            <div class="two wide field">
                 <label>Format</label>
                 {{ details_form.format }}
             </div>
@@ -95,11 +95,11 @@
                 <label>Priority</label>
                 {{ details_form.priority }}
             </div>
-            <div class="four wide field only-if-read{% if goodreads_url %} error{% endif %}">
+            <div class="four wide field only-if-read">
                 <label>Start date</label>
                 {{ details_form.start_date }}
             </div>
-            <div class="four wide field only-if-read{% if goodreads_url %} error{% endif %}">
+            <div class="four wide field only-if-read">
                 <label>End date</label>
                 {{ details_form.end_date }}
             </div>
